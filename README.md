@@ -27,3 +27,4 @@ datasus-sih/
 │ │── settings.py
 │── requirements.txt
 │── README.md
+│── .gitignore

@@ -21,7 +21,7 @@ Main objectives:
 ```
 datasus-sih/
 │── data/
-    │── support/
+│   │── support/
 │── docs/
 │── src/
 │   │── config/

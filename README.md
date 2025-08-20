@@ -17,13 +17,13 @@ Main objectives:
 ---
 
 ## Repository Structure
+
 datasus-sih/
 │── data/
 │── docs/
 │── src/
-│   │── config/
-│       │── __init__.py
-│       │── settings.py
+│ │── config/
+│ │── init.py
+│ │── settings.py
 │── requirements.txt
 │── README.md
-│── .gitignore

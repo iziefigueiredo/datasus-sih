@@ -1,0 +1,20 @@
+# Virtual environments
+venv/
+.env/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Large data files
+*.csv
+*.parquet
+*.db
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS/system files
+.DS_Store
+

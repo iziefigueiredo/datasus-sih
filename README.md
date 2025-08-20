@@ -1,0 +1,26 @@
+# DATASUS_SIH
+
+Structured database built from the Brazilian Hospital Information System (SIH/DATASUS).  
+This project provides ETL scripts, schema design, and sample data for research, analytics, and predictive modeling in healthcare.
+
+---
+
+## Overview
+This repository organizes hospital admission data from SIH/DATASUS in a clean and reproducible way.
+
+Main objectives:
+- Standardize and structure raw health data
+- Provide ETL and data loading scripts
+- Share schema diagrams and documentation
+- Enable exploratory analysis and predictive studies
+
+---
+
+## Repository Structure
+datasus_sih/
+
+│── data/              
+│── docs/              
+│── src/                
+│── requirements.txt     
+│── README.md         

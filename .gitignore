@@ -18,3 +18,10 @@ __pycache__/
 # OS/system files
 .DS_Store
 
+venv/
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+*.log
+.DS_Store

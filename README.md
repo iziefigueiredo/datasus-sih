@@ -31,3 +31,5 @@ datasus-sih/
 │── README.md
 │── .gitignore
 ```
+
+Developed by Isadora Figueiredo and Victoria Marques

@@ -27,6 +27,12 @@ datasus-sih/
 │   │── config/
 │       │── __init__.py
 │       │── settings.py
+│   │── data/
+│       │── __init__.py
+│       │── download.py
+│       │── unify.py
+│       │── preprocess.py
+│       │── split.py
 │── requirements.txt
 │── README.md
 │── .gitignore

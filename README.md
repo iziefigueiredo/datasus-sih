@@ -14,6 +14,9 @@ Main objectives:
 - Share schema diagrams and documentation
 - Enable exploratory analysis and predictive studies
 
+⚠️ **Performance note**: the pipeline processes **23,792,498 hospital admission records** and was tested on a machine with **32GB RAM**, which is recommended for smooth execution.  
+
+
 ---
 
 
@@ -42,6 +45,11 @@ source .venv/bin/activate   # Linux/Mac
 ```
 pip install -r requirements.txt
 
+```
+
+### Run the pipeline  
+```
+python main.py
 ```
 
 

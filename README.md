@@ -16,6 +16,23 @@ Main objectives:
 
 ---
 
+
+---
+
+## Getting Started  
+
+### Create and activate a virtual environment  
+
+python -m venv .venv
+source .venv/bin/activate   # Linux/Mac
+.venv\Scripts\activate      # Windows
+
+### Install dependencies
+
+pip install -r requirements.txt
+
+
+
 ## Repository Structure
 
 ```
@@ -33,7 +50,12 @@ datasus-sih/
 │       │── unify.py
 │       │── preprocess.py
 │       │── split.py
+│   │── database/
+│       │── __init__.py
+│       │── schema.py
+│       │── load.py
 │── requirements.txt
+│── main.py
 │── README.md
 │── .gitignore
 ```

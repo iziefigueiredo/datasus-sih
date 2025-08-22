@@ -1,6 +1,6 @@
 # DATASUS_SIH
 
-Structured database built from the Brazilian Hospital Information System (SIH/DATASUS).  
+Structured database built from the Brazilian Hospital Information System (SIH/DATASUS). 
 This project provides ETL scripts, schema design, and sample data for research, analytics, and predictive modeling in healthcare.
 
 ---
@@ -39,3 +39,4 @@ datasus-sih/
 ```
 
 Developed by Isadora Figueiredo and Victoria Marques
+

@@ -29,7 +29,6 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
             "IDENT": pl.String,
             "DT_INTER": pl.Date,
             "DT_SAIDA": pl.Date,
-            "QT_DIARIAS": pl.Int32,
             "PROC_REA": pl.String,
             "VAL_SH": pl.Float64,
             "VAL_SP": pl.Float64,

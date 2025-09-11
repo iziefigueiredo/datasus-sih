@@ -57,27 +57,56 @@ python main.py
 
 ```
 datasus-sih/
-│── data/
-│   │── support/
-│── docs/
-│── src/
-│   │── config/
-│       │── __init__.py
-│       │── settings.py
-│   │── data/
-│       │── __init__.py
-│       │── download.py
-│       │── unify.py
-│       │── preprocess.py
-│       │── split.py
-│   │── database/
-│       │── __init__.py
-│       │── schema.py
-│       │── load.py
-│── requirements.txt
-│── main.py
-│── README.md
-│── .gitignore
+├─ data/                           # Data layer
+│  ├─ raw/                         # Raw parquet files downloaded from DATASUS
+│  ├─ interim/                     # Unified and preprocessed parquet files
+│  └─ support/                     # Lookup CSVs (cid10.csv, municipios.csv, procedimentos.csv)
+│
+├─ docs/                           # Documentation (for GitHub/Pages)
+│  ├─ diagrams/                    # Schema and ETL diagrams
+│  ├─ decisions/                   # Architecture decision records
+│  └─ reports/                     # Optional: copies of summary.md reports for visualization
+│
+├─ reports/                        # Generated Data Quality reports (artefacts)
+│  ├─ extract/                     # Coverage, timeliness
+│  ├─ unify/                       # Uniqueness, completeness
+│  ├─ preprocess/                  # Validity, accuracy
+│  ├─ split/                       # Consistency between fact/dim tables
+│  ├─ load/                        # PK/FK, row counts
+│  └─ integrity/                   # Consolidated checks (advanced)
+│
+├─ src/                            # Source code (pipeline and reports)
+│  ├─ config/
+│  │  ├─ __init__.py
+│  │  └── settings.py              # Global parameters (paths, DB, UF, years, months)
+│  │
+│  ├─ data/                        # ETL scripts
+│  │  ├─ __init__.py
+│  │  ├─ download.py               # EXTRACT: Download DATASUS → parquet
+│  │  ├─ unify.py                  # TRANSFORM 1: Merge parquet files
+│  │  ├─ preprocess.py             # TRANSFORM 2: Clean & standardize
+│  │  └─ split.py                  # TRANSFORM 3: Split into fact/dim tables
+│  │
+│  ├─ database/                    # Database schema and loader
+│  │  ├─ __init__.py
+│  │  ├─ schema.py                 # Table schemas (columns, PK, FK, types)
+│  │  └─ load.py                   # LOAD: Insert parquet tables into PostgreSQL
+│  │
+│  └─ reports/                     # Report generators (code)
+│     ├─ __init__.py
+│     ├─ common.py                 # Shared utilities (I/O, metrics)
+│     ├─ extract_report.py
+│     ├─ unify_report.py
+│     ├─ preprocess_report.py
+│     ├─ split_report.py
+│     ├─ load_report.py
+│     └─ integrity_report.py
+│
+├─ .gitignore                      # Ignore rules (exclude data/raw, interim, etc.)
+├─ requirements.txt                # Dependencies
+├─ main.py                         # Orchestration (menu to run ETL steps 1–5)
+└─ README.md                       # Documentation: how to install, run, DB setup
+
 ```
 
 Developed by Isadora Figueiredo and Victoria Marques

@@ -14,7 +14,7 @@ from config.settings import Settings
 
 def verificar_arquivos_existentes():
     """Conta arquivos já baixados"""
-    pasta = Settings.PARQUET_DIR
+    pasta = Settings.RAW_DIR
     
     if not pasta.exists():
         return 0, set()
@@ -46,7 +46,7 @@ def main():
     print("=== DOWNLOAD DATASUS ===")
     
     Settings.criar_diretorios()
-    print(f"Pasta de destino: {Settings.PARQUET_DIR}")
+    print(f"Pasta de destino: {Settings.RAW_DIR}")
     
     print("Verificando arquivos já baixados...")
     qtd_existentes, nomes_existentes = verificar_arquivos_existentes()

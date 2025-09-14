@@ -42,7 +42,7 @@ class SIHUnifier:
             'NUM_FILHOS', 'INSTRU', 'CID_NOTIF', 'CONTRACEP1', 'CONTRACEP2', 'GESTRICO', 'INSC_PN', 'CBOR',
             'CNAER', 'VINCPREV', 'INFEHOSP', 'CID_ASSO', 'CID_MORTE', 'COMPLEX', 'RACA_COR', 'ETNIA',
             'DIAGSEC1', 'DIAGSEC2', 'DIAGSEC3', 'DIAGSEC4', 'DIAGSEC5', 'DIAGSEC6', 'DIAGSEC7', 'DIAGSEC8', 'DIAGSEC9', 
-            'COD_IDADE'
+            'COD_IDADE', 'CGC_HOSP'
         ]
         
         Settings.criar_diretorios()

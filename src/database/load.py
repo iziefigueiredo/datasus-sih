@@ -235,36 +235,7 @@ class PostgreSQLLoader:
                 self.conn.rollback()
                 logger.error(f"Erro ao criar constraint {nome}: {e}")
 
-    def converter_csv_parquet(self):
-        logger.info("--- Convertendo CSVs de apoio para Parquet ---")
-        support_dir = Settings.SUPPORT_FILES_DIR
-
-        arquivos = {
-            "cid10": "cid10.csv",
-            "municipios": "municipios.csv",
-            "procedimentos": "procedimentos.csv",
-            "dado_ibge" : "dado_ibge.csv"
-        }
-
-        for nome, csv_nome in arquivos.items():
-            # AQUI FOI AJUSTADO O CAMINHO DE SAÍDA PARA A PASTA DE SUPORTE
-            parquet_path = self.processed_dir / f"{nome}.parquet"
-            if parquet_path.exists():
-                logger.info(f"{nome}.parquet já existe. Pulando conversão.")
-                continue
-
-            csv_path = support_dir / csv_nome
-            if not csv_path.exists():
-                logger.warning(f"Arquivo {csv_nome} não encontrado!")
-                continue
-
-            try:
-                df = pd.read_csv(csv_path, encoding="latin1")
-                df.to_parquet(parquet_path, index=False)
-                logger.info(f"{csv_nome} convertido para {nome}.parquet com sucesso!")
-            except Exception as e:
-                logger.error(f"Erro ao converter {csv_nome}: {e}")
-
+   
 
 def run_db_load_pipeline():
     db_config = Settings.DB_CONFIG

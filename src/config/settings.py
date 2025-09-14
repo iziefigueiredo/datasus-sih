@@ -68,6 +68,19 @@ class Settings:
     INTERNACOES_FILENAME = "internacoes.parquet"
     UTI_DETALHES_FILENAME = "uti_detalhes.parquet"
     CONDICOES_ESPECIFICAS_FILENAME = "condicoes_especificas.parquet" 
+    HOSPITAL_FILENAME = "hospitais.parquet"
+    MUNICIPIOS_FILENAME = "municipios.parquet"
+    PROCEDIMENTOS_FILENAME = "procedimentos.parquet"
+    CID10_FILENAME = "cid10.parquet"
+    DIAGNOSTICOS_SECUNDARIOS_FILENAME = "diagnosticos_secundarios.parquet"
+    OBSTETRICOS_FILENAME = "obstetricos.parquet"
+    INSTRUCAO_FILENAME = "instrucao.parquet"
+    ETINA_FILENAME = "etnia.parquet"
+    MORTES_FILENAME = "mortes.parquet"
+    INFEHOSP_FILENAME = "infehosp.parquet"
+    VINCPREV_FILENAME = "vincprev.parquet"
+    CBOR_FILENAME = "cbor.parquet"
+
   
 
 

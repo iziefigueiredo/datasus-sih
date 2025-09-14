@@ -21,7 +21,7 @@ class Settings:
     PARQUET_PROCESSED_DIR = DATA_DIR / "processed"  
     SUPPORT_FILES_DIR = DATA_DIR / "support"        
     BACKUPS_DIR = DATA_DIR / "backups"      
-    PARQUET_DIR = DATA_DIR / "parquet"  # --- IGNORE ---        
+      
 
 
     # === CONFIGURAÇÕES DO DATASUS ===

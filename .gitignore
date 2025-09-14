@@ -11,6 +11,7 @@ __pycache__/
 *.csv
 *.parquet
 *.db
+*.dbf
 
 # Jupyter
 .ipynb_checkpoints/

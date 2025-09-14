@@ -283,9 +283,42 @@ class TableSplitter:
         except Exception as e:
             logger.error(f"Erro durante a divisão para '{table_name}': {e}")
             raise
+    
 
+    def converter_csv_parquet(self):
+        """Converte arquivos CSV de apoio para Parquet e salva na pasta processada."""
+        logger.info("--- Convertendo CSVs de apoio para Parquet ---")
+        
+        arquivos_apoio = {
+            "cid10": "cid10.csv",
+            "municipios": "municipios.csv",
+            "procedimentos": "procedimentos.csv",
+            "dado_ibge": "dado_ibge.csv"
+        }
+
+        for nome, csv_nome in arquivos_apoio.items():
+            csv_path = Settings.SUPPORT_FILES_DIR / csv_nome
+            parquet_path = self.output_dir / f"{nome}.parquet"
+
+            if not csv_path.exists():
+                logger.warning(f"Arquivo de apoio {csv_nome} não encontrado. Pulando a conversão.")
+                continue
+
+            if parquet_path.exists():
+                logger.info(f"Arquivo {parquet_path.name} já existe. Pulando a conversão.")
+                continue
+
+            try:
+                # Usa Polars para ler CSV e escrever Parquet, mais rápido que Pandas
+                df = pl.read_csv(csv_path, infer_schema_length=10000, encoding="latin1")
+                df.write_parquet(parquet_path, compression="snappy")
+                logger.info(f"Conversão de {csv_nome} para {parquet_path.name} concluída com sucesso.")
+            except Exception as e:
+                logger.error(f"Erro ao converter {csv_nome}: {e}")
+    
     def run(self):
         logger.info("=== INICIANDO DIVISÃO DE ARQUIVOS PARA CARGA NO BANCO ===")
+        self.converter_csv_parquet()
         self.split_internacoes()
         self.split_uti_detalhes()
         self.split_condicoes_especificas()

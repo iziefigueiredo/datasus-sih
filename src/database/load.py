@@ -23,7 +23,7 @@ class PostgreSQLLoader:
         self.conn = self.engine.raw_connection()
         self.cursor = self.conn.cursor()
         self.chunk_size = chunk_size
-        self.processed_dir = processed_dir  # Renomeado para maior clareza
+        self.processed_dir = processed_dir
         self.tables = [
             "internacoes",
             "uti_detalhes",
@@ -116,9 +116,10 @@ class PostgreSQLLoader:
             return "TEXT"
 
     def process_table(self, table_name):
-        
+        # AQUI O CAMINHO FOI AJUSTADO PARA USAR O DIRETÓRIO DE PROCESSADOS
+        # COM O QUAL O OBJETO FOI INSTANCIADO
         if table_name in ["cid10", "municipios", "procedimentos", "dado_ibge"]:
-            file_path = Settings.SUPPORT_FILES_DIR / f"{table_name}.parquet"
+            file_path = self.processed_dir / f"{table_name}.parquet"
         else:
             file_path = self.processed_dir / f"{table_name}.parquet"
 
@@ -218,8 +219,9 @@ class PostgreSQLLoader:
             ("fk_infehosp_internacoes", "ALTER TABLE infehosp ADD CONSTRAINT fk_infehosp_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
             ("fk_vincprev_internacoes", "ALTER TABLE vincprev ADD CONSTRAINT fk_vincprev_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
             ("fk_cbor_internacoes", "ALTER TABLE cbor ADD CONSTRAINT fk_cbor_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
-            ("fk_dado_ibge", "ALTER TABLE dado_ibge ADD CONSTRAINT fk_dado_ibge FOREIGN KEY (\"codigo_municipio_completo\") REFERENCES municipios (\"codigo_ibge\");"),
+            ("fk_dado_ibge_municipios", "ALTER TABLE dado_ibge ADD CONSTRAINT fk_dado_ibge_municipios FOREIGN KEY (\"codigo_municipio_completo\") REFERENCES municipios (\"codigo_ibge\");"),
         ]
+
 
         for nome, comando in comandos:
             if self.constraint_existe(nome):
@@ -246,7 +248,7 @@ class PostgreSQLLoader:
 
         for nome, csv_nome in arquivos.items():
             # AQUI FOI AJUSTADO O CAMINHO DE SAÍDA PARA A PASTA DE SUPORTE
-            parquet_path = Settings.SUPPORT_FILES_DIR / f"{nome}.parquet"
+            parquet_path = self.processed_dir / f"{nome}.parquet"
             if parquet_path.exists():
                 logger.info(f"{nome}.parquet já existe. Pulando conversão.")
                 continue

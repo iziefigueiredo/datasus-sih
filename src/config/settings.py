@@ -17,8 +17,8 @@ class Settings:
     
     # Subpastas de dados
     RAW_DIR = DATA_DIR / "raw"                      
-    PARQUET_INTERIM_DIR = DATA_DIR / "interim"              
-    PARQUET_PROCESSED_DIR = DATA_DIR / "processed"  
+    INTERIM_DIR = DATA_DIR / "interim"              
+    PROCESSED_DIR = DATA_DIR / "processed"  
     SUPPORT_FILES_DIR = DATA_DIR / "support"        
     BACKUPS_DIR = DATA_DIR / "backups"      
       

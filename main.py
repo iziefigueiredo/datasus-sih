@@ -6,32 +6,17 @@ Download, Unificação, Pré-processamento, Divisão e Carga no banco
 import sys
 from pathlib import Path
 
+# Certifica que o diretório 'src' está no PATH
 SRC_DIR = Path(__file__).parent / "src"
 sys.path.insert(0, str(SRC_DIR))
 
-from config.settings import Settings
-from data.split import TableSplitter
-from database.load import run_db_load_pipeline
-
-
-def etapa_1():
-    from data.download import main as download_dados
-    download_dados()
-
-def etapa_2():
-    from data.unify import main as unificar_dados
-    unificar_dados()
-
-def etapa_3():
-    from data.preprocess import main as preprocessar_dados
-    preprocessar_dados()
-
-def etapa_4():
-    splitter = TableSplitter()
-    splitter.run()
-
-def etapa_5():
-    run_db_load_pipeline()
+# Importa a função principal de cada etapa.
+# Não há necessidade de criar funções intermediárias como etapa_1().
+from data.download import main as download_main
+from data.unify import main as unify_main
+from data.preprocess import main as preprocess_main
+from data.split import main as split_main
+from database.load import run_db_load_pipeline as load_main
 
 
 def main():
@@ -51,15 +36,15 @@ def main():
 
         try:
             if escolha == "1":
-                etapa_1()
+                download_main()
             elif escolha == "2":
-                etapa_2()
+                unify_main()
             elif escolha == "3":
-                etapa_3()
+                preprocess_main()
             elif escolha == "4":
-                etapa_4()
+                split_main()
             elif escolha == "5":
-                etapa_5()
+                load_main()
             elif escolha == "0":
                 print("Encerrando pipeline.")
                 break

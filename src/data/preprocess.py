@@ -23,8 +23,8 @@ class SIHPreprocessor:
     """Pré-processamento SIH/SUS com processamento em chunks"""
     
     def __init__(self, arquivo_entrada=None, arquivo_saida=None, chunk_size=100_000):
-        self.entrada = arquivo_entrada or Settings.PARQUET_UNIFIED_DIR / "sih_rs.parquet"
-        self.saida = arquivo_saida or Settings.PARQUET_UNIFIED_DIR / "sih_rs_tratado.parquet"
+        self.entrada = arquivo_entrada or Settings.PARQUET_INTERIM_DIR / "sih_rs.parquet"
+        self.saida = arquivo_saida or Settings.PARQUET_INTERIM_DIR / "sih_rs_tratado.parquet"
         self.chunk_size = chunk_size
         self.temp_dir = Path(tempfile.mkdtemp(prefix="sih_processing_"))
         Settings.criar_diretorios()

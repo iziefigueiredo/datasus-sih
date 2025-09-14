@@ -106,7 +106,8 @@ class Settings:
             cls.BASE_DIR,
             cls.DATA_DIR,
             cls.RAW_DIR,
-            cls.PARQUET_DIR, 
+            cls.INTERIM_DIR,
+            cls.PROCESSED_DIR,
             cls.SUPPORT_FILES_DIR,
             cls.BACKUPS_DIR,
             

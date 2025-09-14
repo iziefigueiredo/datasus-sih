@@ -31,7 +31,7 @@ class SIHUnifier:
         lote_size: int = 50
     ):
         self.pasta_entrada = pasta_entrada or Settings.RAW_DIR
-        self.arquivo_saida = arquivo_saida or Settings.PARQUET_INTERIM_DIR/ "sih_rs.parquet"
+        self.arquivo_saida = arquivo_saida or Settings.INTERIM_DIR/ "sih_rs.parquet"
         self.lote_size = lote_size
         
         self.colunas_desejadas = [
@@ -164,7 +164,7 @@ def main():
     try:
         unifier = SIHUnifier(
             pasta_entrada=Settings.RAW_DIR,
-            arquivo_saida=Settings.PARQUET_INTERIM_DIR / "sih_rs.parquet",
+            arquivo_saida=Settings.INTERIM_DIR / "sih_rs.parquet",
             lote_size=50
         )
         

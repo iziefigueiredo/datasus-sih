@@ -16,8 +16,8 @@ logger = logging.getLogger(__name__)
 
 class TableSplitter:
     def __init__(self):
-        self.input_parquet_path = Settings.PARQUET_UNIFIED_DIR / Settings.PARQUET_TREATED_FILENAME
-        self.output_dir = Settings.PARQUET_UNIFIED_DIR
+        self.input_parquet_path = Settings.PARQUET_INTERIM_DIR / Settings.PARQUET_TREATED_FILENAME
+        self.output_dir = Settings.PARQUET_PROCESSED_DIR
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
         self.internacoes_cols = [
@@ -50,6 +50,10 @@ class TableSplitter:
         self.mortes_cols = [
             "N_AIH", "CID_MORTE"
         ]
+
+    # As funções abaixo, como split_condicoes_especificas, também foram ajustadas
+    # para usar as variáveis de nome de arquivo definidas em Settings, quando disponíveis.
+    # Isso torna seu código mais consistente.
 
     def split_internacoes(self):
         table_name = "internacoes"
@@ -96,7 +100,8 @@ class TableSplitter:
 
     def split_condicoes_especificas(self):
         table_name = "condicoes_especificas"
-        output_file = self.output_dir / f"{table_name}.parquet"
+        # AQUI FOI AJUSTADO PARA USAR A VARIÁVEL DO SETTINGS
+        output_file = self.output_dir / Settings.CONDICOES_ESPECIFICAS_FILENAME
         schema_info = TABLE_SCHEMAS.get(table_name)
         if not schema_info:
             logger.error(f"Esquema para a tabela '{table_name}' não encontrado. Ignorando.")
@@ -119,7 +124,8 @@ class TableSplitter:
 
     def split_hospital(self):
         table_name = "hospital"
-        output_file = self.output_dir / f"{table_name}.parquet"
+        # AQUI FOI AJUSTADO PARA USAR A VARIÁVEL DO SETTINGS
+        output_file = self.output_dir / Settings.HOSPITAL_FILENAME 
         logger.info(f"Iniciando divisão para a tabela '{table_name}'...")
         try:
             df = pl.read_parquet(self.input_parquet_path, columns=self.hospital_cols)
@@ -134,12 +140,10 @@ class TableSplitter:
             logger.error(f"Erro durante a divisão para '{table_name}': {e}")
             raise
 
-
     def split_obstetricos(self):
-        
-
         table_name = "obstetricos"
-        output_file = self.output_dir / f"{table_name}.parquet"
+        # AQUI FOI AJUSTADO PARA USAR A VARIÁVEL DO SETTINGS
+        output_file = self.output_dir / Settings.OBSTETRICOS_FILENAME 
         logger.info(f"Iniciando divisão para a tabela '{table_name}'...")
         try:
             df = pd.read_parquet(self.input_parquet_path, columns=["N_AIH", "INSC_PN"])
@@ -161,11 +165,10 @@ class TableSplitter:
             logger.error(f"Erro durante a divisão para '{table_name}': {e}")
             raise
 
-    
-        
     def split_instrucao(self):
         table_name = "instrucao"
-        output_file = self.output_dir / f"{table_name}.parquet"
+        # AQUI FOI AJUSTADO PARA USAR A VARIÁVEL DO SETTINGS
+        output_file = self.output_dir / Settings.INSTRUCAO_FILENAME
         logger.info(f"Iniciando divisão para a tabela '{table_name}'...")
 
         try:
@@ -193,7 +196,8 @@ class TableSplitter:
     
     def split_mortes(self):
         table_name = "mortes"
-        output_file = self.output_dir / f"{table_name}.parquet"
+        # AQUI FOI AJUSTADO PARA USAR A VARIÁVEL DO SETTINGS
+        output_file = self.output_dir / Settings.MORTES_FILENAME 
         logger.info(f"Iniciando divisão para a tabela '{table_name}'...")
         try:
             df = pl.read_parquet(self.input_parquet_path, columns=["N_AIH", "MORTE", "CID_MORTE"])
@@ -212,7 +216,8 @@ class TableSplitter:
 
     def split_infehosp(self):
         table_name = "infehosp"
-        output_file = self.output_dir / f"{table_name}.parquet"
+        # AQUI FOI AJUSTADO PARA USAR A VARIÁVEL DO SETTINGS
+        output_file = self.output_dir / Settings.INFEHOSP_FILENAME 
         logger.info(f"Iniciando divisão para a tabela '{table_name}'...")
         try:
             df = pl.read_parquet(self.input_parquet_path, columns=["N_AIH", "INFEHOSP"]).with_columns(
@@ -235,7 +240,8 @@ class TableSplitter:
 
     def split_vincprev(self):
         table_name = "vincprev"
-        output_file = self.output_dir / f"{table_name}.parquet"
+        # AQUI FOI AJUSTADO PARA USAR A VARIÁVEL DO SETTINGS
+        output_file = self.output_dir / Settings.VINCPREV_FILENAME 
         logger.info(f"Iniciando divisão para a tabela '{table_name}'...")
         try:
             df = pl.read_parquet(self.input_parquet_path, columns=["N_AIH", "VINCPREV"]).with_columns(
@@ -261,7 +267,8 @@ class TableSplitter:
 
     def split_cbor(self):
         table_name = "cbor"
-        output_file = self.output_dir / f"{table_name}.parquet"
+        # AQUI FOI AJUSTADO PARA USAR A VARIÁVEL DO SETTINGS
+        output_file = self.output_dir / Settings.CBOR_FILENAME
         logger.info(f"Iniciando divisão para a tabela '{table_name}'...")
         try:
             df = pl.read_parquet(self.input_parquet_path, columns=["N_AIH", "CBOR"]).with_columns(
@@ -285,10 +292,6 @@ class TableSplitter:
             logger.error(f"Erro durante a divisão para '{table_name}': {e}")
             raise
 
-
-
-
-
     def run(self):
         logger.info("=== INICIANDO DIVISÃO DE ARQUIVOS PARA CARGA NO BANCO ===")
         self.split_internacoes()
@@ -304,6 +307,7 @@ class TableSplitter:
         logger.info("=== DIVISÃO DE ARQUIVOS CONCLUÍDA ===")
 
 def main():
+
     splitter = TableSplitter()
     splitter.run()
 

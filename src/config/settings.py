@@ -69,7 +69,7 @@ class Settings:
     INTERNACOES_FILENAME = "internacoes.parquet"
     UTI_DETALHES_FILENAME = "uti_detalhes.parquet"
     CONDICOES_ESPECIFICAS_FILENAME = "condicoes_especificas.parquet" 
-    HOSPITAL_FILENAME = "hospitais.parquet"
+    HOSPITAL_FILENAME = "hospital.parquet"
     MUNICIPIOS_FILENAME = "municipios.parquet"
     PROCEDIMENTOS_FILENAME = "procedimentos.parquet"
     CID10_FILENAME = "cid10.parquet"

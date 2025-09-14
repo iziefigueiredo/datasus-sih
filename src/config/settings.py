@@ -64,6 +64,8 @@ class Settings:
 
     # --- CORREÇÃO: Adicionado PARQUET_TREATED_FILENAME como atributo de classe ---
     PARQUET_TREATED_FILENAME = "sih_rs_tratado.parquet"
+
+    PARQUET_UNIFIED_FILENAME = "sih_rs.parquet"
     # --- FIM DA CORREÇÃO ---
 
     INTERNACOES_FILENAME = "internacoes.parquet"
@@ -131,9 +133,9 @@ class Settings:
         print(f"SRC_DIR:              {cls.SRC_DIR}")
         print(f"BASE_DIR:             {cls.BASE_DIR}")
         print(f"DATA_DIR:             {cls.DATA_DIR}")
-        print(f"PARQUET_DIR:          {cls.PARQUET_DIR}")
-        print(f"PARQUET_UNIFIED_DIR:  {cls.PARQUET_UNIFIED_DIR}")
         print(f"RAW_DIR:              {cls.RAW_DIR}") 
+        print(f"INTERIM_DIR:          {cls.INTERIM_DIR}")
+        print(f"PROCESSED_DIR:        {cls.PROCESSED_DIR}")
         print(f"SUPPORT_FILES_DIR:    {cls.SUPPORT_FILES_DIR}") 
         print("===================")
 

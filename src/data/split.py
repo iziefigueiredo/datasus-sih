@@ -100,7 +100,6 @@ class TableSplitter:
 
     def split_condicoes_especificas(self):
         table_name = "condicoes_especificas"
-        # AQUI FOI AJUSTADO PARA USAR A VARIÁVEL DO SETTINGS
         output_file = self.output_dir / Settings.CONDICOES_ESPECIFICAS_FILENAME
         schema_info = TABLE_SCHEMAS.get(table_name)
         if not schema_info:
@@ -124,7 +123,6 @@ class TableSplitter:
 
     def split_hospital(self):
         table_name = "hospital"
-        # AQUI FOI AJUSTADO PARA USAR A VARIÁVEL DO SETTINGS
         output_file = self.output_dir / Settings.HOSPITAL_FILENAME 
         logger.info(f"Iniciando divisão para a tabela '{table_name}'...")
         try:
@@ -142,7 +140,6 @@ class TableSplitter:
 
     def split_obstetricos(self):
         table_name = "obstetricos"
-        # AQUI FOI AJUSTADO PARA USAR A VARIÁVEL DO SETTINGS
         output_file = self.output_dir / Settings.OBSTETRICOS_FILENAME 
         logger.info(f"Iniciando divisão para a tabela '{table_name}'...")
         try:
@@ -167,7 +164,6 @@ class TableSplitter:
 
     def split_instrucao(self):
         table_name = "instrucao"
-        # AQUI FOI AJUSTADO PARA USAR A VARIÁVEL DO SETTINGS
         output_file = self.output_dir / Settings.INSTRUCAO_FILENAME
         logger.info(f"Iniciando divisão para a tabela '{table_name}'...")
 
@@ -196,7 +192,6 @@ class TableSplitter:
     
     def split_mortes(self):
         table_name = "mortes"
-        # AQUI FOI AJUSTADO PARA USAR A VARIÁVEL DO SETTINGS
         output_file = self.output_dir / Settings.MORTES_FILENAME 
         logger.info(f"Iniciando divisão para a tabela '{table_name}'...")
         try:
@@ -216,7 +211,6 @@ class TableSplitter:
 
     def split_infehosp(self):
         table_name = "infehosp"
-        # AQUI FOI AJUSTADO PARA USAR A VARIÁVEL DO SETTINGS
         output_file = self.output_dir / Settings.INFEHOSP_FILENAME 
         logger.info(f"Iniciando divisão para a tabela '{table_name}'...")
         try:

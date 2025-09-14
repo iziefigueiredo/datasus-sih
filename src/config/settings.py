@@ -20,7 +20,8 @@ class Settings:
     PARQUET_INTERIM_DIR = DATA_DIR / "interim"              
     PARQUET_PROCESSED_DIR = DATA_DIR / "processed"  
     SUPPORT_FILES_DIR = DATA_DIR / "support"        
-    BACKUPS_DIR = DATA_DIR / "backups"              
+    BACKUPS_DIR = DATA_DIR / "backups"      
+    PARQUET_DIR = DATA_DIR / "parquet"  # --- IGNORE ---        
 
 
     # === CONFIGURAÇÕES DO DATASUS ===

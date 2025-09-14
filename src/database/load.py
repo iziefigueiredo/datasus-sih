@@ -277,7 +277,7 @@ class PostgreSQLLoader:
 def run_db_load_pipeline():
     db_config = Settings.DB_CONFIG
     db_url = f"postgresql://{db_config['user']}:{db_config['password']}@{db_config['host']}:{db_config['port']}/{db_config['database']}"
-    parquet_dir = Settings.PARQUET_UNIFIED_DIR
+    parquet_dir = Settings.PARQUET_PROCESSED_DIR
 
     loader = PostgreSQLLoader(db_url=db_url, parquet_dir=parquet_dir)
     loader.run()

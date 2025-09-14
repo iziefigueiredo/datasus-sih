@@ -21,7 +21,7 @@ class TableSplitter:
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
         self.internacoes_cols = [
-            "CNES", "N_AIH", "ESPEC", "IDENT", "DT_INTER", "DT_SAIDA", "QT_DIARIAS",
+            "CNES", "N_AIH", "ESPEC", "IDENT", "DT_INTER", "DT_SAIDA", 
             "PROC_REA", "VAL_SH", "VAL_SP", "VAL_TOT", "COBRANCA", "DIAS_PERM",
             "COMPLEX", "CID_NOTIF", "MUNIC_MOV", "DIAG_PRINC", "DIAG_SECUN", "CID_ASSO",
             "NASC", "SEXO", "IDADE", "NACIONAL", "NUM_FILHOS", "RACA_COR", "MUNIC_RES", "CEP"

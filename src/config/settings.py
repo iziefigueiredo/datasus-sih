@@ -17,7 +17,7 @@ class Settings:
     
     # Subpastas de dados
     RAW_DIR = DATA_DIR / "raw"                      # projeto_sih/data/raw/
-    PARQUET_DIR = DATA_DIR / "parquet"              # projeto_sih/data/parquet/
+    PARQUET_DIR = DATA_DIR / "interim"              # projeto_sih/data/parquet/
     PARQUET_UNIFIED_DIR = DATA_DIR / "parquet_unified"  # projeto_sih/data/parquet_unified/
     SUPPORT_FILES_DIR = DATA_DIR / "support"        # projeto_sih/data/support/
     BACKUPS_DIR = DATA_DIR / "backups"              # projeto_sih/data/backups/

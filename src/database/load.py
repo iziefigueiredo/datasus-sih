@@ -116,8 +116,7 @@ class PostgreSQLLoader:
             return "TEXT"
 
     def process_table(self, table_name):
-        # AQUI O CAMINHO FOI AJUSTADO PARA USAR O DIRETÓRIO DE PROCESSADOS
-        # COM O QUAL O OBJETO FOI INSTANCIADO
+        
         if table_name in ["cid10", "municipios", "procedimentos", "dado_ibge"]:
             file_path = Settings.SUPPORT_FILES_DIR / f"{table_name}.parquet"
         else:
@@ -219,7 +218,7 @@ class PostgreSQLLoader:
             ("fk_infehosp_internacoes", "ALTER TABLE infehosp ADD CONSTRAINT fk_infehosp_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
             ("fk_vincprev_internacoes", "ALTER TABLE vincprev ADD CONSTRAINT fk_vincprev_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
             ("fk_cbor_internacoes", "ALTER TABLE cbor ADD CONSTRAINT fk_cbor_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
-            ("fk_dado_ibge_municipios", "ALTER TABLE dado_ibge ADD CONSTRAINT fk_dado_ibge_municipios FOREIGN KEY (\"codigo_municipio_completo\") REFERENCES municipios (\"codigo_ibge\");"),
+            ("fk_dado_ibge", "ALTER TABLE dado_ibge ADD CONSTRAINT fk_dado_ibge FOREIGN KEY (\"codigo_municipio_completo\") REFERENCES municipios (\"codigo_ibge\");"),
         ]
 
         for nome, comando in comandos:
@@ -247,7 +246,7 @@ class PostgreSQLLoader:
 
         for nome, csv_nome in arquivos.items():
             # AQUI FOI AJUSTADO O CAMINHO DE SAÍDA PARA A PASTA DE SUPORTE
-            parquet_path = support_dir / f"{nome}.parquet"
+            parquet_path = Settings.SUPPORT_FILES_DIR / f"{nome}.parquet"
             if parquet_path.exists():
                 logger.info(f"{nome}.parquet já existe. Pulando conversão.")
                 continue

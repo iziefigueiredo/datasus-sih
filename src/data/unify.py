@@ -163,7 +163,7 @@ def main():
     """Função principal para execução standalone"""
     try:
         unifier = SIHUnifier(
-            pasta_entrada=Settings.RAW_DIR_DIR,
+            pasta_entrada=Settings.RAW_DIR,
             arquivo_saida=Settings.PARQUET_INTERIM_DIR / "sih_rs.parquet",
             lote_size=50
         )

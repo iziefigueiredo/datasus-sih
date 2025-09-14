@@ -16,8 +16,8 @@ logger = logging.getLogger(__name__)
 
 class TableSplitter:
     def __init__(self):
-        self.input_parquet_path = Settings.PARQUET_INTERIM_DIR / Settings.PARQUET_TREATED_FILENAME
-        self.output_dir = Settings.PARQUET_PROCESSED_DIR
+        self.input_parquet_path = Settings.INTERIM_DIR / Settings.PARQUET_TREATED_FILENAME
+        self.output_dir = Settings.PROCESSED_DIR
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
         self.internacoes_cols = [
@@ -234,7 +234,6 @@ class TableSplitter:
 
     def split_vincprev(self):
         table_name = "vincprev"
-        # AQUI FOI AJUSTADO PARA USAR A VARIÁVEL DO SETTINGS
         output_file = self.output_dir / Settings.VINCPREV_FILENAME 
         logger.info(f"Iniciando divisão para a tabela '{table_name}'...")
         try:
@@ -261,7 +260,6 @@ class TableSplitter:
 
     def split_cbor(self):
         table_name = "cbor"
-        # AQUI FOI AJUSTADO PARA USAR A VARIÁVEL DO SETTINGS
         output_file = self.output_dir / Settings.CBOR_FILENAME
         logger.info(f"Iniciando divisão para a tabela '{table_name}'...")
         try:

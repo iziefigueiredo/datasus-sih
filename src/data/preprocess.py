@@ -23,8 +23,8 @@ class SIHPreprocessor:
     """Pré-processamento SIH/SUS com processamento em chunks"""
     
     def __init__(self, arquivo_entrada=None, arquivo_saida=None, chunk_size=100_000):
-        self.entrada = arquivo_entrada or Settings.PARQUET_INTERIM_DIR / "sih_rs.parquet"
-        self.saida = arquivo_saida or Settings.PARQUET_INTERIM_DIR / "sih_rs_tratado.parquet"
+        self.entrada = arquivo_entrada or Settings.INTERIM_DIR / "sih_rs.parquet"
+        self.saida = arquivo_saida or Settings.INTERIM_DIR / "sih_rs_tratado.parquet"
         self.chunk_size = chunk_size
         self.temp_dir = Path(tempfile.mkdtemp(prefix="sih_processing_"))
         Settings.criar_diretorios()
@@ -155,7 +155,7 @@ class SIHPreprocessor:
         """Contrai dados processando poucos arquivos por vez"""
         logger.info("=== FASE 2: Contração por Lotes ===")
         
-        colunas_soma = ['VAL_SH', 'VAL_SP', 'VAL_TOT', 'VAL_UTI', 'QT_DIARIAS', 'DIAS_PERM']
+        colunas_soma = ['VAL_SH', 'VAL_SP', 'VAL_TOT', 'VAL_UTI',  'DIAS_PERM']
         colunas_media = ['UTI_MES_TO', 'UTI_INT_TO', 'DIAR_ACOM', 'IDADE']
         
         lote_size = 5
@@ -208,7 +208,7 @@ class SIHPreprocessor:
     def contracao_final(self, arquivos_contraidos: list) -> Path:
         """Contração final de todos os lotes"""
         
-        colunas_soma = ['VAL_SH', 'VAL_SP', 'VAL_TOT', 'VAL_UTI', 'QT_DIARIAS', 'DIAS_PERM']
+        colunas_soma = ['VAL_SH', 'VAL_SP', 'VAL_TOT', 'VAL_UTI', 'DIAS_PERM']
         colunas_media = ['UTI_MES_TO', 'UTI_INT_TO', 'DIAR_ACOM', 'IDADE']
         
         grupos_size = 3

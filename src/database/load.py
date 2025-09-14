@@ -18,12 +18,12 @@ logger = logging.getLogger(__name__)
 
 
 class PostgreSQLLoader:
-    def __init__(self, db_url, parquet_dir, chunk_size=50000):
+    def __init__(self, db_url, processed_dir, chunk_size=50000):
         self.engine = create_engine(db_url)
         self.conn = self.engine.raw_connection()
         self.cursor = self.conn.cursor()
         self.chunk_size = chunk_size
-        self.parquet_dir = parquet_dir
+        self.processed_dir = processed_dir  # Renomeado para maior clareza
         self.tables = [
             "internacoes",
             "uti_detalhes",
@@ -40,6 +40,7 @@ class PostgreSQLLoader:
             "cbor",
             "dado_ibge"  
         ]
+
     def criar_uniques(self):
         logger.info("\n--- Criando UNIQUE constraints a partir do schema ---")
         for table_name, info in TABLE_SCHEMAS.items():
@@ -58,7 +59,6 @@ class PostgreSQLLoader:
                 except Exception as e:
                     self.conn.rollback()
                     logger.error(f"Erro ao criar UNIQUE {uq_name}: {e}")
-
 
     def run(self):
         logger.info("=== INICIANDO CARGA NO POSTGRESQL ===")
@@ -116,7 +116,13 @@ class PostgreSQLLoader:
             return "TEXT"
 
     def process_table(self, table_name):
-        file_path = self.parquet_dir / f"{table_name}.parquet"
+        # AQUI O CAMINHO FOI AJUSTADO PARA USAR O DIRETÓRIO DE PROCESSADOS
+        # COM O QUAL O OBJETO FOI INSTANCIADO
+        if table_name in ["cid10", "municipios", "procedimentos", "dado_ibge"]:
+            file_path = Settings.SUPPORT_FILES_DIR / f"{table_name}.parquet"
+        else:
+            file_path = self.processed_dir / f"{table_name}.parquet"
+
         if not file_path.exists():
             logger.warning(f"Arquivo {file_path} não encontrado. Pulando '{table_name}'.")
             return
@@ -144,8 +150,6 @@ class PostgreSQLLoader:
         df = self.converter_tipos(df, schema)
 
         self.carregar_em_chunks(df, table_name, colunas_db)
-
-   
 
     def truncar_tabela(self, table_name):
         try:
@@ -203,31 +207,18 @@ class PostgreSQLLoader:
         logger.info("\n--- Criando chaves primárias e estrangeiras ---")
         comandos = [
             ("fk_uti_internacoes", "ALTER TABLE uti_detalhes ADD CONSTRAINT fk_uti_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
-            
             ("fk_cond_internacoes", "ALTER TABLE condicoes_especificas ADD CONSTRAINT fk_cond_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
-            
             ("fk_internacoes_hospital", "ALTER TABLE internacoes ADD CONSTRAINT fk_internacoes_hospital FOREIGN KEY (\"CNES\") REFERENCES hospital (\"CNES\");"),
-            
             ("fk_obs_internacoes", "ALTER TABLE obstetricos ADD CONSTRAINT fk_obs_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
-            
             ("fk_diag_princ", "ALTER TABLE internacoes ADD CONSTRAINT fk_diag_princ FOREIGN KEY (\"DIAG_PRINC\") REFERENCES cid10 (\"CID\");"),
-            
             ("fk_diag_secun", "ALTER TABLE internacoes ADD CONSTRAINT fk_diag_secun FOREIGN KEY (\"DIAG_SECUN\") REFERENCES cid10 (\"CID\");"),
-            
             ("fk_cid_notif", "ALTER TABLE internacoes ADD CONSTRAINT fk_cid_notif FOREIGN KEY (\"CID_NOTIF\") REFERENCES cid10 (\"CID\");"),
-            
             ("fk_cid_asso", "ALTER TABLE internacoes ADD CONSTRAINT fk_cid_asso FOREIGN KEY (\"CID_ASSO\") REFERENCES cid10 (\"CID\");"),
-        
             ("fk_instrucao_internacoes", "ALTER TABLE instrucao ADD CONSTRAINT fk_instrucao_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
-            
             ("fk_mortes_internacoes", "ALTER TABLE mortes ADD CONSTRAINT fk_mortes_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
-
             ("fk_infehosp_internacoes", "ALTER TABLE infehosp ADD CONSTRAINT fk_infehosp_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
-        
             ("fk_vincprev_internacoes", "ALTER TABLE vincprev ADD CONSTRAINT fk_vincprev_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
-        
             ("fk_cbor_internacoes", "ALTER TABLE cbor ADD CONSTRAINT fk_cbor_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
-
             ("fk_dado_ibge_municipios", "ALTER TABLE dado_ibge ADD CONSTRAINT fk_dado_ibge_municipios FOREIGN KEY (\"codigo_municipio_completo\") REFERENCES municipios (\"codigo_ibge\");"),
         ]
 
@@ -245,8 +236,7 @@ class PostgreSQLLoader:
 
     def converter_csv_parquet(self):
         logger.info("--- Convertendo CSVs de apoio para Parquet ---")
-        support_dir = Path(__file__).parent.parent.parent / "data" / "support"
-        parquet_dir = self.parquet_dir
+        support_dir = Settings.SUPPORT_FILES_DIR
 
         arquivos = {
             "cid10": "cid10.csv",
@@ -256,7 +246,8 @@ class PostgreSQLLoader:
         }
 
         for nome, csv_nome in arquivos.items():
-            parquet_path = parquet_dir / f"{nome}.parquet"
+            # AQUI FOI AJUSTADO O CAMINHO DE SAÍDA PARA A PASTA DE SUPORTE
+            parquet_path = support_dir / f"{nome}.parquet"
             if parquet_path.exists():
                 logger.info(f"{nome}.parquet já existe. Pulando conversão.")
                 continue
@@ -277,9 +268,11 @@ class PostgreSQLLoader:
 def run_db_load_pipeline():
     db_config = Settings.DB_CONFIG
     db_url = f"postgresql://{db_config['user']}:{db_config['password']}@{db_config['host']}:{db_config['port']}/{db_config['database']}"
-    parquet_dir = Settings.PARQUET_PROCESSED_DIR
+    # AQUI O CAMINHO FOI AJUSTADO PARA A PASTA DE PROCESSADOS
+    processed_dir = Settings.PROCESSED_DIR
 
-    loader = PostgreSQLLoader(db_url=db_url, parquet_dir=parquet_dir)
+    # AQUI O CONSTRUTOR FOI AJUSTADO PARA RECEBER O NOVO NOME DA VARIÁVEL
+    loader = PostgreSQLLoader(db_url=db_url, processed_dir=processed_dir)
     loader.run()
 
 

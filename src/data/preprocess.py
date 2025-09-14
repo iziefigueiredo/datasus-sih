@@ -10,6 +10,7 @@ import time
 import gc
 import tempfile
 from datetime import datetime
+import re
 
 SRC_DIR = Path(__file__).parent.parent
 sys.path.insert(0, str(SRC_DIR))
@@ -67,6 +68,16 @@ class SIHPreprocessor:
                 
                 df = df.drop("COD_IDADE")
         
+
+        if 'CGC_HOSP' in df.columns:
+            df = df.with_columns(
+                pl.col("CGC_HOSP")
+                .cast(pl.Utf8, strict=False)
+                .str.replace_all(r'\D', '')
+                .str.zfill(14)
+                .alias("CGC_HOSP")
+            )
+
         if 'SEXO' in df.columns:
             df = df.with_columns([
                 pl.col("SEXO").cast(pl.Int32, strict=False).fill_null(0).clip(0, 3)
@@ -227,6 +238,13 @@ class SIHPreprocessor:
             
             aggregations = []
             for col in df_grupo.columns:
+                #Manter a moda de CGC_HOSP
+                aggregations.append(
+                    pl.col("CGC_HOSP")
+                    .mode()
+                    .first()
+                    .alias("CGC_HOSP")
+)
                 if col == 'N_AIH':
                     continue
                 elif col in colunas_soma:

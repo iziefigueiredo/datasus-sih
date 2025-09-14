@@ -32,6 +32,7 @@ def main():
         print("0 - Sair")
         print("=" * 60)
 
+
         escolha = input("Digite o número da etapa que deseja executar: ").strip()
 
         try:

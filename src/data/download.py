@@ -107,7 +107,7 @@ def main():
                 print(f"Lote {lote_num}/{total_lotes} ({len(lote)} arquivos)...")
                 
                 try:
-                    baixados_lote = sih.download(lote, local_dir=Settings.PARQUET_DIR)
+                    baixados_lote = sih.download(lote, local_dir=Settings.RAW_DIR)
                     baixados_total.extend(baixados_lote)
                     
                     progresso = len(baixados_total) / len(arquivos_a_baixar) * 100
@@ -119,7 +119,7 @@ def main():
             
             baixados = baixados_total
         else:
-            baixados = sih.download(arquivos_a_baixar, local_dir=Settings.PARQUET_DIR)
+            baixados = sih.download(arquivos_a_baixar, local_dir=Settings.RAW_DIR)
         
         print("CONCLUÍDO!")
         print(f"{len(baixados)} baixados | Total: {qtd_existentes + len(baixados)} arquivos")

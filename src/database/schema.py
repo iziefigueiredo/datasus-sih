@@ -287,11 +287,12 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
     "columns": {
         "N_AIH": pl.String,
         "DIAS_PERM": pl.Int32,
-        "DIAR_ACOMP": pl.Int32
+        "DIAR_ACOM": pl.Int32
     },
     "primary_key": ["N_AIH"],
     "foreign_keys": [
        {"column": "N_AIH", "references_table": "internacoes", "references_column": "N_AIH"}
+    ]
 },
 
 

@@ -247,7 +247,18 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
     ]
 },
 
-
+    "contraceptivos": {
+    "table_name": "contraceptivos",
+    "columns": {
+        "N_AIH": pl.String,
+        "tipo_contraceptivo": pl.String,
+        "codigo_metodo": pl.String,
+    },
+    "primary_key": ["N_AIH", "tipo_contraceptivo"],
+    "foreign_keys": [
+        {"column": "N_AIH", "references_table": "internacoes", "references_column": "N_AIH"}
+    ]
+},
     
 
 

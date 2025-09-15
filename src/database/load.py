@@ -221,8 +221,6 @@ class PostgreSQLLoader:
 
             ("fk_diag_princ", "ALTER TABLE internacoes ADD CONSTRAINT fk_diag_princ FOREIGN KEY (\"DIAG_PRINC\") REFERENCES cid10 (\"CID\");"),
 
-            ("fk_diag_secun", "ALTER TABLE internacoes ADD CONSTRAINT fk_diag_secun FOREIGN KEY (\"DIAG_SECUN\") REFERENCES cid10 (\"CID\");"),
-
             ("fk_cid_asso", "ALTER TABLE internacoes ADD CONSTRAINT fk_cid_asso FOREIGN KEY (\"CID_ASSO\") REFERENCES cid10 (\"CID\");"),
 
             ("fk_instrucao_internacoes", "ALTER TABLE instrucao ADD CONSTRAINT fk_instrucao_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
@@ -237,10 +235,9 @@ class PostgreSQLLoader:
 
             ("fk_dado_ibge_municipios", "ALTER TABLE dado_ibge ADD CONSTRAINT fk_dado_ibge_municipios FOREIGN KEY (\"codigo_municipio_completo\") REFERENCES municipios (\"codigo_ibge\");"),
 
-            #avaliar como vai ser quando pk composta
             ("fk_notificacoes", "ALTER TABLE notificacoes ADD CONSTRAINT fk_notificacoes_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\"); "),
             
-            ("fk_internacoes_etnia", "ALTER TABLE internacoes ADD CONSTRAINT fk_internacoes_etnia FOREIGN KEY (\"N_AIH\") REFERENCES etnia (\"N_AIH\");"),
+            ("fk_etnia_internacoes", "ALTER TABLE etnia ADD CONSTRAINT fk_etnia_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
             
             ("fk_pernoite_internacoes", "ALTER TABLE pernoite ADD CONSTRAINT fk_pernoite_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
 

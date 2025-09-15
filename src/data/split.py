@@ -404,10 +404,10 @@ class TableSplitter:
         logger.info(f"Iniciando divisão para a tabela '{table_name}'...")
         try:
             # Lê o arquivo de entrada
-            df = pl.read_parquet(self.input_parquet_path, columns=["N_AIH", "DIAS_PERM", "DIAR_ACOM"])
+            df = pl.read_parquet(self.input_parquet_path, columns=["N_AIH", "DIAR_ACOM"])
 
             # Filtra registros com DIAS_PERM > 0
-            df = df.filter(pl.col("DIAS_PERM") > 0)
+            df = df.filter(pl.col("DIAR_ACOM") > 0)
 
             # Salva o arquivo no novo diretório
             df.write_parquet(output_file, compression="snappy")

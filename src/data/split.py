@@ -340,7 +340,7 @@ class TableSplitter:
 
     def split_etnia(self):
         table_name = "etnia"
-        output_file = self.output_dir / f"{table_name}.parquet"
+        output_file = self.output_dir / Settings.ETINA_FILENAME
         logger.info(f"Iniciando a criação da tabela de {table_name}.")
         
         try:
@@ -368,7 +368,34 @@ class TableSplitter:
         except Exception as e:
             logger.error(f"Ocorreu um erro ao criar a tabela de {table_name}: {e}")
             raise
-        
+
+
+    def split_cid_notif(self):
+        """Cria uma tabela de notificação com base na coluna CID_NOTIF."""
+        table_name = "notificacoes"
+        output_file = self.output_dir / Settings.CID_NOTIF_FILENAME 
+        logger.info(f"Iniciando a criação da tabela de {table_name}.")
+
+        try:
+            # Lê apenas as colunas necessárias para economizar memória
+            df = pl.read_parquet(self.input_parquet_path, columns=["N_AIH", "CID_NOTIF"])
+
+            # Remove registros com CID_NOTIF nulo ou inválido
+            df = df.filter(pl.col("CID_NOTIF").is_not_null() & (pl.col("CID_NOTIF") != "0"))
+            
+            # Garante a unicidade do N_AIH para esta tabela de dimensão
+            df = df.unique(subset=["N_AIH"], keep="first")
+            
+            # Salva o DataFrame no formato Parquet
+            df.write_parquet(output_file, compression="snappy")
+
+            logger.info(f"Tabela de {table_name} criada com sucesso. Total de registros: {len(df):,}")
+            
+            del df
+            gc.collect()
+        except Exception as e:
+            logger.error(f"Erro durante a divisão para '{table_name}': {e}")
+            raise
 
 
     def converter_csv_parquet(self):

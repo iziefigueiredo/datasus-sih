@@ -41,7 +41,9 @@ class PostgreSQLLoader:
             "dado_ibge",
             "contraceptivos",
             "etnia",
-            "notificacoes" 
+            "notificacoes",
+            "pernoite",
+            "diagnosticos" 
         ]
 
     def criar_uniques(self):

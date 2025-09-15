@@ -33,10 +33,8 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
             "VAL_SH": pl.Float64,
             "VAL_SP": pl.Float64,
             "VAL_TOT": pl.Float64,
-            "COBRANCA": pl.String,
             "DIAS_PERM": pl.Int32,
             "COMPLEX": pl.String,
-            "CID_NOTIF": pl.String,
             "MUNIC_MOV": pl.String,
             "DIAG_PRINC": pl.String,
             "DIAG_SECUN": pl.String,
@@ -283,6 +281,17 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
     "foreign_keys": [
         {"column": "N_AIH", "references_table": "internacoes", "references_column": "N_AIH"}
     ]
+},
+
+"pernoite": {
+    "columns": {
+        "N_AIH": pl.String,
+        "DIAS_PERM": pl.Int32,
+        "DIAR_ACOMP": pl.Int32
+    },
+    "primary_key": ["N_AIH"],
+    "foreign_keys": [
+       {"column": "N_AIH", "references_table": "internacoes", "references_column": "N_AIH"}
 },
 
 

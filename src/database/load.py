@@ -39,7 +39,9 @@ class PostgreSQLLoader:
             "vincprev",
             "cbor",
             "dado_ibge",
-            "contraceptivos" 
+            "contraceptivos",
+            "etnia",
+            "notificacoes" 
         ]
 
     def criar_uniques(self):

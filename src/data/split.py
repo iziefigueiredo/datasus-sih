@@ -445,6 +445,7 @@ class TableSplitter:
         self.split_cbor()
         self.split_contraceptivos()
         self.split_etnia()
+        self.split_cid_notif()
         logger.info("=== DIVISÃO DE ARQUIVOS CONCLUÍDA ===")
 
 def main():

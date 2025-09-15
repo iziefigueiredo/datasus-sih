@@ -33,6 +33,28 @@ class SIHPreprocessor:
     def tratar_chunk_completo(self, df: pl.DataFrame) -> pl.DataFrame:
         """Aplica todos os tratamentos a um chunk"""
         
+
+        if 'RACA_COR' in df.columns and 'ETNIA' in df.columns:
+            # Padroniza as colunas antes da lógica
+            df = df.with_columns(
+                pl.col("RACA_COR").cast(pl.String, strict=False).str.strip_chars().fill_null("0"),
+                pl.col("ETNIA").cast(pl.String, strict=False).str.strip_chars().fill_null("0000") # Padroniza nulos e vazios para "0000" para facilitar a checagem
+            )
+
+            # Define os valores inválidos que a ETNIA pode ter
+            # O filtro de RACA_COR será mais robusto se a ETNIA já estiver limpa
+            etnia_invalida = pl.col("ETNIA").is_in(["0", "00", "000", "0000", ""])
+
+            # A lógica é: se a ETNIA for válida, define RACA_COR como '5'. Senão, mantém a original.
+            df = df.with_columns(
+                pl.when(~etnia_invalida)
+                .then(pl.lit("5"))
+                .otherwise(pl.col("RACA_COR"))
+                .alias("RACA_COR")
+            )
+
+
+
         if 'NUM_FILHOS' in df.columns:
             df = df.with_columns([
                 pl.col("NUM_FILHOS").cast(pl.Int32, strict=False).fill_null(0).clip(0, None)
@@ -274,8 +296,6 @@ class SIHPreprocessor:
             return arquivo_resultado
         else:
             return arquivos_finais[0]
-        
-      
     
     def limpar_temp(self):
         """Remove arquivos temporários"""
@@ -304,7 +324,7 @@ class SIHPreprocessor:
             
             arquivos_temp = self.processar_e_salvar_chunks()
             arquivo_final = self.contrair_por_lotes(arquivos_temp)
-
+            
             logger.info("Salvando arquivo final...")
             df_resultado = pl.read_parquet(arquivo_final)
             

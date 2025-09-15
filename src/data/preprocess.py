@@ -10,8 +10,6 @@ import time
 import gc
 import tempfile
 from datetime import datetime
-import re
-import shutil
 
 SRC_DIR = Path(__file__).parent.parent
 sys.path.insert(0, str(SRC_DIR))
@@ -25,8 +23,8 @@ class SIHPreprocessor:
     """Pré-processamento SIH/SUS com processamento em chunks"""
     
     def __init__(self, arquivo_entrada=None, arquivo_saida=None, chunk_size=100_000):
-        self.entrada = arquivo_entrada or Settings.INTERIM_DIR / Settings.PARQUET_UNIFIED_FILENAME
-        self.saida = arquivo_saida or Settings.INTERIM_DIR / Settings.PARQUET_TREATED_FILENAME
+        self.entrada = arquivo_entrada or Settings.INTERIM_DIR / "sih_rs.parquet"
+        self.saida = arquivo_saida or Settings.INTERIM_DIR / "sih_rs_tratado.parquet"
         self.chunk_size = chunk_size
         self.temp_dir = Path(tempfile.mkdtemp(prefix="sih_processing_"))
         Settings.criar_diretorios()
@@ -116,25 +114,6 @@ class SIHPreprocessor:
                         pl.col(col).map_elements(tratar_cid, skip_nulls=False, return_dtype=pl.String).alias(col)
                     ])
         
-        # Tratamento da coluna CGC_HOSP (CNPJ do hospital)
-        if 'CGC_HOSP' in df.columns:
-            df = df.with_columns(
-                pl.col("CGC_HOSP")
-                .cast(pl.Utf8, strict=False)
-                .str.replace_all(r'\D', '')
-                .str.zfill(14)
-                .alias("CGC_HOSP")
-            )
-        
-        # Tratamento da coluna NAT_JUR (Natureza Jurídica)
-        if 'NAT_JUR' in df.columns:
-            df = df.with_columns(
-                pl.col("NAT_JUR")
-                .cast(pl.Utf8, strict=False)
-                .str.replace_all(r'\D', '')
-                .alias("NAT_JUR")
-            )
-        
         df = df.filter(pl.col("N_AIH").is_not_null())
         
         return df
@@ -172,70 +151,189 @@ class SIHPreprocessor:
         logger.info(f"{len(arquivos_temp)} chunks processados e salvos")
         return arquivos_temp
     
-    def agregar_chunks_finais(self, arquivos_temp: list) -> pl.DataFrame:
-        """
-        Lê todos os chunks temporários e aplica uma única agregação final,
-        incluindo a lógica para selecionar o PROC_REA de maior valor.
-        """
-        logger.info("=== FASE 2: Agregação Final ===")
+    def contrair_por_lotes(self, arquivos_temp: list) -> Path:
+        """Contrai dados processando poucos arquivos por vez"""
+        logger.info("=== FASE 2: Contração por Lotes ===")
         
-        # Usa scan_parquet para ler todos os arquivos sem carregar tudo na memória de uma vez
-        df_lazy = pl.scan_parquet(arquivos_temp)
-        
-        # Define as colunas para cada tipo de agregação
-        colunas_soma = ['VAL_SH', 'VAL_SP', 'VAL_TOT', 'VAL_UTI', 'DIAS_PERM']
+        colunas_soma = ['VAL_SH', 'VAL_SP', 'VAL_TOT', 'VAL_UTI', 'QT_DIARIAS', 'DIAS_PERM']
         colunas_media = ['UTI_MES_TO', 'UTI_INT_TO', 'DIAR_ACOM', 'IDADE']
-        colunas_moda = ['CGC_HOSP', 'NAT_JUR']
         
-        # Constrói a lista de expressões de agregação dinamicamente
-        aggregations = []
+        lote_size = 5
+        arquivos_contraidos = []
         
-        # Agregações de SOMA
-        for col in colunas_soma:
-            if col in df_lazy.columns:
-                aggregations.append(pl.col(col).sum().alias(col))
-                
-        # Agregações de MÉDIA
-        for col in colunas_media:
-            if col in df_lazy.columns:
-                aggregations.append(pl.col(col).mean().round(1).alias(col))
-
-        # Agregações de MODA
-        for col in colunas_moda:
-            if col in df_lazy.columns:
-                aggregations.append(pl.col(col).mode().first().alias(col))
-                
-        # LÓGICA ESPECIAL PARA PROC_REA: Pega o PROC_REA correspondente ao maior VAL_TOT
-        if 'PROC_REA' in df_lazy.columns and 'VAL_TOT' in df_lazy.columns:
-            logger.info("Aplicando lógica para PROC_REA de maior valor...")
-            # Ordena por VAL_TOT decrescente dentro de cada grupo e pega o primeiro PROC_REA
-            aggregations.append(
-                pl.col('PROC_REA').sort_by(pl.col('VAL_TOT'), descending=True).first().alias('PROC_REA')
-            )
-        
-        # Agregações de FIRST (para todas as outras colunas)
-        colunas_ja_agregadas = set(colunas_soma + colunas_media + colunas_moda + ['N_AIH', 'PROC_REA'])
-        outras_colunas = [col for col in df_lazy.columns if col not in colunas_ja_agregadas]
-        
-        for col in outras_colunas:
-            aggregations.append(pl.col(col).first().alias(col))
+        for i in range(0, len(arquivos_temp), lote_size):
+            lote = arquivos_temp[i:i+lote_size]
+            lote_num = (i // lote_size) + 1
             
-        # Executa a agregação
-        logger.info("Executando a agregação final para todas as colunas...")
-        df_final = df_lazy.group_by('N_AIH').agg(aggregations).collect()
+            logger.info(f"Contraindo lote {lote_num} ({len(lote)} arquivos)...")
+            
+            dfs = []
+            for arquivo in lote:
+                df = pl.read_parquet(arquivo)
+                dfs.append(df)
+            
+            df_lote = pl.concat(dfs, how="vertical_relaxed")
+            del dfs
+            gc.collect()
+            
+            aggregations = []
+            
+            for col in df_lote.columns:
+                if col == 'N_AIH':
+                    continue
+                elif col in colunas_soma:
+                    aggregations.append(pl.col(col).sum().alias(col))
+                elif col in colunas_media:
+                    aggregations.append(pl.col(col).mean().round(1).alias(col))
+                else:
+                    aggregations.append(pl.col(col).first().alias(col))
+            
+            df_contraido = df_lote.group_by('N_AIH').agg(aggregations)
+            
+            arquivo_contraido = self.temp_dir / f"contraido_{lote_num:03d}.parquet"
+            df_contraido.write_parquet(arquivo_contraido, compression="snappy")
+            arquivos_contraidos.append(arquivo_contraido)
+            
+            del df_lote, df_contraido
+            gc.collect()
         
-        logger.info(f"Agregação concluída. Total de AIHs únicas: {len(df_final):,}")
+        logger.info(f"{len(arquivos_contraidos)} lotes contraídos")
         
-        return df_final
+        if len(arquivos_contraidos) > 1:
+            logger.info("=== FASE 3: Contração Final ===")
+            return self.contracao_final(arquivos_contraidos)
+        else:
+            return arquivos_contraidos[0]
+    
+    def contracao_final(self, arquivos_contraidos: list) -> Path:
+        """Contração final de todos os lotes"""
+        
+        colunas_soma = ['VAL_SH', 'VAL_SP', 'VAL_TOT', 'VAL_UTI', 'QT_DIARIAS', 'DIAS_PERM']
+        colunas_media = ['UTI_MES_TO', 'UTI_INT_TO', 'DIAR_ACOM', 'IDADE']
+        
+        grupos_size = 3
+        arquivos_finais = []
+        
+        for i in range(0, len(arquivos_contraidos), grupos_size):
+            grupo = arquivos_contraidos[i:i+grupos_size]
+            grupo_num = (i // grupos_size) + 1
+            
+            logger.info(f"Contração final - grupo {grupo_num}...")
+            
+            dfs = [pl.read_parquet(arquivo) for arquivo in grupo]
+            df_grupo = pl.concat(dfs, how="vertical_relaxed")
+            del dfs
+            gc.collect()
+            
+            aggregations = []
+            for col in df_grupo.columns:
+                if col == 'N_AIH':
+                    continue
+                elif col in colunas_soma:
+                    aggregations.append(pl.col(col).sum().alias(col))
+                elif col in colunas_media:
+                    aggregations.append(pl.col(col).mean().round(1).alias(col))
+                else:
+                    aggregations.append(pl.col(col).first().alias(col))
+            
+            df_final_grupo = df_grupo.group_by('N_AIH').agg(aggregations)
+            
+            arquivo_final = self.temp_dir / f"final_{grupo_num:03d}.parquet"
+            df_final_grupo.write_parquet(arquivo_final, compression="snappy")
+            arquivos_finais.append(arquivo_final)
+            
+            del df_grupo, df_final_grupo
+            gc.collect()
+        
+        if len(arquivos_finais) > 1:
+            logger.info("Concatenação final...")
+            dfs_finais = [pl.read_parquet(arquivo) for arquivo in arquivos_finais]
+            df_final = pl.concat(dfs_finais, how="vertical_relaxed")
+            del dfs_finais
+            gc.collect()
+            
+            aihs_unicas = df_final['N_AIH'].n_unique()
+            if len(df_final) > aihs_unicas:
+                logger.info("Contração final necessária...")
+                
+                aggregations = []
+                for col in df_final.columns:
+                    if col == 'N_AIH':
+                        continue
+                    elif col in colunas_soma:
+                        aggregations.append(pl.col(col).sum().alias(col))
+                    elif col in colunas_media:
+                        aggregations.append(pl.col(col).mean().round(1).alias(col))
+                    else:
+                        aggregations.append(pl.col(col).first().alias(col))
+                
+                df_final = df_final.group_by('N_AIH').agg(aggregations)
+            
+            arquivo_resultado = self.temp_dir / "resultado_final.parquet"
+            df_final.write_parquet(arquivo_resultado, compression="snappy")
+            return arquivo_resultado
+        else:
+            return arquivos_finais[0]
     
     def limpar_temp(self):
         """Remove arquivos temporários"""
         try:
+            import shutil
             shutil.rmtree(self.temp_dir)
             logger.info(f"Diretório temporário removido: {self.temp_dir}")
         except Exception as e:
+    
             logger.warning(f"Erro ao remover temp: {e}")
     
+
+
+
+        # COLE ESTA NOVA FUNÇÃO DENTRO DA SUA CLASSE SIHPreprocessor
+    def harmonizar_estabelecimentos(self, df: pl.DataFrame) -> pl.DataFrame:
+        """
+        Garante que cada CNES tenha apenas um CGC_HOSP e uma NAT_JUR.
+
+        Esta função cria uma tabela de mapeamento baseada na moda (valor mais frequente)
+        para cada CNES e a utiliza para corrigir o DataFrame principal.
+        """
+        logger.info("--- FASE 4: Harmonização de Estabelecimentos ---")
+        
+       
+
+        # Verifica se as colunas necessárias existem
+        colunas_necessarias = ["CNES",  "NAT_JUR"]
+        if not all(col in df.columns for col in colunas_necessarias):
+            logger.warning("Colunas 'CNES', 'NAT_JUR' não encontradas. Pulando harmonização.")
+            return df
+
+        logger.info("Criando tabela de mapeamento para CNES -> (NAT_JUR) usando a moda...")
+
+        # 1. Cria a tabela de mapeamento (lookup table)
+        #    Para cada CNES, encontra o NAT_JUR mais frequente (moda).
+        mapeamento_cnes = df.group_by("CNES").agg([
+            
+            pl.col("NAT_JUR").mode().first().alias("NAT_JUR_correta")
+        ])
+
+        logger.info(f"Mapeamento criado para {len(mapeamento_cnes)} CNES únicos.")
+
+        # 2. Atualiza o DataFrame principal
+        #    Remove as colunas antigas e faz o join com o mapeamento para adicionar as corrigidas.
+        df_harmonizado = df.drop("NAT_JUR").join(
+            mapeamento_cnes, on="CNES", how="left"
+        )
+
+        # 3. Renomeia as colunas de volta para os nomes originais
+        df_harmonizado = df_harmonizado.rename({
+            "NAT_JUR_correta": "NAT_JUR"
+        })
+        
+        logger.info("Harmonização de estabelecimentos concluída.")
+        
+        return df_harmonizado
+
+
+
     def processar(self) -> int:
         """Processamento principal"""
         logger.info("=== PRÉ-PROCESSAMENTO SIH/SUS ===")
@@ -252,16 +350,20 @@ class SIHPreprocessor:
                 self.saida.rename(backup)
                 logger.info(f"Backup criado: {backup.name}")
             
-            # FASE 1: Limpa e padroniza os dados em chunks
             arquivos_temp = self.processar_e_salvar_chunks()
+            arquivo_final = self.contrair_por_lotes(arquivos_temp)
             
-            # FASE 2: Agrega todos os chunks de uma vez
-            df_final = self.agregar_chunks_finais(arquivos_temp)
+            logger.info("Salvando arquivo final...")
+            df_resultado = pl.read_parquet(arquivo_final)
+
+
+            df_resultado = self.harmonizar_estabelecimentos(df_resultado)
+
             
-            registros_finais = len(df_final)
+            registros_finais = len(df_resultado)
             logger.info(f"Registros finais: {registros_finais:,}")
             
-            df_final.write_parquet(self.saida, compression="snappy", use_pyarrow=True)
+            df_resultado.write_parquet(self.saida, compression="snappy", use_pyarrow=True)
             
             tempo_total = time.time() - inicio
             tamanho_final_mb = self.saida.stat().st_size / (1024 * 1024)
@@ -276,11 +378,12 @@ class SIHPreprocessor:
             return registros_finais
             
         except Exception as e:
-            logger.error(f"Erro no processamento: {e}")
+            logger.error(f"Erro: {e}")
             raise
         finally:
             self.limpar_temp()
             gc.collect()
+
 
 def main():
     """Execução principal"""

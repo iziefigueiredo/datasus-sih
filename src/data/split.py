@@ -396,6 +396,29 @@ class TableSplitter:
         except Exception as e:
             logger.error(f"Erro durante a divisão para '{table_name}': {e}")
             raise
+    
+    
+    def split_pernoite(self):
+        table_name = "pernoite"
+        output_file = self.output_dir / Settings.PERNOITE_FILENAME
+        logger.info(f"Iniciando divisão para a tabela '{table_name}'...")
+        try:
+            # Lê o arquivo de entrada
+            df = pl.read_parquet(self.input_parquet_path, columns=["N_AIH", "DIAS_PERM", "DIAR_ACOMP"])
+
+            # Filtra registros com DIAS_PERM > 0
+            df = df.filter(pl.col("DIAS_PERM") > 0)
+
+            # Salva o arquivo no novo diretório
+            df.write_parquet(output_file, compression="snappy")
+            logger.info(f"Divisão para '{table_name}' concluída. {len(df):,} registros salvos.")
+        
+        except Exception as e:
+            logger.error(f"Erro durante a divisão para '{table_name}': {e}")
+            raise
+        finally:
+            del df
+            gc.collect()
 
 
     def converter_csv_parquet(self):

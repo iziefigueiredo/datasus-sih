@@ -282,58 +282,8 @@ class SIHPreprocessor:
             shutil.rmtree(self.temp_dir)
             logger.info(f"Diretório temporário removido: {self.temp_dir}")
         except Exception as e:
-    
             logger.warning(f"Erro ao remover temp: {e}")
     
-
-
-
-        # COLE ESTA NOVA FUNÇÃO DENTRO DA SUA CLASSE SIHPreprocessor
-    def harmonizar_estabelecimentos(self, df: pl.DataFrame) -> pl.DataFrame:
-        """
-        Garante que cada CNES tenha apenas um CGC_HOSP e uma NAT_JUR.
-
-        Esta função cria uma tabela de mapeamento baseada na moda (valor mais frequente)
-        para cada CNES e a utiliza para corrigir o DataFrame principal.
-        """
-        logger.info("--- FASE 4: Harmonização de Estabelecimentos ---")
-        
-       
-
-        # Verifica se as colunas necessárias existem
-        colunas_necessarias = ["CNES",  "NAT_JUR"]
-        if not all(col in df.columns for col in colunas_necessarias):
-            logger.warning("Colunas 'CNES', 'NAT_JUR' não encontradas. Pulando harmonização.")
-            return df
-
-        logger.info("Criando tabela de mapeamento para CNES -> (NAT_JUR) usando a moda...")
-
-        # 1. Cria a tabela de mapeamento (lookup table)
-        #    Para cada CNES, encontra o NAT_JUR mais frequente (moda).
-        mapeamento_cnes = df.group_by("CNES").agg([
-            
-            pl.col("NAT_JUR").mode().first().alias("NAT_JUR_correta")
-        ])
-
-        logger.info(f"Mapeamento criado para {len(mapeamento_cnes)} CNES únicos.")
-
-        
-        #    Remove as colunas antigas e faz o join com o mapeamento para adicionar as corrigidas.
-        df_harmonizado = df.drop("NAT_JUR").join(
-            mapeamento_cnes, on="CNES", how="left"
-        )
-
-        # 3. Renomeia as colunas de volta para os nomes originais
-        df_harmonizado = df_harmonizado.rename({
-            "NAT_JUR_correta": "NAT_JUR"
-        })
-        
-        logger.info("Harmonização de estabelecimentos concluída.")
-        
-        return df_harmonizado
-
-
-
     def processar(self) -> int:
         """Processamento principal"""
         logger.info("=== PRÉ-PROCESSAMENTO SIH/SUS ===")
@@ -355,10 +305,6 @@ class SIHPreprocessor:
             
             logger.info("Salvando arquivo final...")
             df_resultado = pl.read_parquet(arquivo_final)
-
-
-            df_resultado = self.harmonizar_estabelecimentos(df_resultado)
-
             
             registros_finais = len(df_resultado)
             logger.info(f"Registros finais: {registros_finais:,}")

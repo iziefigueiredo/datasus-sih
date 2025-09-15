@@ -119,8 +119,7 @@ class PostgreSQLLoader:
             return "TEXT"
 
     def process_table(self, table_name):
-        # AQUI O CAMINHO FOI AJUSTADO PARA USAR O DIRETÓRIO DE PROCESSADOS
-        # COM O QUAL O OBJETO FOI INSTANCIADO
+        
         if table_name in ["cid10", "municipios", "procedimentos", "dado_ibge"]:
             file_path = self.processed_dir / f"{table_name}.parquet"
         else:
@@ -224,6 +223,7 @@ class PostgreSQLLoader:
             ("fk_cbor_internacoes", "ALTER TABLE cbor ADD CONSTRAINT fk_cbor_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
             ("fk_dado_ibge_municipios", "ALTER TABLE dado_ibge ADD CONSTRAINT fk_dado_ibge_municipios FOREIGN KEY (\"codigo_municipio_completo\") REFERENCES municipios (\"codigo_ibge\");"),
             ("fk_contraceptivos", "ALTER TABLE contraceptivos ADD CONSTRAINT fk_contraceptivos_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");")
+            
         ]
         
 

@@ -108,7 +108,7 @@ class SIHPreprocessor:
                     pl.col(col).cast(pl.Float64, strict=False).fill_null(0.0).clip(0, None)
                 ])
         
-        campos_inteiros = ['QT_DIARIAS', 'DIAS_PERM', 'UTI_MES_TO', 'UTI_INT_TO', 'DIAR_ACOM']
+        campos_inteiros = ['DIAS_PERM', 'UTI_MES_TO', 'UTI_INT_TO', 'DIAR_ACOM']
         for col in campos_inteiros:
             if col in df.columns:
                 df = df.with_columns([
@@ -136,8 +136,20 @@ class SIHPreprocessor:
                         pl.col(col).map_elements(tratar_cid, skip_nulls=False, return_dtype=pl.String).alias(col)
                     ])
         
+         # A coluna DIAS_PERM recebe a diferença entre as datas
+        if 'DT_INTER' in df.columns and 'DT_SAIDA' in df.columns:
+            df = df.with_columns(
+                (pl.col("DT_SAIDA") - pl.col("DT_INTER")).dt.total_days().alias("DIAS_PERM")
+            )
+
+        # Garante que DIAS_PERM é um inteiro e não é nulo
+        if 'DIAS_PERM' in df.columns:
+            df = df.with_columns(
+                pl.col("DIAS_PERM").cast(pl.Int32, strict=False).fill_null(0)
+            )
+            
         df = df.filter(pl.col("N_AIH").is_not_null())
-        
+            
         return df
     
     def processar_e_salvar_chunks(self) -> list:

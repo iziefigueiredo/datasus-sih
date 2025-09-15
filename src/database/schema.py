@@ -33,7 +33,6 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
             "VAL_SH": pl.Float64,
             "VAL_SP": pl.Float64,
             "VAL_TOT": pl.Float64,
-            "DIAS_PERM": pl.Int32,
             "COMPLEX": pl.String,
             "MUNIC_MOV": pl.String,
             "DIAG_PRINC": pl.String,
@@ -286,7 +285,6 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
 "pernoite": {
     "columns": {
         "N_AIH": pl.String,
-        "DIAS_PERM": pl.Int32,
         "DIAR_ACOM": pl.Int32
     },
     "primary_key": ["N_AIH"],

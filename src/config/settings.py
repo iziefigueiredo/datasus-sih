@@ -85,7 +85,8 @@ class Settings:
     CBOR_FILENAME = "cbor.parquet"
     CONTRACEPTIVOS_FILENAME = "contraceptivos.parquet"
     CID_NOTIF_FILENAME = "notificacoes.parquet"
-    PERNOITE_FILENAME = "pernoite.parquet"
+    PERNOITE_FILENAME = "pernoite.parquet" 
+    DIAG_FILENAME = "diagnosticos.parquet"
 
   
 

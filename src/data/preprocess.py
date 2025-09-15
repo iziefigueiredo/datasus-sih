@@ -189,7 +189,7 @@ class SIHPreprocessor:
         """Contrai dados processando poucos arquivos por vez"""
         logger.info("=== FASE 2: Contração por Lotes ===")
         
-        colunas_soma = ['VAL_SH', 'VAL_SP', 'VAL_TOT', 'VAL_UTI', 'QT_DIARIAS', 'DIAS_PERM']
+        colunas_soma = ['VAL_SH', 'VAL_SP', 'VAL_TOT', 'VAL_UTI']
         colunas_media = ['UTI_MES_TO', 'UTI_INT_TO', 'DIAR_ACOM', 'IDADE']
         
         lote_size = 5
@@ -242,7 +242,7 @@ class SIHPreprocessor:
     def contracao_final(self, arquivos_contraidos: list) -> Path:
         """Contração final de todos os lotes"""
         
-        colunas_soma = ['VAL_SH', 'VAL_SP', 'VAL_TOT', 'VAL_UTI', 'QT_DIARIAS', 'DIAS_PERM']
+        colunas_soma = ['VAL_SH', 'VAL_SP', 'VAL_TOT', 'VAL_UTI']
         colunas_media = ['UTI_MES_TO', 'UTI_INT_TO', 'DIAR_ACOM', 'IDADE']
         
         grupos_size = 3

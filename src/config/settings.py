@@ -83,6 +83,7 @@ class Settings:
     INFEHOSP_FILENAME = "infehosp.parquet"
     VINCPREV_FILENAME = "vincprev.parquet"
     CBOR_FILENAME = "cbor.parquet"
+    CONTRACEPTIVOS_FILENAME = "contraceptivos"
 
   
 

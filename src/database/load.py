@@ -63,7 +63,7 @@ class PostgreSQLLoader:
 
     def run(self):
         logger.info("=== INICIANDO CARGA NO POSTGRESQL ===")
-        self.converter_csv_parquet()
+        
         self.criar_tabelas()
         for table in self.tables:
             self.process_table(table)

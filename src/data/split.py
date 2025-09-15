@@ -286,13 +286,13 @@ class TableSplitter:
     
     # Adicione esta função à classe TableSplitter
 
-    def criar_contraceptivos(self):
+    def split_contraceptivos(self):
         """
         Processa os dados de contraceptivos da tabela principal para criar uma
         tabela de dimensão no formato longo.
         """
         table_name = "contraceptivos"
-        output_file = Settings.PROCESSED_DIR / f"{table_name}.parquet"
+        output_file = Settings.PROCESSED_DIR / Settings.CONTRACEPTIVOS_FILENAME
         
         logger.info(f"Iniciando a criação da tabela de {table_name}.")
         
@@ -312,13 +312,13 @@ class TableSplitter:
             df_long = df_lazy.melt(
                 id_vars="N_AIH",
                 value_vars=["CONTRACEP1", "CONTRACEP2"],
-                variable_name="tipo_contraceptivo",
-                value_name="codigo_metodo",
+                variable_name="TIPO",
+                value_name="CODIGO_METODO",
             ).filter(
                 # 3. Limpeza pós-melt: remove linhas com códigos inválidos
-                (pl.col("codigo_metodo") != "00") & (pl.col("codigo_metodo").is_not_null())
+                (pl.col("CODIGO_METODO") != "00") & (pl.col("CODIGO_METODO").is_not_null())
             ).unique(
-                subset=["N_AIH", "tipo_contraceptivo"],
+                subset=["N_AIH", "TIPO"],
                 keep="first"
             )
             
@@ -334,6 +334,41 @@ class TableSplitter:
         except Exception as e:
             logger.error(f"Ocorreu um erro ao criar a tabela de contraceptivos: {e}")
             raise
+
+
+    # Adicione esta função à classe TableSplitter em src/data/split.py
+
+    def split_etnia(self):
+        table_name = "etnia"
+        output_file = self.output_dir / f"{table_name}.parquet"
+        logger.info(f"Iniciando a criação da tabela de {table_name}.")
+        
+        try:
+            # 1. Lê apenas as colunas necessárias e aplica o filtro
+            df = pl.read_parquet(self.input_parquet_path, columns=["N_AIH", "ETNIA"])
+            
+            # 2. Filtra as linhas onde ETNIA não é um valor inválido ou nulo
+            df = df.filter(
+                (pl.col("ETNIA").is_not_null()) & 
+                (~pl.col("ETNIA").is_in(["0", "00", "000"]))
+            )
+
+            # 3. Garante registros únicos para a chave primária
+            df = df.unique(subset=["N_AIH"], keep="first")
+            
+            # 4. Salva o resultado
+            df.write_parquet(output_file, compression="snappy")
+            
+            logger.info(f"Tabela de {table_name} criada com sucesso. Total de registros: {len(df):,}")
+            
+        except pl.ColumnNotFoundError as e:
+            logger.error(f"Erro: As colunas necessárias não foram encontradas. {e}")
+            raise
+        except Exception as e:
+            logger.error(f"Ocorreu um erro ao criar a tabela de {table_name}: {e}")
+            raise
+    
+
 
     def converter_csv_parquet(self):
         """Converte arquivos CSV de apoio para Parquet e salva na pasta processada."""
@@ -380,7 +415,7 @@ class TableSplitter:
         self.split_infehosp()
         self.split_vincprev()
         self.split_cbor()
-        self.criar_contraceptivos()
+        self.split_contraceptivos()
         logger.info("=== DIVISÃO DE ARQUIVOS CONCLUÍDA ===")
 
 def main():

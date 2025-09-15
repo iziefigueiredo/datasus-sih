@@ -76,6 +76,20 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
             {"column": "N_AIH", "references_table": "internacoes", "references_column": "N_AIH"}
         ]
     },
+
+     "etnia": {
+        "table_name": "etnia",
+        "columns": {
+            "N_AIH": pl.String,
+            "ETNIA": pl.String,
+            
+        },
+        "primary_key": ["N_AIH"],
+        "foreign_keys": [
+            {"column": "N_AIH", "references_table": "internacoes", "references_column": "N_AIH"}
+        ]
+    },
+
     "diagnosticos_secundarios": {
         "table_name": "diagnosticos_secundarios",
         "columns": {
@@ -251,10 +265,10 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
     "table_name": "contraceptivos",
     "columns": {
         "N_AIH": pl.String,
-        "tipo_contraceptivo": pl.String,
-        "codigo_metodo": pl.String,
+        "TIPO": pl.String,
+        "CODIGO_METODO": pl.String,
     },
-    "primary_key": ["N_AIH", "tipo_contraceptivo"],
+    "primary_key": ["N_AIH", "TIPO"],
     "foreign_keys": [
         {"column": "N_AIH", "references_table": "internacoes", "references_column": "N_AIH"}
     ]

@@ -336,37 +336,30 @@ class TableSplitter:
             raise
 
 
-    # Adicione esta função à classe TableSplitter em src/data/split.py
-
     def split_etnia(self):
         table_name = "etnia"
-        output_file = self.output_dir / Settings.ETINA_FILENAME
+        output_file = self.output_dir / Settings.ETNIA_FILENAME
         logger.info(f"Iniciando a criação da tabela de {table_name}.")
         
         try:
-            # 1. Lê as colunas necessárias e aplica o filtro
+            # Lê as colunas N_AIH, RACA_COR e ETNIA
             df = pl.read_parquet(self.input_parquet_path, columns=["N_AIH", "RACA_COR", "ETNIA"])
             
-            # 2. Filtra as linhas onde RACA_COR é '5' (Indígena) E ETNIA é um valor válido
+            # Filtra os registros onde a Raça/Cor é Indígena ('5') e a ETNIA é preenchida
             df = df.filter(
-                (pl.col("RACA_COR") == "5") &
-                (pl.col("ETNIA").is_not_null()) & 
-                (~pl.col("ETNIA").is_in(["0", "00", "000"]))
+                (pl.col("RACA_COR") == "5") & 
+                pl.col("ETNIA").is_not_null() & 
+                (pl.col("ETNIA") != "") & 
+                (pl.col("ETNIA") != "0000")
             )
-
-            # 3. Garante registros únicos para a chave primária
-            df = df.unique(subset=["N_AIH"], keep="first")
             
-            # 4. Salva o resultado
+            # Seleciona apenas as colunas desejadas e remove duplicatas
+            df = df.select(["N_AIH", "ETNIA"]).unique()
+            
             df.write_parquet(output_file, compression="snappy")
-            
             logger.info(f"Tabela de {table_name} criada com sucesso. Total de registros: {len(df):,}")
-            
-        except pl.ColumnNotFoundError as e:
-            logger.error(f"Erro: As colunas necessárias não foram encontradas. {e}")
-            raise
         except Exception as e:
-            logger.error(f"Ocorreu um erro ao criar a tabela de {table_name}: {e}")
+            logger.error(f"Erro ao criar a tabela de {table_name}: {e}")
             raise
 
 

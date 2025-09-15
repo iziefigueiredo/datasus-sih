@@ -208,22 +208,41 @@ class PostgreSQLLoader:
     def criar_constraints(self):
         logger.info("\n--- Criando chaves primárias e estrangeiras ---")
         comandos = [
-            ("fk_uti_internacoes", "ALTER TABLE uti_detalhes ADD CONSTRAINT fk_uti_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
-            ("fk_cond_internacoes", "ALTER TABLE condicoes_especificas ADD CONSTRAINT fk_cond_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
-            ("fk_internacoes_hospital", "ALTER TABLE internacoes ADD CONSTRAINT fk_internacoes_hospital FOREIGN KEY (\"CNES\") REFERENCES hospital (\"CNES\");"),
-            ("fk_obs_internacoes", "ALTER TABLE obstetricos ADD CONSTRAINT fk_obs_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
-            ("fk_diag_princ", "ALTER TABLE internacoes ADD CONSTRAINT fk_diag_princ FOREIGN KEY (\"DIAG_PRINC\") REFERENCES cid10 (\"CID\");"),
-            ("fk_diag_secun", "ALTER TABLE internacoes ADD CONSTRAINT fk_diag_secun FOREIGN KEY (\"DIAG_SECUN\") REFERENCES cid10 (\"CID\");"),
-            ("fk_cid_notif", "ALTER TABLE internacoes ADD CONSTRAINT fk_cid_notif FOREIGN KEY (\"CID_NOTIF\") REFERENCES cid10 (\"CID\");"),
-            ("fk_cid_asso", "ALTER TABLE internacoes ADD CONSTRAINT fk_cid_asso FOREIGN KEY (\"CID_ASSO\") REFERENCES cid10 (\"CID\");"),
-            ("fk_instrucao_internacoes", "ALTER TABLE instrucao ADD CONSTRAINT fk_instrucao_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
-            ("fk_mortes_internacoes", "ALTER TABLE mortes ADD CONSTRAINT fk_mortes_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
-            ("fk_infehosp_internacoes", "ALTER TABLE infehosp ADD CONSTRAINT fk_infehosp_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
-            ("fk_vincprev_internacoes", "ALTER TABLE vincprev ADD CONSTRAINT fk_vincprev_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
-            ("fk_cbor_internacoes", "ALTER TABLE cbor ADD CONSTRAINT fk_cbor_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
-            ("fk_dado_ibge_municipios", "ALTER TABLE dado_ibge ADD CONSTRAINT fk_dado_ibge_municipios FOREIGN KEY (\"codigo_municipio_completo\") REFERENCES municipios (\"codigo_ibge\");"),
-            ("fk_contraceptivos", "ALTER TABLE contraceptivos ADD CONSTRAINT fk_contraceptivos_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");")
             
+            ("fk_uti_internacoes", "ALTER TABLE uti_detalhes ADD CONSTRAINT fk_uti_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
+
+            ("fk_cond_internacoes", "ALTER TABLE condicoes_especificas ADD CONSTRAINT fk_cond_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
+
+            ("fk_internacoes_hospital", "ALTER TABLE internacoes ADD CONSTRAINT fk_internacoes_hospital FOREIGN KEY (\"CNES\") REFERENCES hospital (\"CNES\");"),
+
+            ("fk_obs_internacoes", "ALTER TABLE obstetricos ADD CONSTRAINT fk_obs_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
+
+            ("fk_diag_princ", "ALTER TABLE internacoes ADD CONSTRAINT fk_diag_princ FOREIGN KEY (\"DIAG_PRINC\") REFERENCES cid10 (\"CID\");"),
+
+            ("fk_diag_secun", "ALTER TABLE internacoes ADD CONSTRAINT fk_diag_secun FOREIGN KEY (\"DIAG_SECUN\") REFERENCES cid10 (\"CID\");"),
+
+            ("fk_cid_asso", "ALTER TABLE internacoes ADD CONSTRAINT fk_cid_asso FOREIGN KEY (\"CID_ASSO\") REFERENCES cid10 (\"CID\");"),
+
+            ("fk_instrucao_internacoes", "ALTER TABLE instrucao ADD CONSTRAINT fk_instrucao_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
+
+            ("fk_mortes_internacoes", "ALTER TABLE mortes ADD CONSTRAINT fk_mortes_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
+
+            ("fk_infehosp_internacoes", "ALTER TABLE infehosp ADD CONSTRAINT fk_infehosp_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
+
+            ("fk_vincprev_internacoes", "ALTER TABLE vincprev ADD CONSTRAINT fk_vincprev_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
+
+            ("fk_cbor_internacoes", "ALTER TABLE cbor ADD CONSTRAINT fk_cbor_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
+
+            ("fk_dado_ibge_municipios", "ALTER TABLE dado_ibge ADD CONSTRAINT fk_dado_ibge_municipios FOREIGN KEY (\"codigo_municipio_completo\") REFERENCES municipios (\"codigo_ibge\");"),
+
+            ("fk_contraceptivos", "ALTER TABLE contraceptivos ADD CONSTRAINT fk_contraceptivos_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");")
+
+            ("fk_notificacoes", "ALTER TABLE notificacoes ADD CONSTRAINT fk_notificacoes_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\"); ")
+            
+            ("fk_internacoes_etnia", "ALTER TABLE internacoes ADD CONSTRAINT fk_internacoes_etnia FOREIGN KEY (\"N_AIH\") REFERENCES etnia (\"N_AIH\");"),
+            
+            ("fk_pernoite_internacoes", "ALTER TABLE pernoite ADD CONSTRAINT fk_pernoite_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
+
         ]
         
 

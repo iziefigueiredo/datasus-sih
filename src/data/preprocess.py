@@ -317,7 +317,7 @@ class SIHPreprocessor:
 
         logger.info(f"Mapeamento criado para {len(mapeamento_cnes)} CNES únicos.")
 
-        # 2. Atualiza o DataFrame principal
+        
         #    Remove as colunas antigas e faz o join com o mapeamento para adicionar as corrigidas.
         df_harmonizado = df.drop("NAT_JUR").join(
             mapeamento_cnes, on="CNES", how="left"

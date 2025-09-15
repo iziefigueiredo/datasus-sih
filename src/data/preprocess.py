@@ -274,6 +274,8 @@ class SIHPreprocessor:
             return arquivo_resultado
         else:
             return arquivos_finais[0]
+        
+      
     
     def limpar_temp(self):
         """Remove arquivos temporários"""
@@ -302,7 +304,7 @@ class SIHPreprocessor:
             
             arquivos_temp = self.processar_e_salvar_chunks()
             arquivo_final = self.contrair_por_lotes(arquivos_temp)
-            
+
             logger.info("Salvando arquivo final...")
             df_resultado = pl.read_parquet(arquivo_final)
             

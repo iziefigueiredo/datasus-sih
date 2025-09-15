@@ -284,6 +284,56 @@ class TableSplitter:
             logger.error(f"Erro durante a divisão para '{table_name}': {e}")
             raise
     
+    # Adicione esta função à classe TableSplitter
+
+    def criar_contraceptivos(self):
+        """
+        Processa os dados de contraceptivos da tabela principal para criar uma
+        tabela de dimensão no formato longo.
+        """
+        table_name = "contraceptivos"
+        output_file = Settings.PROCESSED_DIR / f"{table_name}.parquet"
+        
+        logger.info(f"Iniciando a criação da tabela de {table_name}.")
+        
+        # Expressões para garantir que os valores são válidos
+        valid_value = (pl.col("CONTRACEP1") != "00") & (pl.col("CONTRACEP1").is_not_null())
+        valid_value2 = (pl.col("CONTRACEP2") != "00") & (pl.col("CONTRACEP2").is_not_null())
+        
+        try:
+            # 1. Lê apenas as colunas necessárias e filtra as linhas válidas
+            df_lazy = (
+                pl.scan_parquet(self.input_parquet_path)
+                .select(["N_AIH", "CONTRACEP1", "CONTRACEP2"])
+                .filter(valid_value | valid_value2)
+            )
+
+            # 2. Converte o DataFrame do formato largo para o longo (melt)
+            df_long = df_lazy.melt(
+                id_vars="N_AIH",
+                value_vars=["CONTRACEP1", "CONTRACEP2"],
+                variable_name="tipo_contraceptivo",
+                value_name="codigo_metodo",
+            ).filter(
+                # 3. Limpeza pós-melt: remove linhas com códigos inválidos
+                (pl.col("codigo_metodo") != "00") & (pl.col("codigo_metodo").is_not_null())
+            ).unique(
+                subset=["N_AIH", "tipo_contraceptivo"],
+                keep="first"
+            )
+            
+            # 4. Salva o resultado
+            df_final = df_long.collect()
+            df_final.write_parquet(output_file, compression="snappy")
+            
+            logger.info(f"Tabela de {table_name} criada com sucesso. Total de registros: {len(df_final):,}")
+            
+        except pl.ColumnNotFoundError as e:
+            logger.error(f"Erro: As colunas necessárias não foram encontradas. {e}")
+            raise
+        except Exception as e:
+            logger.error(f"Ocorreu um erro ao criar a tabela de contraceptivos: {e}")
+            raise
 
     def converter_csv_parquet(self):
         """Converte arquivos CSV de apoio para Parquet e salva na pasta processada."""
@@ -314,6 +364,7 @@ class TableSplitter:
                 df.write_parquet(parquet_path, compression="snappy")
                 logger.info(f"Conversão de {csv_nome} para {parquet_path.name} concluída com sucesso.")
             except Exception as e:
+        
                 logger.error(f"Erro ao converter {csv_nome}: {e}")
     
     def run(self):
@@ -329,6 +380,7 @@ class TableSplitter:
         self.split_infehosp()
         self.split_vincprev()
         self.split_cbor()
+        self.criar_contraceptivos()
         logger.info("=== DIVISÃO DE ARQUIVOS CONCLUÍDA ===")
 
 def main():

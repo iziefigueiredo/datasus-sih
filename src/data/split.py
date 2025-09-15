@@ -421,6 +421,32 @@ class TableSplitter:
             gc.collect()
 
 
+    def split_diagnosticos(self):
+        table_name = "diagnosticos"
+        output_file = self.output_dir / Settings.DIAG_FILENAME
+        logger.info(f"Iniciando divisão para a tabela '{table_name}'...")
+        try:
+            # Lê o arquivo de entrada
+            df = pl.read_parquet(self.input_parquet_path, columns=["N_AIH", "DIAG_SECUN"])
+
+            # Filtra registros onde o diagnóstico secundário não é "0" e não é nulo
+            df = df.filter(pl.col("DIAG_SECUN").is_not_null() & (pl.col("DIAG_SECUN") != "0"))
+            
+            # Garante que os registros são únicos
+            df = df.unique(subset=["N_AIH", "DIAG_SECUN"])
+
+            # Salva o arquivo no novo diretório
+            df.write_parquet(output_file, compression="snappy")
+            logger.info(f"Divisão para '{table_name}' concluída. {len(df):,} registros salvos.")
+        
+        except Exception as e:
+            logger.error(f"Erro durante a divisão para '{table_name}': {e}")
+            raise
+        finally:
+            del df
+            gc.collect()
+
+
     def converter_csv_parquet(self):
         """Converte arquivos CSV de apoio para Parquet e salva na pasta processada."""
         logger.info("--- Convertendo CSVs de apoio para Parquet ---")

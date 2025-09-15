@@ -99,6 +99,7 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
     },
     "municipios": {
         "table_name": "municipios",
+        
         "columns": {
             "codigo_6d": pl.String,
             "codigo_ibge": pl.String,

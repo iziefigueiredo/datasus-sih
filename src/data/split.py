@@ -404,7 +404,7 @@ class TableSplitter:
         logger.info(f"Iniciando divisão para a tabela '{table_name}'...")
         try:
             # Lê o arquivo de entrada
-            df = pl.read_parquet(self.input_parquet_path, columns=["N_AIH", "DIAS_PERM", "DIAR_ACOMP"])
+            df = pl.read_parquet(self.input_parquet_path, columns=["N_AIH", "DIAS_PERM", "DIAR_ACOM"])
 
             # Filtra registros com DIAS_PERM > 0
             df = df.filter(pl.col("DIAS_PERM") > 0)
@@ -469,6 +469,7 @@ class TableSplitter:
         self.split_contraceptivos()
         self.split_etnia()
         self.split_cid_notif()
+        self.split_pernoite()
         logger.info("=== DIVISÃO DE ARQUIVOS CONCLUÍDA ===")
 
 def main():

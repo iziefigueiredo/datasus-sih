@@ -91,7 +91,7 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
             "N_AIH": pl.String,
             "DIAG_SECUN": pl.String,
         },
-        "primary_key": ["N_AIH", "ordem_diagnostico"],
+        "primary_key": ["N_AIH"],
         "foreign_keys": [
             {"column": "N_AIH", "references_table": "internacoes", "references_column": "N_AIH"}
         ]

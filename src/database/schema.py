@@ -29,6 +29,7 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
             "IDENT": pl.String,
             "DT_INTER": pl.Date,
             "DT_SAIDA": pl.Date,
+            "DIAS_PERM":pl.Int32,
             "PROC_REA": pl.String,
             "VAL_SH": pl.Float64,
             "VAL_SP": pl.Float64,
@@ -53,8 +54,6 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
             {"column": "MUNIC_RES", "references_table": "municipios", "references_column": "codigo_6d"},
             {"column": "MUNIC_MOV", "references_table": "municipios", "references_column": "codigo_6d"},
             {"column": "DIAG_PRINC", "references_table": "cid10", "references_column": "CID"},
-            {"column": "DIAG_SECUN", "references_table": "cid10", "references_column": "CID"},
-            {"column": "CID_NOTIF", "references_table": "cid10", "references_column": "CID"},
             {"column": "CID_ASSO", "references_table": "cid10", "references_column": "CID"},
         ]
     },
@@ -99,7 +98,7 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
     },
     "municipios": {
         "table_name": "municipios",
-        
+
         "columns": {
             "codigo_6d": pl.String,
             "codigo_ibge": pl.String,

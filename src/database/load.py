@@ -237,9 +237,8 @@ class PostgreSQLLoader:
 
             ("fk_dado_ibge_municipios", "ALTER TABLE dado_ibge ADD CONSTRAINT fk_dado_ibge_municipios FOREIGN KEY (\"codigo_municipio_completo\") REFERENCES municipios (\"codigo_ibge\");"),
 
-            ("fk_contraceptivos", "ALTER TABLE contraceptivos ADD CONSTRAINT fk_contraceptivos_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");")
-
-            ("fk_notificacoes", "ALTER TABLE notificacoes ADD CONSTRAINT fk_notificacoes_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\"); ")
+            #avaliar como vai ser quando pk composta
+            ("fk_notificacoes", "ALTER TABLE notificacoes ADD CONSTRAINT fk_notificacoes_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\"); "),
             
             ("fk_internacoes_etnia", "ALTER TABLE internacoes ADD CONSTRAINT fk_internacoes_etnia FOREIGN KEY (\"N_AIH\") REFERENCES etnia (\"N_AIH\");"),
             

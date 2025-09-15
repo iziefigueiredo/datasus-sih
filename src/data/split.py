@@ -496,6 +496,7 @@ class TableSplitter:
         self.split_etnia()
         self.split_cid_notif()
         self.split_pernoite()
+        self.split_diagnosticos()
         logger.info("=== DIVISÃO DE ARQUIVOS CONCLUÍDA ===")
 
 def main():

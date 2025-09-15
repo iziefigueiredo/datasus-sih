@@ -344,11 +344,12 @@ class TableSplitter:
         logger.info(f"Iniciando a criação da tabela de {table_name}.")
         
         try:
-            # 1. Lê apenas as colunas necessárias e aplica o filtro
-            df = pl.read_parquet(self.input_parquet_path, columns=["N_AIH", "ETNIA"])
+            # 1. Lê as colunas necessárias e aplica o filtro
+            df = pl.read_parquet(self.input_parquet_path, columns=["N_AIH", "RACA_COR", "ETNIA"])
             
-            # 2. Filtra as linhas onde ETNIA não é um valor inválido ou nulo
+            # 2. Filtra as linhas onde RACA_COR é '5' (Indígena) E ETNIA é um valor válido
             df = df.filter(
+                (pl.col("RACA_COR") == "5") &
                 (pl.col("ETNIA").is_not_null()) & 
                 (~pl.col("ETNIA").is_in(["0", "00", "000"]))
             )
@@ -367,7 +368,7 @@ class TableSplitter:
         except Exception as e:
             logger.error(f"Ocorreu um erro ao criar a tabela de {table_name}: {e}")
             raise
-    
+        
 
 
     def converter_csv_parquet(self):
@@ -416,6 +417,7 @@ class TableSplitter:
         self.split_vincprev()
         self.split_cbor()
         self.split_contraceptivos()
+        self.split_etnia()
         logger.info("=== DIVISÃO DE ARQUIVOS CONCLUÍDA ===")
 
 def main():

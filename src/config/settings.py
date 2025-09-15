@@ -78,7 +78,7 @@ class Settings:
     DIAGNOSTICOS_SECUNDARIOS_FILENAME = "diagnosticos_secundarios.parquet"
     OBSTETRICOS_FILENAME = "obstetricos.parquet"
     INSTRUCAO_FILENAME = "instrucao.parquet"
-    ETINA_FILENAME = "etnia.parquet"
+    ETNIA_FILENAME = "etnia.parquet"
     MORTES_FILENAME = "mortes.parquet"
     INFEHOSP_FILENAME = "infehosp.parquet"
     VINCPREV_FILENAME = "vincprev.parquet"

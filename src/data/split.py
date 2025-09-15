@@ -338,7 +338,7 @@ class TableSplitter:
 
     def split_etnia(self):
         table_name = "etnia"
-        output_file = self.output_dir / Settings.ETNIA_FILENAME
+        output_file = self.output_dir / Settings.ETNIA_FILENAME  
         logger.info(f"Iniciando a criação da tabela de {table_name}.")
         
         try:

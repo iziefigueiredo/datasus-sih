@@ -36,7 +36,6 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
             "COMPLEX": pl.String,
             "MUNIC_MOV": pl.String,
             "DIAG_PRINC": pl.String,
-            "DIAG_SECUN": pl.String,
             "CID_ASSO": pl.String,
             "NASC": pl.Date,
             "SEXO": pl.Int32,
@@ -87,12 +86,11 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
         ]
     },
 
-    "diagnosticos_secundarios": {
-        "table_name": "diagnosticos_secundarios",
+    "diagnosticos": {
+        "table_name": "diagnosticos",
         "columns": {
             "N_AIH": pl.String,
-            "codigo_cid_secundario": pl.String,
-            "ordem_diagnostico": pl.Int8
+            "DIAG_SECUN": pl.String,
         },
         "primary_key": ["N_AIH", "ordem_diagnostico"],
         "foreign_keys": [

@@ -262,32 +262,45 @@ class PostgreSQLLoader:
 
    
 
+# Modifique esta função no final do seu load.py
 def run_db_load_pipeline():
     """
     Orquestra a execução da carga no banco de dados e registra o tempo total.
     """
-    inicio = time.time() 
+    inicio = time.time()
     
+    loader = None # Inicializa a variável
     try:
         db_config = Settings.DB_CONFIG
         db_url = f"postgresql://{db_config['user']}:{db_config['password']}@{db_config['host']}:{db_config['port']}/{db_config['database']}"
         processed_dir = Settings.PROCESSED_DIR
 
         loader = PostgreSQLLoader(db_url=db_url, processed_dir=processed_dir)
-        loader.run()
+        loader.run() 
 
         # --- INÍCIO DO NOVO BLOCO DE LOG ---
         tempo_total = time.time() - inicio
         
+        # Reabre uma conexão temporária para buscar as métricas finais
+        temp_loader = PostgreSQLLoader(db_url=db_url, processed_dir=processed_dir)
+        tamanho_db_mb, total_linhas = temp_loader.get_database_size_info()
+        temp_loader.conn.close()
+
         logger.info("="*50)
         logger.info("CARGA NO BANCO DE DADOS CONCLUÍDA!")
         logger.info("="*50)
+        logger.info(f"Total de linhas carregadas em todas as tabelas: {total_linhas:,}")
+        logger.info(f"Tamanho final do banco de dados: {tamanho_db_mb:.1f} MB")
         logger.info(f"Tempo total da etapa de carga: {tempo_total:.1f}s ({tempo_total/60:.1f} min)")
         # --- FIM DO NOVO BLOCO DE LOG ---
 
     except Exception as e:
         logger.critical(f"A etapa de carga no banco de dados falhou: {e}", exc_info=True)
-        raise 
+        raise
+    finally:
+        # Garante que a conexão seja fechada mesmo se ocorrer um erro antes
+        if loader and not loader.conn.closed:
+            loader.conn.close()
 
 if __name__ == "__main__":
     run_db_load_pipeline()

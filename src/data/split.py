@@ -51,9 +51,7 @@ class TableSplitter:
             "N_AIH", "CID_MORTE"
         ]
 
-    # As funções abaixo, como split_condicoes_especificas, também foram ajustadas
-    # para usar as variáveis de nome de arquivo definidas em Settings, quando disponíveis.
-    # Isso torna seu código mais consistente.
+ 
 
     def split_internacoes(self):
         table_name = "internacoes"

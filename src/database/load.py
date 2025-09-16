@@ -6,6 +6,7 @@ import logging
 from pathlib import Path
 import psycopg2
 from sqlalchemy import create_engine
+import time
 
 SRC_DIR = Path(__file__).parent.parent
 sys.path.insert(0, str(SRC_DIR))
@@ -262,15 +263,31 @@ class PostgreSQLLoader:
    
 
 def run_db_load_pipeline():
-    db_config = Settings.DB_CONFIG
-    db_url = f"postgresql://{db_config['user']}:{db_config['password']}@{db_config['host']}:{db_config['port']}/{db_config['database']}"
-    # AQUI O CAMINHO FOI AJUSTADO PARA A PASTA DE PROCESSADOS
-    processed_dir = Settings.PROCESSED_DIR
+    """
+    Orquestra a execução da carga no banco de dados e registra o tempo total.
+    """
+    inicio = time.time() 
+    
+    try:
+        db_config = Settings.DB_CONFIG
+        db_url = f"postgresql://{db_config['user']}:{db_config['password']}@{db_config['host']}:{db_config['port']}/{db_config['database']}"
+        processed_dir = Settings.PROCESSED_DIR
 
-    # AQUI O CONSTRUTOR FOI AJUSTADO PARA RECEBER O NOVO NOME DA VARIÁVEL
-    loader = PostgreSQLLoader(db_url=db_url, processed_dir=processed_dir)
-    loader.run()
+        loader = PostgreSQLLoader(db_url=db_url, processed_dir=processed_dir)
+        loader.run()
 
+        # --- INÍCIO DO NOVO BLOCO DE LOG ---
+        tempo_total = time.time() - inicio
+        
+        logger.info("="*50)
+        logger.info("CARGA NO BANCO DE DADOS CONCLUÍDA!")
+        logger.info("="*50)
+        logger.info(f"Tempo total da etapa de carga: {tempo_total:.1f}s ({tempo_total/60:.1f} min)")
+        # --- FIM DO NOVO BLOCO DE LOG ---
+
+    except Exception as e:
+        logger.critical(f"A etapa de carga no banco de dados falhou: {e}", exc_info=True)
+        raise 
 
 if __name__ == "__main__":
     run_db_load_pipeline()

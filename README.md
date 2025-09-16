@@ -67,13 +67,8 @@ datasus-sih/
 │  ├─ decisions/                   # Architecture decision records
 │  └─ reports/                     # Optional: copies of summary.md reports for visualization
 │
-├─ reports/                        # Generated Data Quality reports (artefacts)
-│  ├─ extract/                     # Coverage, timeliness
-│  ├─ unify/                       # Uniqueness, completeness
-│  ├─ preprocess/                  # Validity, accuracy
-│  ├─ split/                       # Consistency between fact/dim tables
-│  ├─ load/                        # PK/FK, row counts
-│  └─ integrity/                   # Consolidated checks (advanced)
+├─ reports/                        # Generated Reports (logs/data quality/viz)
+│  ├─ logs/                   
 │
 ├─ src/                            # Source code (pipeline and reports)
 │  ├─ config/
@@ -92,15 +87,6 @@ datasus-sih/
 │  │  ├─ schema.py                 # Table schemas (columns, PK, FK, types)
 │  │  └─ load.py                   # LOAD: Insert parquet tables into PostgreSQL
 │  │
-│  └─ reports/                     # Report generators (code)
-│     ├─ __init__.py
-│     ├─ common.py                 # Shared utilities (I/O, metrics)
-│     ├─ extract_report.py
-│     ├─ unify_report.py
-│     ├─ preprocess_report.py
-│     ├─ split_report.py
-│     ├─ load_report.py
-│     └─ integrity_report.py
 │
 ├─ .gitignore                      # Ignore rules (exclude data/raw, interim, etc.)
 ├─ requirements.txt                # Dependencies

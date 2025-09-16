@@ -4,6 +4,7 @@ from pathlib import Path
 import logging
 import gc
 import pandas as pd
+import time 
 
 SRC_DIR = Path(__file__).parent.parent
 sys.path.insert(0, str(SRC_DIR))
@@ -470,30 +471,62 @@ class TableSplitter:
         
                 logger.error(f"Erro ao converter {csv_nome}: {e}")
     
+    
     def run(self):
+        """
+        Executa todas as etapas de divisão e registra o tempo total de execução.
+        """
         logger.info("=== INICIANDO DIVISÃO DE ARQUIVOS PARA CARGA NO BANCO ===")
-        self.converter_csv_parquet()
-        self.split_internacoes()
-        self.split_uti_detalhes()
-        self.split_condicoes_especificas()
-        self.split_hospital()
-        self.split_obstetricos()
-        self.split_instrucao()
-        self.split_mortes()
-        self.split_infehosp()
-        self.split_vincprev()
-        self.split_cbor()
-        self.split_contraceptivos()
-        self.split_etnia()
-        self.split_cid_notif()
-        self.split_pernoite()
-        self.split_diagnosticos()
-        logger.info("=== DIVISÃO DE ARQUIVOS CONCLUÍDA ===")
+        inicio = time.time() 
+
+        try:
+            self.converter_csv_parquet()
+            self.split_internacoes()
+            self.split_uti_detalhes()
+            self.split_condicoes_especificas()
+            self.split_hospital()
+            self.split_obstetricos()
+            self.split_instrucao()
+            self.split_mortes()
+            self.split_infehosp()
+            self.split_vincprev()
+            self.split_cbor()
+            self.split_contraceptivos()
+            self.split_etnia()
+            self.split_cid_notif()
+            self.split_pernoite()
+            self.split_diagnosticos()
+
+            # --- INÍCIO DO NOVO BLOCO DE LOG ---
+            tempo_total = time.time() - inicio
+            
+            # Opcional: Calcular o tamanho total dos arquivos gerados
+            tamanho_total_bytes = sum(f.stat().st_size for f in self.output_dir.glob('*.parquet') if f.is_file())
+            tamanho_total_mb = tamanho_total_bytes / (1024 * 1024)
+
+            logger.info("="*50)
+            logger.info("DIVISÃO DE ARQUIVOS CONCLUÍDA!")
+            logger.info("="*50)
+            logger.info(f"Tamanho total dos arquivos gerados: {tamanho_total_mb:.1f} MB")
+            logger.info(f"Tempo total da etapa de divisão: {tempo_total:.1f}s ({tempo_total/60:.1f} min)")
+            # --- FIM DO NOVO BLOCO DE LOG ---
+
+        except Exception as e:
+            logger.error(f"Erro durante a etapa de divisão: {e}", exc_info=True)
+            raise 
+        finally:
+            gc.collect()
 
 def main():
-
-    splitter = TableSplitter()
-    splitter.run()
+    """
+    Função principal para executar o TableSplitter.
+    """
+    try:
+        splitter = TableSplitter()
+        splitter.run()
+    except Exception:
+        logger.critical("A etapa de divisão falhou. Verifique os logs de erro acima.")
+        raise
 
 if __name__ == "__main__":
     main()

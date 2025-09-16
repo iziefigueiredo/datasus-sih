@@ -241,6 +241,8 @@ class PostgreSQLLoader:
             
             ("fk_pernoite_internacoes", "ALTER TABLE pernoite ADD CONSTRAINT fk_pernoite_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
 
+            ("fk_contraceptivos_internacoes", "ALTER TABLE contraceptivos ADD CONSTRAINT fk_contraceptivos_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
+
         ]
         
 

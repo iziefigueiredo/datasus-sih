@@ -500,7 +500,6 @@ class TableSplitter:
             # --- INÍCIO DO NOVO BLOCO DE LOG ---
             tempo_total = time.time() - inicio
             
-            # Opcional: Calcular o tamanho total dos arquivos gerados
             tamanho_total_bytes = sum(f.stat().st_size for f in self.output_dir.glob('*.parquet') if f.is_file())
             tamanho_total_mb = tamanho_total_bytes / (1024 * 1024)
 

@@ -7,6 +7,8 @@ from pathlib import Path
 import psycopg2
 from sqlalchemy import create_engine
 import time
+from sqlalchemy import text
+
 
 SRC_DIR = Path(__file__).parent.parent
 sys.path.insert(0, str(SRC_DIR))
@@ -46,6 +48,22 @@ class PostgreSQLLoader:
             "pernoite",
             "diagnosticos" 
         ]
+
+    def get_database_size_info(self):
+        with self.engine.connect() as conn:
+            # tamanho do banco em MB
+            size_query = "SELECT pg_database_size(current_database()) / 1024 / 1024;"
+            tamanho_db_mb = conn.execute(text(size_query)).scalar()
+
+            # estimativa de linhas em todas as tabelas
+            rows_query = """
+                SELECT SUM(reltuples)::bigint
+                FROM pg_class
+                WHERE relkind = 'r';
+            """
+            total_linhas = conn.execute(text(rows_query)).scalar()
+
+        return tamanho_db_mb, total_linhas
 
     def criar_uniques(self):
         logger.info("\n--- Criando UNIQUE constraints a partir do schema ---")
@@ -297,9 +315,11 @@ def run_db_load_pipeline():
         logger.critical(f"A etapa de carga no banco de dados falhou: {e}", exc_info=True)
         raise
     finally:
-        # Garante que a conexão seja fechada mesmo se ocorrer um erro antes
-        if loader and not loader.conn.closed:
-            loader.conn.close()
+        if loader:
+            try:
+                loader.conn.close()
+            except:
+                pass
 
 if __name__ == "__main__":
     run_db_load_pipeline()

@@ -1,0 +1,12 @@
+version: 2
+
+sources:
+  - name: public
+    schema: public
+    tables:
+      - name: procedimentos
+        columns:
+          - name: '"PROC_REA"'   # precisa das aspas duplas dentro da string
+            tests:
+              - not_null
+              - unique

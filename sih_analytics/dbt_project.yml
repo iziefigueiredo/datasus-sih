@@ -1,12 +1,16 @@
-sih_analytics: # Este é o nome do perfil, que corresponde ao nome do seu projeto
-  target: dev
-  outputs:
-    dev:
-      type: postgres
-      host: localhost # ou o host do seu DB
-      user: postgres # seu usuário do postgres
-      password: 1234 # sua senha do postgres
-      port: 5432
-      dbname: sih_rs
-      schema: dbt_isadora # O dbt cria um schema para trabalhar
-      threads: 1
+name: 'sih_analytics'
+version: '1.0.0'
+config-version: 2
+
+profile: 'sih_analytics'
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+models:
+  sih_analytics:
+    +materialized: view

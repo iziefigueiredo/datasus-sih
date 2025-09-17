@@ -262,7 +262,6 @@ class PostgreSQLLoader:
 
    
 
-# Modifique esta função no final do seu load.py
 def run_db_load_pipeline():
     """
     Orquestra a execução da carga no banco de dados e registra o tempo total.

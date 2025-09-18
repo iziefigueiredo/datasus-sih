@@ -46,7 +46,8 @@ class PostgreSQLLoader:
             "etnia",
             "notificacoes",
             "pernoite",
-            "diagnosticos" 
+            "diagnosticos",
+            "atendimentos" 
         ]
 
     def get_database_size_info(self):

@@ -98,7 +98,7 @@ class PostgreSQLLoader:
             self.process_table(table)
         self.criar_uniques()
         self.criar_constraints()
-        self.conn.close()
+        #self.conn.close()
         logger.info("=== CARGA CONCLUÍDA COM SUCESSO ===")
 
     def polars_to_postgres_type(self, tipo, col_name=None, pk_cols=None):
@@ -293,45 +293,49 @@ def run_db_load_pipeline():
     """
     inicio = time.time()
     
-    loader = None # Inicializa a variável
+    loader = None # Inicializa a variável para que esteja acessível no 'finally'
+    
     try:
+        # Configura as variáveis de conexão e diretórios
         db_config = Settings.DB_CONFIG
         db_url = f"postgresql://{db_config['user']}:{db_config['password']}@{db_config['host']}:{db_config['port']}/{db_config['database']}"
         processed_dir = Settings.PROCESSED_DIR
 
+        # Cria a instância do loader
         loader = PostgreSQLLoader(db_url=db_url, processed_dir=processed_dir)
+        
+        # Executa a carga. (Lembre-se de remover 'self.conn.close()' de dentro do método run())
         loader.run() 
 
-        # --- INÍCIO DO NOVO BLOCO DE LOG ---
         tempo_total = time.time() - inicio
         
-        # Reabre uma conexão temporária para buscar as métricas finais
-        if not loader.conn.closed:
-            tamanho_db_mb, total_linhas = loader.get_database_size_info()
-        else:
-             # Se a conexão principal já foi fechada, cria uma nova temporária
-            temp_loader = PostgreSQLLoader(db_url=db_url, processed_dir=processed_dir)
-            tamanho_db_mb, total_linhas = temp_loader.get_database_size_info()
-            temp_loader.conn.close()
+        # Com a conexão principal ainda aberta, busca as métricas finais do banco.
+        tamanho_db_mb, total_linhas = loader.get_database_size_info()
 
-
+        # Exibe o resumo final do sucesso da operação
         logger.info("="*50)
         logger.info("CARGA NO BANCO DE DADOS CONCLUÍDA!")
         logger.info("="*50)
         logger.info(f"Total de linhas carregadas em todas as tabelas: {total_linhas:,}")
         logger.info(f"Tamanho final do banco de dados: {tamanho_db_mb:.1f} MB")
         logger.info(f"Tempo total da etapa de carga: {tempo_total:.1f}s ({tempo_total/60:.1f} min)")
-        # --- FIM DO NOVO BLOCO DE LOG ---
+        # --- FIM DO BLOCO DE LOG ---
 
     except Exception as e:
+        # Se qualquer erro ocorrer durante o 'try', ele será capturado e logado aqui.
         logger.critical(f"A etapa de carga no banco de dados falhou: {e}", exc_info=True)
-        raise
+        raise # Re-levanta a exceção para parar a execução do programa principal.
+
     finally:
-        if loader and not loader.conn.closed:
+        # Este bloco é executado SEMPRE, tenha ocorrido um erro ou não.
+        # É o lugar mais seguro para garantir que a conexão com o banco seja fechada.
+        if loader and loader.conn and not loader.conn.closed:
             try:
                 loader.conn.close()
-            except:
-                pass
+                logger.info("Conexão com o banco de dados fechada com sucesso.")
+            except Exception as e:
+                # Loga um erro se até mesmo o fechamento da conexão falhar.
+                logger.error(f"Erro ao tentar fechar a conexão com o banco de dados: {e}")
 
 if __name__ == "__main__":
     run_db_load_pipeline()

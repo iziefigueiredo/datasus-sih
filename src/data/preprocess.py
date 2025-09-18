@@ -56,6 +56,7 @@ class SIHPreprocessor:
                     .str.replace_all("-", "")
                     .cast(pl.Float64, strict=False)
                     .fill_null(0.0)
+                    .clip(lower_bound=0.0)
                     .alias(col)
                 )
 
@@ -153,7 +154,7 @@ class SIHPreprocessor:
         
         return df
 
-    def processar_e_salvar_chunks(self) -> list:
+    def processar_chunks(self) -> list:
         """Processa chunks e salva arquivos temporários"""
         logger.info("=== FASE 1: Processamento em Chunks ===")
         
@@ -211,7 +212,7 @@ class SIHPreprocessor:
                 self.saida.rename(backup)
                 logger.info(f"Backup criado: {backup.name}")
             
-            arquivos_temp = self.processar_e_salvar_chunks()
+            arquivos_temp = self.processar_chunks()
             
             logger.info("Lendo todos os chunks para o arquivo final...")
             

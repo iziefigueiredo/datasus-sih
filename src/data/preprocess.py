@@ -94,8 +94,9 @@ class SIHPreprocessor:
                 pl.col("DIAS_PERM").cast(pl.Int16, strict=False).fill_null(0)
             )
 
-        # Padronização dos códigos de município para 6 dígitos
+        # Padronização dos códigos de município para 6 dígitos/ Mapeamento de valores não encontrado
         campos_municipio = ['MUNIC_RES', 'MUNIC_MOV']
+        
         for col in campos_municipio:
             if col in df.columns:
                 df = df.with_columns(
@@ -103,10 +104,21 @@ class SIHPreprocessor:
                     .cast(pl.String, strict=False)
                     .str.strip_chars()
                     .fill_null("000000")
+                    
+                    # --- LÓGICA DE GENERALIZAÇÃO PARA O DISTRITO FEDERAL ---
+                    .pipe(lambda s:
+                        # SE o código começar com '53' (prefixo do DF)
+                        pl.when(s.str.starts_with("5301"))
+                        .then(pl.lit("530010"))  # ENTÃO, substitui pelo código unificado de Brasília
+                        .otherwise(s)           # SENÃO, mantém o código original
+                    )
+                    
+                    # Continua com a padronização geral para 6 dígitos
                     .str.slice(0, 6)
                     .str.pad_start(length=6, fill_char='0')
                     .alias(col)
                 )
+
 
         # Padronização do código de procedimento (PROC_REA)
         if 'PROC_REA' in df.columns:
@@ -157,6 +169,8 @@ class SIHPreprocessor:
         
         # Em preprocess.py, dentro de tratar_chunk_completo
 
+        # Em src/data/preprocess.py, dentro da função tratar_chunk_completo
+
         # Tratamento de campos CID
         campos_cid = ['DIAG_PRINC', 'DIAG_SECUN', 'CID_NOTIF', 'CID_ASSO', 'CID_MORTE']
         for col in campos_cid:
@@ -166,10 +180,16 @@ class SIHPreprocessor:
                     .cast(pl.String, strict=False)  # Garante que é texto
                     .str.strip_chars()              # Remove espaços, transformando '  ' em ''
                     .str.to_uppercase()             # Converte para maiúsculas
+                    
+                    # --- LÓGICA DE PADRONIZAÇÃO APRIMORADA ---
                     .pipe(lambda s: 
-                        # SE a string for vazia ('') OU nula (is_null)
-                        pl.when(s.is_in([""]) | s.is_null())
-                        .then(pl.lit("0"))  # ENTÃO, substitui por '0'
+                        # SE a string for vazia, nula, OU contiver apenas zeros (ex: '0', '00', '0000')
+                        pl.when(
+                            s.is_in([""]) | 
+                            s.is_null() | 
+                            s.str.contains(r"^0+$") # Regex: ^ (início), 0+ (um ou mais zeros), $ (fim)
+                        )
+                        .then(pl.lit("0"))  # ENTÃO, substitui por um único '0'
                         .otherwise(s)       # SENÃO, mantém o valor original
                     )
                     .alias(col)

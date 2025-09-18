@@ -67,6 +67,9 @@ class SIHPreprocessor:
                     pl.col(col).cast(pl.Utf8).str.strptime(pl.Date, format="%Y%m%d", strict=False)
                 ])
 
+
+       
+
         # Calcula a idade de forma precisa
         if 'DT_INTER' in df.columns and 'NASC' in df.columns:
             df = df.with_columns([
@@ -79,8 +82,8 @@ class SIHPreprocessor:
                  .then(1)
                  .otherwise(0)
                 )
-                .clip(0, 120)
-                .cast(pl.Int32)
+                .clip(0, 150)
+                .cast(pl.Int16)
                 .alias("IDADE")
             ])
             
@@ -90,21 +93,35 @@ class SIHPreprocessor:
                 (pl.col("DT_SAIDA") - pl.col("DT_INTER")).dt.total_days().alias("DIAS_PERM")
             )
             df = df.with_columns(
-                pl.col("DIAS_PERM").cast(pl.Int32, strict=False).fill_null(0)
+                pl.col("DIAS_PERM").cast(pl.Int16, strict=False).fill_null(0)
+
+            )
+
+        if 'NACIONAL' in df.columns:
+            df = df.with_columns(
+                pl.col("NACIONAL")
+                .cast(pl.Utf8, strict=False)
+                .str.lstrip('0')
+                .cast(pl.Int16, strict=False)
+                .fill_null(10) # Preenche nulos com 10
+                .when(pl.col("NACIONAL").is_in(range(0, 351))) # Se o valor estiver no intervalo, mantém ele.
+                .then(pl.col("NACIONAL"))
+                .otherwise(pl.lit(10)) # Se não estiver, substitui por 10.
+                .alias("NACIONAL")
             )
 
         # Tratamento de valores inteiros
-        campos_inteiros = ['UTI_MES_TO', 'UTI_INT_TO', 'DIAR_ACOM', 'COD_IDADE']
+        campos_inteiros = ['UTI_MES_TO', 'UTI_INT_TO', 'DIAR_ACOM']
         for col in campos_inteiros:
             if col in df.columns:
                 df = df.with_columns(
-                    pl.col(col).cast(pl.Int32, strict=False).fill_null(0).clip(0, None).alias(col)
+                    pl.col(col).cast(pl.Int16, strict=False).fill_null(0).clip(0, None).alias(col)
                 )
 
         # Padroniza outras colunas
         if 'NUM_FILHOS' in df.columns:
             df = df.with_columns([
-                pl.col("NUM_FILHOS").cast(pl.Int32, strict=False).fill_null(0).clip(0, None)
+                pl.col("NUM_FILHOS").cast(pl.Int8, strict=False).fill_null(0).clip(0, None)
             ])
         if 'INSTRU' in df.columns:
             df = df.with_columns([
@@ -117,7 +134,7 @@ class SIHPreprocessor:
         
         df = df.filter(pl.col("N_AIH").is_not_null())
 
-        #Tratar CID
+        #-----Tratar CID-----
         campos_cid = ['DIAG_PRINC', 'DIAG_SECUN', 'CID_NOTIF', 'CID_ASSO', 'CID_MORTE']
         def tratar_cid(valor):
             if valor is None: return "0"

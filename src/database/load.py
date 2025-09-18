@@ -28,26 +28,27 @@ class PostgreSQLLoader:
         self.chunk_size = chunk_size
         self.processed_dir = processed_dir
         self.tables = [
-            "internacoes",
-            "uti_detalhes",
-            "condicoes_especificas",
-            "hospital",
-            "obstetricos",
+            # Tabelas de dimensão primeiro (sem dependências ou com dependências já listadas)
             "cid10",
             "municipios",
             "procedimentos",
+            "hospital",
+            "dado_ibge",
+            "internacoes", # Tabela de fatos principal
+            "uti_detalhes",
+            "condicoes_especificas",
+            "obstetricos",
             "instrucao",
             "mortes",
             "infehosp",
             "vincprev",
             "cbor",
-            "dado_ibge",
             "contraceptivos",
             "etnia",
             "notificacoes",
             "pernoite",
             "diagnosticos",
-            "atendimentos" 
+            "atendimentos"
         ]
 
     def get_database_size_info(self):
@@ -69,15 +70,19 @@ class PostgreSQLLoader:
     def criar_uniques(self):
         logger.info("\n--- Criando UNIQUE constraints a partir do schema ---")
         for table_name, info in TABLE_SCHEMAS.items():
-            for col in info.get("uniques", []):
-                uq_name = f"uq_{table_name}_{col}"
+            for col_group in info.get("uniques", []):
+                # Garante que col_group seja sempre uma lista
+                cols = col_group if isinstance(col_group, list) else [col_group]
+                uq_name = f"uq_{table_name}_{'_'.join(cols)}"
+
                 if self.constraint_existe(uq_name):
                     logger.info(f"UNIQUE '{uq_name}' já existe. Pulando.")
                     continue
                 try:
+                    cols_str = ", ".join([f'"{c}"' for c in cols])
                     self.cursor.execute(
                         f'ALTER TABLE "{table_name}" '
-                        f'ADD CONSTRAINT {uq_name} UNIQUE ("{col}");'
+                        f'ADD CONSTRAINT {uq_name} UNIQUE ({cols_str});'
                     )
                     self.conn.commit()
                     logger.info(f"UNIQUE criada: {uq_name}")
@@ -91,32 +96,67 @@ class PostgreSQLLoader:
         self.criar_tabelas()
         for table in self.tables:
             self.process_table(table)
-        self.criar_uniques()    
+        self.criar_uniques()
         self.criar_constraints()
         self.conn.close()
         logger.info("=== CARGA CONCLUÍDA COM SUCESSO ===")
+
+    def polars_to_postgres_type(self, tipo, col_name=None, pk_cols=None):
+        """
+        Converte um tipo Polars para um tipo PostgreSQL.
+        A lógica foi aprimorada para identificar chaves primárias e usar BIGSERIAL.
+        """
+        # Se a coluna for uma chave primária e seu tipo for nosso "sinalizador",
+        # converta para BIGSERIAL.
+        if col_name in (pk_cols or []) and tipo == pl.UInt64:
+            return "BIGSERIAL"
+
+        # O resto da lógica de conversão continua a mesma.
+        if tipo == pl.Int64 or tipo == pl.Int32:
+            return "BIGINT" if tipo == pl.Int64 else "INTEGER"
+        elif tipo == pl.Float64:
+            return "DOUBLE PRECISION"
+        elif tipo == pl.String or tipo == pl.Utf8: # Usar pl.String é mais moderno
+            return "TEXT"
+        elif tipo == pl.Boolean:
+            return "BOOLEAN"
+        elif tipo == pl.Date or tipo == pl.Datetime:
+            return "TIMESTAMP"
+        else:
+            return "TEXT"
 
     def criar_tabelas(self, table_name=None):
         if table_name:
             nomes = [table_name]
         else:
             logger.info("\n--- Criando todas as tabelas no PostgreSQL ---")
-            nomes = list(TABLE_SCHEMAS.keys())
+            # Usa a ordem definida na classe para garantir a criação correta das dependências
+            nomes = self.tables
 
         for nome in nomes:
             schema = TABLE_SCHEMAS.get(nome, {})
+            if not schema:
+                logger.warning(f"Esquema para a tabela '{nome}' não encontrado. Pulando.")
+                continue
+            
             colunas_sql = []
+            
+            # Pega a lista de chaves primárias antes do loop
+            pk_cols = schema.get("primary_key", [])
 
-            for col, tipo in schema["columns"].items():
-                tipo_pg = self.polars_to_postgres_type(tipo)
-                colunas_sql.append(f'"{col}" {tipo_pg}')
+            # Itera sobre as colunas para montar o SQL
+            for col_name, col_type in schema["columns"].items():
+                # Passa as informações extras para a função de conversão
+                postgres_type = self.polars_to_postgres_type(col_type, col_name=col_name, pk_cols=pk_cols)
+                colunas_sql.append(f'"{col_name}" {postgres_type}')
 
-            pk = schema.get("primary_key")
-            if pk:
-                pk_str = ", ".join([f'"{col}"' for col in pk])
+            # Adiciona a constraint de chave primária no final, se existir
+            if pk_cols:
+                pk_str = ", ".join([f'"{col}"' for col in pk_cols])
                 colunas_sql.append(f"PRIMARY KEY ({pk_str})")
 
-            sql = f'CREATE TABLE IF NOT EXISTS "{nome}" (\n  {", ".join(colunas_sql)}\n);'
+            # Monta e executa o comando SQL final
+            sql = f'CREATE TABLE IF NOT EXISTS "{nome}" (\n  {",\n  ".join(colunas_sql)}\n);'
 
             try:
                 self.cursor.execute(sql)
@@ -126,26 +166,9 @@ class PostgreSQLLoader:
                 self.conn.rollback()
                 logger.error(f"Erro ao criar tabela {nome}: {e}")
 
-    def polars_to_postgres_type(self, tipo):
-        if tipo == pl.Int64 or tipo == pl.Int32:
-            return "BIGINT" if tipo == pl.Int64 else "INTEGER"
-        elif tipo == pl.Float64:
-            return "DOUBLE PRECISION"
-        elif tipo == pl.Utf8:
-            return "TEXT"
-        elif tipo == pl.Boolean:
-            return "BOOLEAN"
-        elif tipo == pl.Date or tipo == pl.Datetime:
-            return "TIMESTAMP"
-        else:
-            return "TEXT"
-
     def process_table(self, table_name):
         
-        if table_name in ["cid10", "municipios", "procedimentos", "dado_ibge"]:
-            file_path = self.processed_dir / f"{table_name}.parquet"
-        else:
-            file_path = self.processed_dir / f"{table_name}.parquet"
+        file_path = self.processed_dir / f"{table_name}.parquet"
 
         if not file_path.exists():
             logger.warning(f"Arquivo {file_path} não encontrado. Pulando '{table_name}'.")
@@ -156,24 +179,29 @@ class PostgreSQLLoader:
             logger.info(f"{table_name}: arquivo vazio. Pulando carga.")
             return
 
-        self.criar_tabelas(table_name)
+        # A criação da tabela já foi feita no início do 'run'
         self.truncar_tabela(table_name)
 
         schema = TABLE_SCHEMAS.get(table_name, {})
         logger.info(f"{table_name}: Iniciando carga de {len(df):,} linhas...")
 
         colunas_db = self.get_colunas_db(table_name)
+        
+        # Filtra colunas do DataFrame para corresponder às colunas do DB
+        # Ignora colunas que são auto-incrementadas (como id_atendimento)
+        colunas_df_para_carregar = [c for c in df.columns if c in colunas_db]
 
-        faltando = [c for c in colunas_db if c not in df.columns]
+        faltando = [c for c in colunas_df_para_carregar if c not in df.columns]
         if faltando:
             raise ValueError(f"Tabela {table_name}: colunas ausentes no arquivo: {faltando}")
-        extras = [c for c in df.columns if c not in colunas_db]
+        
+        extras = [c for c in df.columns if c not in colunas_df_para_carregar]
         if extras:
-            logger.info(f"{table_name}: colunas extras no arquivo (serão ignoradas no SELECT): {extras}")
+            logger.info(f"{table_name}: colunas extras no arquivo (serão ignoradas): {extras}")
 
         df = self.converter_tipos(df, schema)
 
-        self.carregar_em_chunks(df, table_name, colunas_db)
+        self.carregar_em_chunks(df, table_name, colunas_df_para_carregar)
 
     def truncar_tabela(self, table_name):
         try:
@@ -187,7 +215,7 @@ class PostgreSQLLoader:
     def get_colunas_db(self, table_name):
         self.cursor.execute(f"""
             SELECT column_name FROM information_schema.columns
-            WHERE table_name = '{table_name.lower()}' AND column_name != 'id'
+            WHERE table_name = '{table_name.lower()}'
             ORDER BY ordinal_position;
         """)
         return [row[0] for row in self.cursor.fetchall()]
@@ -203,16 +231,20 @@ class PostgreSQLLoader:
                 logger.warning(f"Falha ao converter coluna '{col}' para {tipo}: {e}")
         return df
 
-    def carregar_em_chunks(self, df, table_name, colunas_db):
+    def carregar_em_chunks(self, df, table_name, colunas_df):
+        if not colunas_df:
+            logger.warning(f"Tabela {table_name}: Nenhuma coluna para carregar. Pulando.")
+            return
+            
         for i in range(0, len(df), self.chunk_size):
-            chunk = df.slice(i, self.chunk_size).select(colunas_db)
+            chunk = df.slice(i, self.chunk_size).select(colunas_df)
             buffer = io.BytesIO()
             csv_str = chunk.write_csv(None, include_header=False)
             buffer.write(csv_str.encode("utf-8"))
             buffer.seek(0)
 
             try:
-                self.cursor.copy_from(buffer, table_name, sep=",", null="", columns=colunas_db)
+                self.cursor.copy_from(buffer, table_name, sep=",", null="", columns=colunas_df)
                 self.conn.commit()
                 logger.info(f"{table_name}: Chunk {i // self.chunk_size + 1} carregado.")
             except Exception as e:
@@ -228,58 +260,32 @@ class PostgreSQLLoader:
         return self.cursor.fetchone() is not None
 
     def criar_constraints(self):
-        logger.info("\n--- Criando chaves primárias e estrangeiras ---")
-        comandos = [
-            
-            ("fk_uti_internacoes", "ALTER TABLE uti_detalhes ADD CONSTRAINT fk_uti_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
+        logger.info("\n--- Criando chaves estrangeiras a partir do schema ---")
+        # Itera na ordem correta para garantir que as tabelas referenciadas existam
+        for table_name in self.tables:
+            schema_info = TABLE_SCHEMAS.get(table_name, {})
+            for fk in schema_info.get("foreign_keys", []):
+                fk_name = f"fk_{table_name}_{fk['column']}"
+                
+                if self.constraint_existe(fk_name):
+                    logger.info(f"Constraint '{fk_name}' já existe. Pulando.")
+                    continue
+                
+                try:
+                    comando = (
+                        f"ALTER TABLE \"{table_name}\" "
+                        f"ADD CONSTRAINT \"{fk_name}\" "
+                        f"FOREIGN KEY (\"{fk['column']}\") "
+                        f"REFERENCES \"{fk['references_table']}\" (\"{fk['references_column']}\") "
+                        "ON DELETE CASCADE;"
+                    )
+                    self.cursor.execute(comando)
+                    self.conn.commit()
+                    logger.info(f"Constraint criada: {fk_name}")
+                except Exception as e:
+                    self.conn.rollback()
+                    logger.error(f"Erro ao criar constraint {fk_name}: {e}")
 
-            ("fk_cond_internacoes", "ALTER TABLE condicoes_especificas ADD CONSTRAINT fk_cond_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
-
-            ("fk_internacoes_hospital", "ALTER TABLE internacoes ADD CONSTRAINT fk_internacoes_hospital FOREIGN KEY (\"CNES\") REFERENCES hospital (\"CNES\");"),
-
-            ("fk_obs_internacoes", "ALTER TABLE obstetricos ADD CONSTRAINT fk_obs_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
-
-            ("fk_diag_princ", "ALTER TABLE internacoes ADD CONSTRAINT fk_diag_princ FOREIGN KEY (\"DIAG_PRINC\") REFERENCES cid10 (\"CID\");"),
-
-            ("fk_cid_asso", "ALTER TABLE internacoes ADD CONSTRAINT fk_cid_asso FOREIGN KEY (\"CID_ASSO\") REFERENCES cid10 (\"CID\");"),
-
-            ("fk_instrucao_internacoes", "ALTER TABLE instrucao ADD CONSTRAINT fk_instrucao_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
-
-            ("fk_mortes_internacoes", "ALTER TABLE mortes ADD CONSTRAINT fk_mortes_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
-
-            ("fk_infehosp_internacoes", "ALTER TABLE infehosp ADD CONSTRAINT fk_infehosp_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
-
-            ("fk_vincprev_internacoes", "ALTER TABLE vincprev ADD CONSTRAINT fk_vincprev_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
-
-            ("fk_cbor_internacoes", "ALTER TABLE cbor ADD CONSTRAINT fk_cbor_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
-
-            ("fk_dado_ibge_municipios", "ALTER TABLE dado_ibge ADD CONSTRAINT fk_dado_ibge_municipios FOREIGN KEY (\"codigo_municipio_completo\") REFERENCES municipios (\"codigo_ibge\");"),
-
-            ("fk_notificacoes", "ALTER TABLE notificacoes ADD CONSTRAINT fk_notificacoes_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\"); "),
-            
-            ("fk_etnia_internacoes", "ALTER TABLE etnia ADD CONSTRAINT fk_etnia_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
-            
-            ("fk_pernoite_internacoes", "ALTER TABLE pernoite ADD CONSTRAINT fk_pernoite_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
-
-            ("fk_contraceptivos_internacoes", "ALTER TABLE contraceptivos ADD CONSTRAINT fk_contraceptivos_internacoes FOREIGN KEY (\"N_AIH\") REFERENCES internacoes (\"N_AIH\");"),
-
-        ]
-        
-
-
-        for nome, comando in comandos:
-            if self.constraint_existe(nome):
-                logger.info(f"Constraint '{nome}' já existe. Pulando.")
-                continue
-            try:
-                self.cursor.execute(comando)
-                self.conn.commit()
-                logger.info(f"Constraint criada: {nome}")
-            except Exception as e:
-                self.conn.rollback()
-                logger.error(f"Erro ao criar constraint {nome}: {e}")
-
-   
 
 def run_db_load_pipeline():
     """
@@ -300,9 +306,14 @@ def run_db_load_pipeline():
         tempo_total = time.time() - inicio
         
         # Reabre uma conexão temporária para buscar as métricas finais
-        temp_loader = PostgreSQLLoader(db_url=db_url, processed_dir=processed_dir)
-        tamanho_db_mb, total_linhas = temp_loader.get_database_size_info()
-        temp_loader.conn.close()
+        if not loader.conn.closed:
+            tamanho_db_mb, total_linhas = loader.get_database_size_info()
+        else:
+             # Se a conexão principal já foi fechada, cria uma nova temporária
+            temp_loader = PostgreSQLLoader(db_url=db_url, processed_dir=processed_dir)
+            tamanho_db_mb, total_linhas = temp_loader.get_database_size_info()
+            temp_loader.conn.close()
+
 
         logger.info("="*50)
         logger.info("CARGA NO BANCO DE DADOS CONCLUÍDA!")
@@ -316,7 +327,7 @@ def run_db_load_pipeline():
         logger.critical(f"A etapa de carga no banco de dados falhou: {e}", exc_info=True)
         raise
     finally:
-        if loader:
+        if loader and not loader.conn.closed:
             try:
                 loader.conn.close()
             except:

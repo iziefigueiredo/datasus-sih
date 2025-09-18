@@ -50,7 +50,7 @@ class SIHPreprocessor:
             if col in df.columns:
                 df = df.with_columns(
                     pl.col(col)
-                    .cast(pl.Utf8, strict=False)
+                    .cast(pl.String, strict=False)
                     .str.replace_all(",", ".")
                     .str.replace_all(" ", "")
                     .str.replace_all("-", "")
@@ -65,11 +65,8 @@ class SIHPreprocessor:
         for col in campos_datas:
             if col in df.columns:
                 df = df.with_columns([
-                    pl.col(col).cast(pl.Utf8).str.strptime(pl.Date, format="%Y%m%d", strict=False)
+                    pl.col(col).cast(pl.String).str.strptime(pl.Date, format="%Y%m%d", strict=False)
                 ])
-
-
-       
 
         # Calcula a idade de forma precisa
         if 'DT_INTER' in df.columns and 'NASC' in df.columns:
@@ -95,20 +92,35 @@ class SIHPreprocessor:
             )
             df = df.with_columns(
                 pl.col("DIAS_PERM").cast(pl.Int16, strict=False).fill_null(0)
-
             )
 
-        if 'NACIONAL' in df.columns:
+        # Padronização dos códigos de município para 6 dígitos
+        campos_municipio = ['MUNIC_RES', 'MUNIC_MOV']
+        for col in campos_municipio:
+            if col in df.columns:
+                df = df.with_columns(
+                    pl.col(col)
+                    .cast(pl.String, strict=False)
+                    .str.strip_chars()
+                    .fill_null("000000")
+                    .str.slice(0, 6)
+                    .str.pad_start(length=6, fill_char='0')
+                    .alias(col)
+                )
+
+        # Padronização do código de procedimento (PROC_REA)
+        if 'PROC_REA' in df.columns:
             df = df.with_columns(
-                pl.col("NACIONAL")
-                .cast(pl.Utf8, strict=False)
-                .str.lstrip('0')
-                .cast(pl.Int16, strict=False)
-                .fill_null(10) # Preenche nulos com 10
-                .when(pl.col("NACIONAL").is_in(range(0, 351))) # Se o valor estiver no intervalo, mantém ele.
-                .then(pl.col("NACIONAL"))
-                .otherwise(pl.lit(10)) # Se não estiver, substitui por 10.
-                .alias("NACIONAL")
+                pl.col('PROC_REA')
+                .cast(pl.String, strict=False)
+                .str.strip_chars()
+                .fill_null("0")
+                .pipe(lambda s: 
+                    pl.when(s.str.starts_with('0'))
+                    .then(s.str.slice(1))
+                    .otherwise(s)
+                )
+                .alias('PROC_REA')
             )
 
         # Tratamento de valores inteiros
@@ -116,8 +128,18 @@ class SIHPreprocessor:
         for col in campos_inteiros:
             if col in df.columns:
                 df = df.with_columns(
-                    pl.col(col).cast(pl.Int16, strict=False).fill_null(0).clip(0, None).alias(col)
+                    pl.col(col).cast(pl.Int32, strict=False).fill_null(0).clip(0, None).alias(col)
                 )
+        
+        # Tratamento da coluna NACIONAL
+        if 'NACIONAL' in df.columns:
+            df = df.with_columns(
+                pl.col("NACIONAL")
+                .cast(pl.Int16, strict=False)
+                .fill_null(10)
+                .clip(0, 350)
+                .alias("NACIONAL")
+            )
 
         # Padroniza outras colunas
         if 'NUM_FILHOS' in df.columns:
@@ -126,35 +148,39 @@ class SIHPreprocessor:
             ])
         if 'INSTRU' in df.columns:
             df = df.with_columns([
-                pl.col("INSTRU").cast(pl.Utf8).str.zfill(2).str.replace_all("nan", "0").fill_null("00")
+                pl.col("INSTRU").cast(pl.String).str.zfill(2).str.replace_all("nan", "0").fill_null("00")
             ])
         if 'SEXO' in df.columns:
             df = df.with_columns([
                 pl.col("SEXO").cast(pl.Int8, strict=False).fill_null(0).clip(0, 3)
             ])
         
-        df = df.filter(pl.col("N_AIH").is_not_null())
+        # Em preprocess.py, dentro de tratar_chunk_completo
 
-        #-----Tratar CID-----
+        # Tratamento de campos CID
         campos_cid = ['DIAG_PRINC', 'DIAG_SECUN', 'CID_NOTIF', 'CID_ASSO', 'CID_MORTE']
-        def tratar_cid(valor):
-            if valor is None: return "0"
-            valor_str = str(valor).strip().upper()
-            if valor_str in ["", "0", "00", "000", "0000", "00000", "000000"]:
-                return "0"
-            return valor_str
         for col in campos_cid:
             if col in df.columns:
-                df = df.with_columns([
-                    pl.col(col).map_elements(tratar_cid, skip_nulls=False, return_dtype=pl.String).alias(col)
-                ])
-        # --- Fim da lógica do CID ---
+                df = df.with_columns(
+                    pl.col(col)
+                    .cast(pl.String, strict=False)  # Garante que é texto
+                    .str.strip_chars()              # Remove espaços, transformando '  ' em ''
+                    .str.to_uppercase()             # Converte para maiúsculas
+                    .pipe(lambda s: 
+                        # SE a string for vazia ('') OU nula (is_null)
+                        pl.when(s.is_in([""]) | s.is_null())
+                        .then(pl.lit("0"))  # ENTÃO, substitui por '0'
+                        .otherwise(s)       # SENÃO, mantém o valor original
+                    )
+                    .alias(col)
+                )
 
+        # Garante que N_AIH não seja nulo para evitar problemas posteriores
         df = df.filter(pl.col("N_AIH").is_not_null())
         
         return df
 
-    def processar_chunks(self) -> list:
+    def processar_salvar_chunk(self) -> list:
         """Processa chunks e salva arquivos temporários"""
         logger.info("=== FASE 1: Processamento em Chunks ===")
         
@@ -212,11 +238,13 @@ class SIHPreprocessor:
                 self.saida.rename(backup)
                 logger.info(f"Backup criado: {backup.name}")
             
-            arquivos_temp = self.processar_chunks()
+            arquivos_temp = self.processar_salvar_chunk()
             
-            logger.info("Lendo todos os chunks para o arquivo final...")
+            logger.info("Unificando e salvando arquivo final...")
             
-            df_final = pl.read_parquet(arquivos_temp)
+            # Lê os arquivos temporários de forma lazy para evitar estouro de memória
+            df_lazy = pl.scan_parquet(arquivos_temp)
+            df_final = df_lazy.collect()
             
             registros_finais = len(df_final)
             logger.info(f"Registros finais: {registros_finais:,}")

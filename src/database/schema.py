@@ -238,9 +238,6 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
     "columns": {
         "uf": pl.Int64,
         "nome_uf": pl.String,
-        "regiao_geografica_intermediaria": pl.Int64,
-        "nome_regiao_geografica_imediata": pl.String,
-        "regiao_geografica_imediata": pl.Int64,
         "municipio": pl.Int64,
         "codigo_municipio_completo": pl.String,  
         "nome_municipio": pl.String,

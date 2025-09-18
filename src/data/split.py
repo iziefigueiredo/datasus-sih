@@ -432,30 +432,53 @@ class TableSplitter:
             gc.collect()
 
 
+    # Em src/data/split.py, dentro da classe TableSplitter
+
     def split_diagnosticos(self):
         table_name = "diagnosticos"
         output_file = self.output_dir / Settings.DIAG_FILENAME
         logger.info(f"Iniciando divisão para a tabela '{table_name}'...")
+        
         try:
-            # Lê o arquivo de entrada
+            # Lê apenas as colunas necessárias do arquivo de entrada
             df = pl.read_parquet(self.input_parquet_path, columns=["N_AIH", "DIAG_SECUN"])
 
-            # Filtra registros onde o diagnóstico secundário não é "0" e não é nulo
-            df = df.filter(pl.col("DIAG_SECUN").is_not_null() & (pl.col("DIAG_SECUN") != "0"))
+            # --- LÓGICA DE FILTRAGEM APRIMORADA ---
             
-            # Garante que os registros são únicos
-            df = df.unique(subset=["N_AIH", "DIAG_SECUN"])
+            # Condição 1: O valor não pode ser nulo.
+            cond_nao_nulo = pl.col("DIAG_SECUN").is_not_null()
+            
+            # Condição 2: O valor não pode ser uma string que contém APENAS zeros (ex: '0', '00', '0000').
+            # A expressão regular `^0+$` verifica isso.
+            cond_nao_so_zeros = ~pl.col("DIAG_SECUN").str.contains(r"^0+$")
+            
+            # Condição 3 (NOVA): O valor não pode começar com '0'.
+            cond_nao_comeca_com_zero = ~pl.col("DIAG_SECUN").str.starts_with('0')
 
-            # Salva o arquivo no novo diretório
-            df.write_parquet(output_file, compression="snappy")
-            logger.info(f"Divisão para '{table_name}' concluída. {len(df):,} registros salvos.")
+            # Aplica todos os filtros combinados
+            df_filtrado = df.filter(
+                cond_nao_nulo &
+                cond_nao_so_zeros &
+                cond_nao_comeca_com_zero
+            )
+            
+            # Garante que as combinações de internação e diagnóstico são únicas
+            df_final = df_filtrado.unique(subset=["N_AIH", "DIAG_SECUN"])
+
+            # Salva o arquivo Parquet resultante
+            df_final.write_parquet(output_file, compression="snappy")
+            logger.info(f"Divisão para '{table_name}' concluída. {len(df_final):,} registros salvos.")
         
         except Exception as e:
             logger.error(f"Erro durante a divisão para '{table_name}': {e}")
             raise
         finally:
-            del df
+            # Garante a limpeza da memória
+            if 'df' in locals(): del df
+            if 'df_filtrado' in locals(): del df_filtrado
+            if 'df_final' in locals(): del df_final
             gc.collect()
+
 
 
     def converter_csv_parquet(self):

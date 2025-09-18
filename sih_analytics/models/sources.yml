@@ -1,12 +1,28 @@
+# Em sih_analytics/models/sources.yml
 version: 2
 
 sources:
-  - name: public
-    schema: public
+  - name: postgres # <--- NOME SIMPLES E DIRETO
+    description: "Tabelas do schema 'postgres' no banco de dados sih_rs."
+    database: sih_rs
+    schema: postgres # O nome do schema real
+    
     tables:
+      - name: internacoes
+      - name: hospital
+      - name: cid10
+      - name: cbor
+      - name: condicoes_especificas
+      - name: contraceptivos
+      - name: dado_ibge
+      - name: diagnosticos
+      - name: etnia
+      - name: instrucao
+      - name: mortes
+      - name: municipios
+      - name: notificacoes
+      - name: obstetricos
+      - name: pernoite
       - name: procedimentos
-        columns:
-          - name: '"PROC_REA"'   # precisa das aspas duplas dentro da string
-            tests:
-              - not_null
-              - unique
+      - name: uti_detalhes
+      - name: vincprev

@@ -63,7 +63,7 @@ class TableSplitter:
         output_file = self.output_dir / Settings.ATENDIMENTO_FILENAME
         logger.info(f"Iniciando divisão para a tabela '{table_name}'...")
         try:
-            df = pl.read_parquet(self.input_parquet_full, columns=self.atendimento_cols)
+            df = pl.read_parquet(self.input_parquet_full, columns=self.atendimentos_cols)
             df.write_parquet(output_file, compression="snappy")
             logger.info(f"Divisão para '{table_name}' concluída. {len(df):,} registros salvos.")
             del df
@@ -515,7 +515,7 @@ class TableSplitter:
             self.split_cid_notif()
             self.split_pernoite()
             self.split_diagnosticos()
-
+            self.split_atendimentos()
             # --- INÍCIO DO NOVO BLOCO DE LOG ---
             tempo_total = time.time() - inicio
             

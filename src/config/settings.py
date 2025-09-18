@@ -26,7 +26,7 @@ class Settings:
 
     # === CONFIGURAÇÕES DO DATASUS ===
     # Estados de interesse
-    UF_DEFAULT = "RS"
+    UF_DEFAULT = ["RS", "MA"]
     
     # Período de dados
     ANOS_INICIO = 2008

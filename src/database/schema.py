@@ -36,7 +36,6 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
             "COMPLEX": pl.String,
             "MUNIC_MOV": pl.String,
             "DIAG_PRINC": pl.String,
-            "CID_ASSO": pl.String,
             "NASC": pl.Date,
             "SEXO": pl.Int8,
             "IDADE": pl.Int16,
@@ -49,19 +48,19 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
         "primary_key": ["N_AIH"],
         "foreign_keys": [
             {"column": "CNES", "references_table": "hospital", "references_column": "CNES"},
-            {"column": "MUNIC_RES", "references_table": "municipios", "references_column": "codigo_6d"},
+            #{"column": "MUNIC_RES", "references_table": "municipios", "references_column": "codigo_6d"},
             {"column": "MUNIC_MOV", "references_table": "municipios", "references_column": "codigo_6d"},
             {"column": "DIAG_PRINC", "references_table": "cid10", "references_column": "CID"},
-            {"column": "CID_ASSO", "references_table": "cid10", "references_column": "CID"},
         ]
     },
     "atendimentos": {
         "table_name": "atendimentos",
         "columns": {
+            "id_atendimento": pl.UInt64, # Sinalizador para BIGSERIAL
             "N_AIH": pl.String,
             "PROC_REA": pl.String,
         },
-        "primary_key": ["N_AIH", "PROC_REA"],
+        "primary_key": ["id_atendimento"],
         "foreign_keys": [
             {"column": "N_AIH", "references_table": "internacoes", "references_column": "N_AIH"},
             {"column": "PROC_REA", "references_table": "procedimentos", "references_column": "PROC_REA"},

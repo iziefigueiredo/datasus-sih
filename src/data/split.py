@@ -26,7 +26,7 @@ class TableSplitter:
         self.internacoes_cols = [
             "CNES", "N_AIH", "ESPEC", "IDENT", "DT_INTER", "DT_SAIDA", 
             "VAL_SH", "VAL_SP", "VAL_TOT",  "DIAS_PERM",
-            "COMPLEX",  "MUNIC_MOV", "DIAG_PRINC", "CID_ASSO",
+            "COMPLEX",  "MUNIC_MOV", "DIAG_PRINC",
             "NASC", "SEXO", "IDADE", "NACIONAL", "NUM_FILHOS", "RACA_COR", "MUNIC_RES", "CEP"
         ]
 

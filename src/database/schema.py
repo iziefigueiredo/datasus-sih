@@ -102,7 +102,9 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
         },
         "primary_key": ["N_AIH"],
         "foreign_keys": [
-            {"column": "N_AIH", "references_table": "internacoes", "references_column": "N_AIH"}
+            {"column": "N_AIH", "references_table": "internacoes", "references_column": "N_AIH"},
+            {"column": "DIAG_SECUN", "references_table": "cid10", "references_column": "CID"}
+
         ]
     },
     "municipios": {
@@ -193,7 +195,9 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
             },
             "primary_key": ["N_AIH"],
             "foreign_keys": [
-                {"column": "N_AIH", "references_table": "internacoes", "references_column": "N_AIH"}
+                {"column": "N_AIH", "references_table": "internacoes", "references_column": "N_AIH"},
+                {"column": "CID_MORTE", "references_table": "cid10", "references_column": "CID"}
+
             ]
          },
     "infehosp": {
@@ -281,7 +285,8 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
     },
     "primary_key": ["N_AIH"],
     "foreign_keys": [
-        {"column": "N_AIH", "references_table": "internacoes", "references_column": "N_AIH"}
+        {"column": "N_AIH", "references_table": "internacoes", "references_column": "N_AIH"},
+        {"column": "CID_NOTIF", "references_table": "cid10", "references_column": "CID"}
     ]
 },
 

@@ -80,7 +80,8 @@ datasus-sih/
 │  │  ├─ download.py               # EXTRACT: Download DATASUS → parquet
 │  │  ├─ unify.py                  # TRANSFORM 1: Merge parquet files
 │  │  ├─ preprocess.py             # TRANSFORM 2: Clean & standardize
-│  │  └─ split.py                  # TRANSFORM 3: Split into fact/dim tables
+│  │  ├─ aggregate.py              # TRANSFORM 3: Contract 
+│  │  └─ split.py                  # TRANSFORM 4: Split into fact/dim tables
 │  │
 │  ├─ database/                    # Database schema and loader
 │  │  ├─ __init__.py

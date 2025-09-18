@@ -1,7 +1,3 @@
-"""
-Script para pré-processamento de dados SIH/SUS
-"""
-
 import polars as pl
 import sys
 from pathlib import Path
@@ -11,6 +7,7 @@ import gc
 import tempfile
 from datetime import datetime
 
+# Garante que o script pode importar de src/
 SRC_DIR = Path(__file__).parent.parent
 sys.path.insert(0, str(SRC_DIR))
 from config.settings import Settings
@@ -33,19 +30,13 @@ class SIHPreprocessor:
     def tratar_chunk_completo(self, df: pl.DataFrame) -> pl.DataFrame:
         """Aplica todos os tratamentos a um chunk"""
         
-
+        # Tratamento para RACA_COR e ETNIA
         if 'RACA_COR' in df.columns and 'ETNIA' in df.columns:
-            # Padroniza as colunas antes da lógica
             df = df.with_columns(
                 pl.col("RACA_COR").cast(pl.String, strict=False).str.strip_chars().fill_null("0"),
-                pl.col("ETNIA").cast(pl.String, strict=False).str.strip_chars().fill_null("0000") # Padroniza nulos e vazios para "0000" para facilitar a checagem
+                pl.col("ETNIA").cast(pl.String, strict=False).str.strip_chars().fill_null("0000")
             )
-
-            # Define os valores inválidos que a ETNIA pode ter
-            # O filtro de RACA_COR será mais robusto se a ETNIA já estiver limpa
             etnia_invalida = pl.col("ETNIA").is_in(["0", "00", "000", "0000", ""])
-
-            # A lógica é: se a ETNIA for válida, define RACA_COR como '5'. Senão, mantém a original.
             df = df.with_columns(
                 pl.when(~etnia_invalida)
                 .then(pl.lit("5"))
@@ -53,105 +44,98 @@ class SIHPreprocessor:
                 .alias("RACA_COR")
             )
 
+        # Converte campos de valor de texto para float, tratando vírgulas
+        campos_valores = ['VAL_SH', 'VAL_SP', 'VAL_TOT', 'VAL_UTI']
+        for col in campos_valores:
+            if col in df.columns:
+                df = df.with_columns(
+                    pl.col(col)
+                    .cast(pl.Utf8, strict=False)
+                    .str.replace_all(",", ".")
+                    .str.replace_all(" ", "")
+                    .str.replace_all("-", "")
+                    .cast(pl.Float64, strict=False)
+                    .fill_null(0.0)
+                    .alias(col)
+                )
 
-
-        if 'NUM_FILHOS' in df.columns:
-            df = df.with_columns([
-                pl.col("NUM_FILHOS").cast(pl.Int32, strict=False).fill_null(0).clip(0, None)
-            ])
-        
-        if 'INSTRU' in df.columns:
-            df = df.with_columns([
-                pl.col("INSTRU").cast(pl.Utf8).str.zfill(2).str.replace_all("nan", "0").fill_null("00")
-            ])
-        
-        if 'IDADE' in df.columns:
-            df = df.with_columns([
-                pl.col("IDADE").cast(pl.Float64, strict=False).fill_null(0.0)
-            ])
-            
-            if 'COD_IDADE' in df.columns:
-                df = df.with_columns([
-                    pl.col("COD_IDADE").cast(pl.Int32, strict=False).fill_null(4)
-                ])
-                
-                df = df.with_columns([
-                    pl.when(pl.col("COD_IDADE") == 1)
-                    .then(0.0)
-                    .when(pl.col("COD_IDADE") == 2)  
-                    .then((pl.col("IDADE") / 365.0).round(2))
-                    .when(pl.col("COD_IDADE") == 3)
-                    .then((pl.col("IDADE") / 12.0).round(2))
-                    .otherwise(pl.col("IDADE"))
-                    .clip(0, 120)
-                    .alias("IDADE")
-                ])
-                
-                df = df.drop("COD_IDADE")
-        
-        if 'SEXO' in df.columns:
-            df = df.with_columns([
-                pl.col("SEXO").cast(pl.Int32, strict=False).fill_null(0).clip(0, 3)
-            ])
-        
+        # Trata campos de data
         campos_datas = ['DT_INTER', 'DT_SAIDA', 'NASC']
         for col in campos_datas:
             if col in df.columns:
                 df = df.with_columns([
                     pl.col(col).cast(pl.Utf8).str.strptime(pl.Date, format="%Y%m%d", strict=False)
                 ])
-        
-        campos_valores = ['VAL_SH', 'VAL_SP', 'VAL_TOT', 'VAL_UTI']
-        for col in campos_valores:
-            if col in df.columns:
-                df = df.with_columns([
-                    pl.col(col).cast(pl.Float64, strict=False).fill_null(0.0).clip(0, None)
-                ])
-        
-        campos_inteiros = ['DIAS_PERM', 'UTI_MES_TO', 'UTI_INT_TO', 'DIAR_ACOM']
-        for col in campos_inteiros:
-            if col in df.columns:
-                df = df.with_columns([
-                    pl.col(col).cast(pl.Int32, strict=False).fill_null(0).clip(0, None)
-                ])
-        
-        campos_cid = ['DIAG_PRINC', 'DIAG_SECUN', 'CID_NOTIF', 'CID_ASSO', 'CID_MORTE']
 
-        for col in campos_cid:
-
-            if col in df.columns:
-
-                def tratar_cid(valor):
-
-                    if valor is None:
-                        return "0"
+        # Calcula a idade de forma precisa
+        if 'DT_INTER' in df.columns and 'NASC' in df.columns:
+            df = df.with_columns([
+                (pl.col("DT_INTER").dt.year() - pl.col("NASC").dt.year() -
+                 pl.when(
+                     (pl.col("DT_INTER").dt.month() < pl.col("NASC").dt.month()) |
+                     ((pl.col("DT_INTER").dt.month() == pl.col("NASC").dt.month()) &
+                      (pl.col("DT_INTER").dt.day() < pl.col("NASC").dt.day()))
+                 )
+                 .then(1)
+                 .otherwise(0)
+                )
+                .clip(0, 120)
+                .cast(pl.Int32)
+                .alias("IDADE")
+            ])
             
-                    valor_str = str(valor).strip().upper()
-            
-                    if valor_str in ["", "0", "00", "000", "0000", "00000", "000000"]:
-                        return "0"
-                    return valor_str
-
-                df = df.with_columns([
-                        pl.col(col).map_elements(tratar_cid, skip_nulls=False, return_dtype=pl.String).alias(col)
-                    ])
-        
-         # A coluna DIAS_PERM recebe a diferença entre as datas
+        # Calcula DIAS_PERM a partir das datas
         if 'DT_INTER' in df.columns and 'DT_SAIDA' in df.columns:
             df = df.with_columns(
                 (pl.col("DT_SAIDA") - pl.col("DT_INTER")).dt.total_days().alias("DIAS_PERM")
             )
-
-        # Garante que DIAS_PERM é um inteiro e não é nulo
-        if 'DIAS_PERM' in df.columns:
             df = df.with_columns(
                 pl.col("DIAS_PERM").cast(pl.Int32, strict=False).fill_null(0)
             )
-            
+
+        # Tratamento de valores inteiros
+        campos_inteiros = ['UTI_MES_TO', 'UTI_INT_TO', 'DIAR_ACOM', 'COD_IDADE']
+        for col in campos_inteiros:
+            if col in df.columns:
+                df = df.with_columns(
+                    pl.col(col).cast(pl.Int32, strict=False).fill_null(0).clip(0, None).alias(col)
+                )
+
+        # Padroniza outras colunas
+        if 'NUM_FILHOS' in df.columns:
+            df = df.with_columns([
+                pl.col("NUM_FILHOS").cast(pl.Int32, strict=False).fill_null(0).clip(0, None)
+            ])
+        if 'INSTRU' in df.columns:
+            df = df.with_columns([
+                pl.col("INSTRU").cast(pl.Utf8).str.zfill(2).str.replace_all("nan", "0").fill_null("00")
+            ])
+        if 'SEXO' in df.columns:
+            df = df.with_columns([
+                pl.col("SEXO").cast(pl.Int8, strict=False).fill_null(0).clip(0, 3)
+            ])
+        
         df = df.filter(pl.col("N_AIH").is_not_null())
-            
+
+        #Tratar CID
+        campos_cid = ['DIAG_PRINC', 'DIAG_SECUN', 'CID_NOTIF', 'CID_ASSO', 'CID_MORTE']
+        def tratar_cid(valor):
+            if valor is None: return "0"
+            valor_str = str(valor).strip().upper()
+            if valor_str in ["", "0", "00", "000", "0000", "00000", "000000"]:
+                return "0"
+            return valor_str
+        for col in campos_cid:
+            if col in df.columns:
+                df = df.with_columns([
+                    pl.col(col).map_elements(tratar_cid, skip_nulls=False, return_dtype=pl.String).alias(col)
+                ])
+        # --- Fim da lógica do CID ---
+
+        df = df.filter(pl.col("N_AIH").is_not_null())
+        
         return df
-    
+
     def processar_e_salvar_chunks(self) -> list:
         """Processa chunks e salva arquivos temporários"""
         logger.info("=== FASE 1: Processamento em Chunks ===")
@@ -185,130 +169,6 @@ class SIHPreprocessor:
         logger.info(f"{len(arquivos_temp)} chunks processados e salvos")
         return arquivos_temp
     
-    def contrair_por_lotes(self, arquivos_temp: list) -> Path:
-        """Contrai dados processando poucos arquivos por vez"""
-        logger.info("=== FASE 2: Contração por Lotes ===")
-        
-        colunas_soma = ['VAL_SH', 'VAL_SP', 'VAL_TOT', 'VAL_UTI']
-        colunas_media = ['UTI_MES_TO', 'UTI_INT_TO', 'DIAR_ACOM', 'IDADE']
-        
-        lote_size = 5
-        arquivos_contraidos = []
-        
-        for i in range(0, len(arquivos_temp), lote_size):
-            lote = arquivos_temp[i:i+lote_size]
-            lote_num = (i // lote_size) + 1
-            
-            logger.info(f"Contraindo lote {lote_num} ({len(lote)} arquivos)...")
-            
-            dfs = []
-            for arquivo in lote:
-                df = pl.read_parquet(arquivo)
-                dfs.append(df)
-            
-            df_lote = pl.concat(dfs, how="vertical_relaxed")
-            del dfs
-            gc.collect()
-            
-            aggregations = []
-            
-            for col in df_lote.columns:
-                if col == 'N_AIH':
-                    continue
-                elif col in colunas_soma:
-                    aggregations.append(pl.col(col).sum().alias(col))
-                elif col in colunas_media:
-                    aggregations.append(pl.col(col).mean().round(1).alias(col))
-                else:
-                    aggregations.append(pl.col(col).first().alias(col))
-            
-            df_contraido = df_lote.group_by('N_AIH').agg(aggregations)
-            
-            arquivo_contraido = self.temp_dir / f"contraido_{lote_num:03d}.parquet"
-            df_contraido.write_parquet(arquivo_contraido, compression="snappy")
-            arquivos_contraidos.append(arquivo_contraido)
-            
-            del df_lote, df_contraido
-            gc.collect()
-        
-        logger.info(f"{len(arquivos_contraidos)} lotes contraídos")
-        
-        if len(arquivos_contraidos) > 1:
-            logger.info("=== FASE 3: Contração Final ===")
-            return self.contracao_final(arquivos_contraidos)
-        else:
-            return arquivos_contraidos[0]
-    
-    def contracao_final(self, arquivos_contraidos: list) -> Path:
-        """Contração final de todos os lotes"""
-        
-        colunas_soma = ['VAL_SH', 'VAL_SP', 'VAL_TOT', 'VAL_UTI']
-        colunas_media = ['UTI_MES_TO', 'UTI_INT_TO', 'DIAR_ACOM', 'IDADE']
-        
-        grupos_size = 3
-        arquivos_finais = []
-        
-        for i in range(0, len(arquivos_contraidos), grupos_size):
-            grupo = arquivos_contraidos[i:i+grupos_size]
-            grupo_num = (i // grupos_size) + 1
-            
-            logger.info(f"Contração final - grupo {grupo_num}...")
-            
-            dfs = [pl.read_parquet(arquivo) for arquivo in grupo]
-            df_grupo = pl.concat(dfs, how="vertical_relaxed")
-            del dfs
-            gc.collect()
-            
-            aggregations = []
-            for col in df_grupo.columns:
-                if col == 'N_AIH':
-                    continue
-                elif col in colunas_soma:
-                    aggregations.append(pl.col(col).sum().alias(col))
-                elif col in colunas_media:
-                    aggregations.append(pl.col(col).mean().round(1).alias(col))
-                else:
-                    aggregations.append(pl.col(col).first().alias(col))
-            
-            df_final_grupo = df_grupo.group_by('N_AIH').agg(aggregations)
-            
-            arquivo_final = self.temp_dir / f"final_{grupo_num:03d}.parquet"
-            df_final_grupo.write_parquet(arquivo_final, compression="snappy")
-            arquivos_finais.append(arquivo_final)
-            
-            del df_grupo, df_final_grupo
-            gc.collect()
-        
-        if len(arquivos_finais) > 1:
-            logger.info("Concatenação final...")
-            dfs_finais = [pl.read_parquet(arquivo) for arquivo in arquivos_finais]
-            df_final = pl.concat(dfs_finais, how="vertical_relaxed")
-            del dfs_finais
-            gc.collect()
-            
-            aihs_unicas = df_final['N_AIH'].n_unique()
-            if len(df_final) > aihs_unicas:
-                logger.info("Contração final necessária...")
-                
-                aggregations = []
-                for col in df_final.columns:
-                    if col == 'N_AIH':
-                        continue
-                    elif col in colunas_soma:
-                        aggregations.append(pl.col(col).sum().alias(col))
-                    elif col in colunas_media:
-                        aggregations.append(pl.col(col).mean().round(1).alias(col))
-                    else:
-                        aggregations.append(pl.col(col).first().alias(col))
-                
-                df_final = df_final.group_by('N_AIH').agg(aggregations)
-            
-            arquivo_resultado = self.temp_dir / "resultado_final.parquet"
-            df_final.write_parquet(arquivo_resultado, compression="snappy")
-            return arquivo_resultado
-        else:
-            return arquivos_finais[0]
-    
     def limpar_temp(self):
         """Remove arquivos temporários"""
         try:
@@ -335,15 +195,15 @@ class SIHPreprocessor:
                 logger.info(f"Backup criado: {backup.name}")
             
             arquivos_temp = self.processar_e_salvar_chunks()
-            arquivo_final = self.contrair_por_lotes(arquivos_temp)
             
-            logger.info("Salvando arquivo final...")
-            df_resultado = pl.read_parquet(arquivo_final)
+            logger.info("Lendo todos os chunks para o arquivo final...")
             
-            registros_finais = len(df_resultado)
+            df_final = pl.read_parquet(arquivos_temp)
+            
+            registros_finais = len(df_final)
             logger.info(f"Registros finais: {registros_finais:,}")
-            
-            df_resultado.write_parquet(self.saida, compression="snappy", use_pyarrow=True)
+
+            df_final.write_parquet(self.saida, compression="snappy", use_pyarrow=True)
             
             tempo_total = time.time() - inicio
             tamanho_final_mb = self.saida.stat().st_size / (1024 * 1024)

@@ -36,13 +36,13 @@ class SIHUnifier:
         
         self.colunas_desejadas = [
             'ESPEC', 'N_AIH', 'IDENT', 'CEP', 'MUNIC_RES', 'NASC', 'SEXO', 'DT_INTER', 'DT_SAIDA',
-            'UTI_MES_TO', 'MARCA_UTI', 'UTI_INT_TO', 'DIAR_ACOM', 'QT_DIARIAS', 'PROC_REA', 
+            'UTI_MES_TO', 'MARCA_UTI', 'UTI_INT_TO', 'DIAR_ACOM',  'PROC_REA', 
             'VAL_SH', 'VAL_SP', 'VAL_TOT', 'VAL_UTI', 'NATUREZA', 'CNES', 'NAT_JUR', 'GESTAO', 'IND_VDRL', 
-            'IDADE', 'DIAG_PRINC', 'DIAG_SECUN', 'COBRANCA', 'MORTE', 'MUNIC_MOV', 'DIAS_PERM', 'NACIONAL', 
+            'IDADE', 'DIAG_PRINC', 'DIAG_SECUN',  'MORTE', 'MUNIC_MOV', 'DIAS_PERM', 'NACIONAL', 
             'NUM_FILHOS', 'INSTRU', 'CID_NOTIF', 'CONTRACEP1', 'CONTRACEP2', 'GESTRICO', 'INSC_PN', 'CBOR',
             'CNAER', 'VINCPREV', 'INFEHOSP', 'CID_ASSO', 'CID_MORTE', 'COMPLEX', 'RACA_COR', 'ETNIA',
-            'DIAGSEC1', 'DIAGSEC2', 'DIAGSEC3', 'DIAGSEC4', 'DIAGSEC5', 'DIAGSEC6', 'DIAGSEC7', 'DIAGSEC8', 'DIAGSEC9', 
-            'COD_IDADE', 'CGC_HOSP'
+            
+         
         ]
         
         Settings.criar_diretorios()

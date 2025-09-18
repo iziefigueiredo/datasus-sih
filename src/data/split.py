@@ -17,13 +17,15 @@ logger = logging.getLogger(__name__)
 
 class TableSplitter:
     def __init__(self):
-        self.input_parquet_path = Settings.INTERIM_DIR / Settings.PARQUET_TREATED_FILENAME
+    
+        self.input_parquet_path = Settings.INTERIM_DIR / Settings.PARQUET_CONTRACT_FILENAME
+        self.input_parquet_full = Settings.INTERIM_DIR/ Settings.PARQUET_TREATED_FILENAME
         self.output_dir = Settings.PROCESSED_DIR
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
         self.internacoes_cols = [
             "CNES", "N_AIH", "ESPEC", "IDENT", "DT_INTER", "DT_SAIDA", 
-            "PROC_REA", "VAL_SH", "VAL_SP", "VAL_TOT",  "DIAS_PERM",
+            "VAL_SH", "VAL_SP", "VAL_TOT",  "DIAS_PERM",
             "COMPLEX",  "MUNIC_MOV", "DIAG_PRINC", "CID_ASSO",
             "NASC", "SEXO", "IDADE", "NACIONAL", "NUM_FILHOS", "RACA_COR", "MUNIC_RES", "CEP"
         ]
@@ -52,7 +54,24 @@ class TableSplitter:
             "N_AIH", "CID_MORTE"
         ]
 
- 
+        self.atendimentos_cols = [
+            "N_AIH", "PROC_REA"
+        ]
+
+    def split_atendimentos(self):
+        table_name = "atendimentos"
+        output_file = self.output_dir / Settings.ATENDIMENTO_FILENAME
+        logger.info(f"Iniciando divisão para a tabela '{table_name}'...")
+        try:
+            df = pl.read_parquet(self.input_parquet_full, columns=self.atendimento_cols)
+            df.write_parquet(output_file, compression="snappy")
+            logger.info(f"Divisão para '{table_name}' concluída. {len(df):,} registros salvos.")
+            del df
+            gc.collect()
+        except Exception as e:
+            logger.error(f"Erro durante a divisão para '{table_name}': {e}")
+            raise
+    
 
     def split_internacoes(self):
         table_name = "internacoes"

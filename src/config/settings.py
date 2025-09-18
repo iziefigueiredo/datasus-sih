@@ -62,7 +62,8 @@ class Settings:
         "cid10": "cid10.csv"
     }
 
-    # --- CORREÇÃO: Adicionado PARQUET_TREATED_FILENAME como atributo de classe ---
+
+    # =========== FILENAME ===========
     PARQUET_TREATED_FILENAME = "sih_rs_tratado.parquet"
 
     
@@ -70,7 +71,6 @@ class Settings:
 
 
     PARQUET_UNIFIED_FILENAME = "sih_rs.parquet"
-    # --- FIM DA CORREÇÃO ---
 
     INTERNACOES_FILENAME = "internacoes.parquet"
     UTI_DETALHES_FILENAME = "uti_detalhes.parquet"

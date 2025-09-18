@@ -65,6 +65,10 @@ class Settings:
     # --- CORREÇÃO: Adicionado PARQUET_TREATED_FILENAME como atributo de classe ---
     PARQUET_TREATED_FILENAME = "sih_rs_tratado.parquet"
 
+    
+    PARQUET_CONTRACT_FILENAME = "sih_rs_contraido.parquet"
+
+
     PARQUET_UNIFIED_FILENAME = "sih_rs.parquet"
     # --- FIM DA CORREÇÃO ---
 

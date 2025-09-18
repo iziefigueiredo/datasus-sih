@@ -26,3 +26,4 @@ sources:
       - name: procedimentos
       - name: uti_detalhes
       - name: vincprev
+      - name: atendimentos

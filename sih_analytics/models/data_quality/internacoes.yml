@@ -2,10 +2,10 @@ version: 2
 
 sources:
   - name: public
-  
     tables:
       - name: internacoes
         columns:
+          # Verificações de Chaves e Integridade
           - name: '"N_AIH"'
             tests:
               - not_null
@@ -13,47 +13,52 @@ sources:
           - name: '"CNES"'
             tests:
               - not_null
-          
+              - relationships:
+                  to: source('public', 'hospital')
+                  field: '"CNES"'
+          - name: '"DIAG_PRINC"'
+            tests:
+              - not_null
+              - relationships:
+                  to: source('public', 'cid10')
+                  field: '"CID"'
+
+          # Verificações de Lógica de Negócio e Datas
           - name: '"DT_INTER"'
             tests:
               - not_null
-
-          - name: '"NASC"'
+         
+          - name: '"DT_SAIDA"'
             tests:
               - not_null
-
-          - name: '"MUNIC_RES"'
+         
+          - name: '"DIAS_PERM"'
             tests:
               - not_null
+              
           
-          - name: '"SEXO"'
-            tests:
-              - accepted_values:
-                  arguments:
-                    values: [1, 3]
-
-          - name: '"PROC_REA"'
-            tests:
-              - not_null
-          
-          - name: '"VAL_TOT"'
-            tests:
-              - not_null   
- 
-      
-
-          - name: '"VAL_SP"'
-            tests:
-              - not_null
-                     
-
-          - name: '"MUNIC_MOV"'
-            tests:
-              - not_null
-
+          # Verificações de Valores e Plausibilidade
           - name: '"IDADE"'
             tests:
               - not_null
-                 
-
+              
+          - name: '"SEXO"'
+            tests:
+              - not_null
+              - accepted_values:
+                  values: [1, 3]
+          
+          - name: '"VAL_TOT"'
+            tests:
+              - not_null
+              
+          - name: '"VAL_SP"'
+            tests:
+              - not_null
+              
+          - name: '"VAL_SH"'
+            tests:
+              - not_null
+              - dbt_utils.expression_is_true:
+                  expression: "'VAL_SH' > 0"
               

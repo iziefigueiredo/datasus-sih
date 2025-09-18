@@ -91,6 +91,7 @@ class Settings:
     CID_NOTIF_FILENAME = "notificacoes.parquet"
     PERNOITE_FILENAME = "pernoite.parquet" 
     DIAG_FILENAME = "diagnosticos.parquet"
+    ATENDIMENTO_FILENAME = "atendimentos.parquet"
 
   
 

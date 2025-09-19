@@ -1,0 +1,19 @@
+version: 2
+
+sources:
+  - name: public
+    database: "{{ target.database }}"
+    schema: public
+
+    tables:
+      - name: procedimentos
+        description: "Tabela de fatos principal contendo cada registro de internação hospitalar."
+        
+        columns:
+          # --- Testes de Chaves e Integridade ---
+        - name: '"PROC_REA"'
+          tests:
+            - not_null
+            - unique
+
+          

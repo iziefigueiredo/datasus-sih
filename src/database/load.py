@@ -121,7 +121,7 @@ class PostgreSQLLoader:
         elif tipo == pl.Boolean:
             return "BOOLEAN"
         elif tipo == pl.Date or tipo == pl.Datetime:
-            return "TIMESTAMP"
+            return "DATE"
         else:
             return "TEXT"
 

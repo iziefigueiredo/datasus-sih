@@ -88,4 +88,14 @@ sources:
             description: "Valor dos serviços profissionais."
             tests:
               - not_null
-              
+
+      - name: procedimentos
+        description: "Tabela de fatos principal contendo cada registro de internação hospitalar."
+        
+        columns:
+          # --- Testes de Chaves e Integridade ---
+        - name: '"PROC_REA"'
+          tests:
+            - not_null
+            - unique
+  

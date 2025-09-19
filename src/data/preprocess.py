@@ -60,6 +60,19 @@ class SIHPreprocessor:
                     .alias(col)
                 )
 
+        if 'VAL_UTI' not in df.columns:
+            df = df.with_columns(pl.lit(0.0).cast(pl.Float64).alias('VAL_UTI'))
+
+        # ETAPA 2: Recalcula e substitui 'VAL_TOT' pela soma dos componentes.
+        # Esta é a nova "fonte da verdade" para o valor total.
+        df = df.with_columns(
+            (
+                pl.col("VAL_SH") + 
+                pl.col("VAL_SP") + 
+                pl.col("VAL_UTI")
+            ).alias("VAL_TOT")
+        )
+
         # Trata campos de data
         campos_datas = ['DT_INTER', 'DT_SAIDA', 'NASC']
         for col in campos_datas:
@@ -108,7 +121,7 @@ class SIHPreprocessor:
                     # --- LÓGICA DE GENERALIZAÇÃO PARA O DISTRITO FEDERAL ---
                     .pipe(lambda s:
                         # SE o código começar com '53' (prefixo do DF)
-                        pl.when(s.str.starts_with("5301"))
+                        pl.when(s.str.starts_with("53"))
                         .then(pl.lit("530010"))  # ENTÃO, substitui pelo código unificado de Brasília
                         .otherwise(s)           # SENÃO, mantém o código original
                     )

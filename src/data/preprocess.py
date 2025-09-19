@@ -156,17 +156,24 @@ class SIHPreprocessor:
                     pl.col(col).cast(pl.Int32, strict=False).fill_null(0).clip(0, None).alias(col)
                 )
         
+        # Tratamento da coluna NACIONAL
         if 'NACIONAL' in df.columns:
             df = df.with_columns(
-                pl.when(pl.col("NACIONAL").is_null() | (pl.col("NACIONAL") == 0))
-                .then(pl.lit(10))
-                .otherwise(pl.col("NACIONAL"))
-                .cast(pl.Int16, strict=False)
-                .clip(0, 350)
-                .alias("NACIONAL")
+                pl.col("NACIONAL")
+                .cast(pl.Int16, strict=False) # Primeiro, tenta converter para Int16
+                .fill_null(0) # Preenche nulos resultantes da conversão com um valor temporário (0), para depois tratá-lo
+                .alias("NACIONAL_TEMP") # Cria uma coluna temporária para a lógica
             )
-
             
+            df = df.with_columns(
+                pl.when(pl.col("NACIONAL_TEMP") == 0) # Agora, verifica se o valor é 0 (que inclui os antigos nulos e os zeros originais)
+                .then(pl.lit(10))
+                .otherwise(pl.col("NACIONAL_TEMP"))
+                .clip(0, 350) # Aplica o clip
+                .alias("NACIONAL") # Renomeia de volta para NACIONAL
+            ).drop("NACIONAL_TEMP") # Remove a coluna temporária
+
+
         # Padroniza outras colunas
         if 'NUM_FILHOS' in df.columns:
             df = df.with_columns([
@@ -186,10 +193,7 @@ class SIHPreprocessor:
                 pl.col("ETNIA").cast(pl.Int8, strict=False).fill_null(0).clip(0, None)
             ])
         
-        # Em preprocess.py, dentro de tratar_chunk_completo
-
-        # Em src/data/preprocess.py, dentro da função tratar_chunk_completo
-
+        #
         # Tratamento de campos CID
         campos_cid = ['DIAG_PRINC', 'DIAG_SECUN', 'CID_NOTIF', 'CID_ASSO', 'CID_MORTE']
         for col in campos_cid:

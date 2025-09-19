@@ -1,6 +1,6 @@
 SELECT
     "NACIONAL"
 FROM
-     {{ source('public', 'internacoes') }}
+    {{ source('public', 'internacoes') }}
 WHERE
-    "NACIONAL" <= 0 OR "NACIONAL" > 350;
+    "NACIONAL" <= 0 OR "NACIONAL" > 350

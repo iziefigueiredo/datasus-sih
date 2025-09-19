@@ -112,7 +112,7 @@ class PostgreSQLLoader:
             return "BIGSERIAL"
 
         # O resto da lógica de conversão continua a mesma.
-        if tipo == pl.Int64 or tipo == pl.Int32:
+        if tipo == pl.Int64 or tipo == pl.Int32 or tipo == pl.Int8 or tipo == pl.Int16:
             return "BIGINT" if tipo == pl.Int64 else "INTEGER"
         elif tipo == pl.Float64:
             return "DOUBLE PRECISION"

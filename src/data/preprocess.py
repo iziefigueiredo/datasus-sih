@@ -180,6 +180,11 @@ class SIHPreprocessor:
                 pl.col("SEXO").cast(pl.Int8, strict=False).fill_null(0).clip(0, 3)
             ])
         
+        if 'ETNIA' in df.columns:
+            df = df.with_columns([
+                pl.col("ETNIA").cast(pl.Int8, strict=False).fill_null(0).clip(0, None)
+            ])
+        
         # Em preprocess.py, dentro de tratar_chunk_completo
 
         # Em src/data/preprocess.py, dentro da função tratar_chunk_completo

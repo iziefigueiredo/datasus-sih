@@ -48,7 +48,7 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
         "primary_key": ["N_AIH"],
         "foreign_keys": [
             {"column": "CNES", "references_table": "hospital", "references_column": "CNES"},
-            #{"column": "MUNIC_RES", "references_table": "municipios", "references_column": "codigo_6d"},
+            {"column": "MUNIC_RES", "references_table": "municipios", "references_column": "codigo_6d"},
             {"column": "MUNIC_MOV", "references_table": "municipios", "references_column": "codigo_6d"},
             {"column": "DIAG_PRINC", "references_table": "cid10", "references_column": "CID"},
         ]

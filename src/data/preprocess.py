@@ -156,16 +156,17 @@ class SIHPreprocessor:
                     pl.col(col).cast(pl.Int32, strict=False).fill_null(0).clip(0, None).alias(col)
                 )
         
-        # Tratamento da coluna NACIONAL
         if 'NACIONAL' in df.columns:
             df = df.with_columns(
-                pl.col("NACIONAL")
+                pl.when(pl.col("NACIONAL").is_null() | (pl.col("NACIONAL") == 0))
+                .then(pl.lit(10))
+                .otherwise(pl.col("NACIONAL"))
                 .cast(pl.Int16, strict=False)
-                .fill_null(10)
                 .clip(0, 350)
                 .alias("NACIONAL")
             )
 
+            
         # Padroniza outras colunas
         if 'NUM_FILHOS' in df.columns:
             df = df.with_columns([

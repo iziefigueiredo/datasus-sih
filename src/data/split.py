@@ -365,10 +365,9 @@ class TableSplitter:
             
             # Filtra os registros onde a Raça/Cor é Indígena ('5') e a ETNIA é preenchida
             df = df.filter(
-                (pl.col("RACA_COR") == "5") & 
+                (pl.col("RACA_COR") == "05") & 
                 pl.col("ETNIA").is_not_null() & 
-                (pl.col("ETNIA") != "") & 
-                (pl.col("ETNIA") != "0000")
+                (pl.col("ETNIA") != 0)
             )
             
             # Seleciona apenas as colunas desejadas e remove duplicatas

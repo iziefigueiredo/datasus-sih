@@ -3,4 +3,4 @@ SELECT
 FROM
      {{ source('public', 'internacoes') }}
 WHERE
-    "NACIONAL" < 0 OR "NACIONAL" > 350;
+    "NACIONAL" <= 0 OR "NACIONAL" > 350;

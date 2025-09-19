@@ -39,7 +39,7 @@ class SIHPreprocessor:
             etnia_invalida = pl.col("ETNIA").is_in(["0", "00", "000", "0000", ""])
             df = df.with_columns(
                 pl.when(~etnia_invalida)
-                .then(pl.lit("5"))
+                .then(pl.lit("05"))
                 .otherwise(pl.col("RACA_COR"))
                 .alias("RACA_COR")
             )

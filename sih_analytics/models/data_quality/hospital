@@ -1,0 +1,23 @@
+# models/data_quality/hospital.yml (VERSÃO CORRIGIDA)
+version: 2
+
+sources:
+  - name: public
+    tables:
+      - name: hospital # <--- CORRIGIDO
+        description: "Tabela de dimensão com informações sobre os hospitais (CNES)."
+        
+        columns:
+          - name: '"CNES"' # <--- COLUNA CORRETA
+            description: "Chave primária da tabela hospital (Cadastro Nacional de Estabelecimentos de Saúde)."
+            tests:
+              - not_null
+              - unique
+          
+          - name: '"NATUREZA"' # <--- OUTRA COLUNA CORRETA
+            description: "Código da natureza jurídica do estabelecimento."
+            tests:
+              - not_null
+              # Você pode adicionar um teste de valores aceitos aqui se souber os códigos
+              # - accepted_values:
+              #     values: ['20', '36', '40', '50'] 

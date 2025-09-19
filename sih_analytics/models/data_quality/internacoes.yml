@@ -6,6 +6,7 @@ sources:
     schema: public
 
     tables:
+      # --- Tabela Principal: internacoes ---
       - name: internacoes
         description: "Tabela de fatos principal contendo cada registro de internação hospitalar."
         
@@ -16,7 +17,7 @@ sources:
             tests:
               - not_null
               - unique
-
+             
           - name: '"CNES"'
             description: "Chave estrangeira para a tabela de hospitais."
             tests:
@@ -96,17 +97,7 @@ sources:
             tests:
               - not_null
 
-      - name: procedimentos
-        description: "Tabela de fatos principal contendo cada registro de internação hospitalar."
-        
-        columns:
-          # --- Testes de Chaves e Integridade ---
-        - name: '"PROC_REA"'
-          tests:
-            - not_null
-            - unique
-      
-
+      # --- Tabela: hospital ---
       - name: hospital
         description: "Tabela de dimensão de hospitais."
         columns:
@@ -117,15 +108,166 @@ sources:
           - name: '"NATUREZA"'
             tests:
               - not_null
-          
-          #- name: '"NAT_JUR"'
-          #  tests:
-          #    - not_null
+          # A linha com # - name: '"NAT_JUR"' foi removida por estar comentada e não ter sido usada.
 
+      # --- Tabela: instrucao ---
       - name: instrucao
+        description: "Tabela de informações sobre o nível de instrução do paciente, vinculada à internação."
         columns:
+          - name: '"N_AIH"' # Chave estrangeira para internacoes
+            description: "Chave estrangeira para a tabela de internações."
+            tests:
+              # - not_null # Opcional, dependendo se todo registro de instrucao TEM uma AIH
+              - relationships:
+                  to: source('public', 'internacoes')
+                  field: '"N_AIH"'
           - name: '"INSTRU"'
             tests:
               - not_null
               - accepted_values:
                   values: ['01','02', '03', '04', '05', '06', '07', '08', '09', '10', '11']
+
+      # --- Tabela: procedimentos ---
+      - name: procedimentos # Nome da sua tabela de procedimentos
+        description: "Detalhes de procedimentos realizados." # Descrição atualizada
+        columns:
+          
+          - name: '"PROC_REA"' # Coluna que referencia a si mesma ou uma dimensão de procedimentos
+            description: "Código do procedimento realizado."
+            tests:
+              - not_null
+            
+
+
+      # --- Tabela: etnia ---
+      - name: etnia
+        description: "Tabela com detalhes de etnia do paciente quando aplicável."
+        columns:
+          - name: '"N_AIH"'
+            description: "Chave estrangeira para a tabela de internações."
+            tests:
+              - not_null # Se um registro na tabela etnia DEVE ter uma AIH
+              - relationships:
+                  to: source('public', 'internacoes')
+                  field: '"N_AIH"'
+          - name: '"ETNIA"'
+            description: "Código da etnia."
+            tests:
+              - not_null # Se ETNIA não pode ser nula aqui
+
+      # --- Tabela: atendimentos ---
+      - name: atendimentos
+        description: "Detalhes adicionais sobre os atendimentos."
+        columns:
+          - name: '"PROC_REA"'
+            description: "Chave estrangeira para a tabela de internações."
+            tests:
+              - not_null # Opcional
+              - relationships:
+                  to: source('public', 'procedimentos')
+                  field: '"PROC_REA"'
+          
+          - name: '"N_AIH"'
+            tests:
+              - not_null
+          # Adicione outras colunas de 'atendimentos' aqui se houver, com suas descrições e testes.
+
+      # --- Tabela: pernoite ---
+      - name: pernoite
+        description: "Informações sobre pernoites do paciente."
+        columns:
+          - name: '"N_AIH"'
+            description: "Chave estrangeira para a tabela de internações."
+            tests:
+              # - not_null # Opcional
+              - relationships:
+                  to: source('public', 'internacoes')
+                  field: '"N_AIH"'
+          # Adicione outras colunas de 'pernoite' aqui se houver, com suas descrições e testes.
+
+      # --- Tabela: obstetricos ---
+      - name: obstetricos
+        description: "Dados obstétricos para internações relacionadas a gravidez/parto."
+        columns:
+          - name: '"N_AIH"'
+            description: "Chave estrangeira para a tabela de internações."
+            tests:
+              # - not_null # Opcional: Se nem toda internação é obstétrica, pode ser NULL
+              - relationships:
+                  to: source('public', 'internacoes')
+                  field: '"N_AIH"'
+          # Adicione outras colunas de 'obstetricos' aqui se houver, com suas descrições e testes.
+
+      # --- Tabela: mortes ---
+      - name: mortes
+        description: "Informações sobre óbitos de pacientes internados."
+        columns:
+          - name: '"N_AIH"'
+            description: "Chave estrangeira para a tabela de internações."
+            tests:
+              - unique # Cada N_AIH só pode aparecer uma vez (um óbito por internação)
+              - not_null # Se um registro aqui DEVE ter uma AIH
+              - relationships:
+                  to: source('public', 'internacoes')
+                  field: '"N_AIH"'
+          # Adicione outras colunas de 'mortes' aqui se houver, com suas descrições e testes.
+
+      # --- Tabela: diagnosticos ---
+      - name: diagnosticos
+        description: "Detalhes adicionais de diagnóstico (ex: secundários) por AIH."
+        columns:
+          - name: '"N_AIH"'
+            description: "Chave estrangeira para a tabela de internações."
+            tests:
+              # - not_null # Opcional
+              - relationships:
+                  to: source('public', 'internacoes')
+                  field: '"N_AIH"'
+          - name: '"DIAG_SECUN"'
+            description: "Código do diagnóstico secundário."
+            tests:
+              - not_null
+              - relationships:
+                  to: source('public', 'cid10')
+                  field: '"CID"'
+          # Adicione outras colunas de 'diagnosticos' aqui se houver, com suas descrições e testes.
+
+      # --- Tabela: cbor ---
+      - name: cbor
+        description: "Informações relacionadas a procedimentos ou códigos CBOR."
+        columns:
+          - name: '"N_AIH"'
+            description: "Chave estrangeira para a tabela de internações."
+            tests:
+              # - not_null # Opcional
+              - relationships:
+                  to: source('public', 'internacoes')
+                  field: '"N_AIH"'
+          # Adicione outras colunas de 'cbor' aqui se houver, com suas descrições e testes.
+
+      # --- Tabela: vincprev ---
+      - name: vincprev
+        description: "Informações sobre vínculo previdenciário."
+        columns:
+          - name: '"N_AIH"'
+            description: "Chave estrangeira para a tabela de internações."
+            tests:
+              # - not_null # Opcional
+              - relationships:
+                  to: source('public', 'internacoes')
+                  field: '"N_AIH"'
+          # Adicione outras colunas de 'vincprev' aqui se houver, com suas descrições e testes.
+
+      # --- Outros sources existentes (se houver e não listados antes) ---
+      # - name: cid10
+      #   columns:
+      #     - name: '"CID"'
+      #       tests:
+      #         - not_null
+      #         - unique
+      # - name: municipios
+      #   columns:
+      #     - name: '"codigo_6d"'
+      #       tests:
+      #         - not_null
+      #         - unique

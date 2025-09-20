@@ -33,7 +33,7 @@ class PostgreSQLLoader:
             "municipios",
             "procedimentos",
             "hospital",
-            "dado_ibge",
+            "indicadores",
             "internacoes", # Tabela de fatos principal
             "uti_detalhes",
             "condicoes_especificas",

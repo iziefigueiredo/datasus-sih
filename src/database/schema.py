@@ -237,33 +237,22 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
         ]
     },
 
-    "dado_ibge": {
-    "table_name": "dado_ibge",
+    
+    "indicadores": {
+    "table_name": "indicadores",
     "columns": {
-        "uf": pl.Int64,
-        "nome_uf": pl.String,
-        "municipio": pl.Int64,
-        "codigo_municipio_completo": pl.String,  
-        "nome_municipio": pl.String,
-        "sigla_estado": pl.String,
-        "populacao": pl.Int32,
-        "densidade_demografica": pl.Int32,
-        "salario_medio": pl.Int32,
-        "pessoal_ocupado": pl.Int32,
-        "ideb_anos_iniciais_ensino_fundamental": pl.Int32,
-        "ideb_anos_finais_ensino_fundamental": pl.Int32,
-        "receita_bruta": pl.Int32,
-        "dependencia_financeira": pl.Int32,
-        "despesas_empenhadas": pl.Int32,
-        "mortalidade_infantil": pl.Int32,
-        "internacoes_por_diarreia": pl.Int32,
-        "area_cidade": pl.Int32,
+        "codigo_6d": pl.String,
+        "ano": pl.Int32,
+        "metrica": pl.String,
+        "valor": pl.Float64,
+        "escala": pl.String,
     },
-    "primary_key": ["codigo_municipio_completo"],
+    "primary_key": ["codigo_6d", "ano", "metrica"],
     "foreign_keys": [
-        {"column": "codigo_municipio_completo", "references_table": "municipios", "references_column": "codigo_ibge"}
+        {"column": "codigo_6d", "references_table": "municipios", "references_column": "codigo_6d"}
     ]
 },
+
 
     "contraceptivos": {
     "table_name": "contraceptivos",

@@ -488,7 +488,7 @@ class TableSplitter:
             "cid10": "cid10.csv",
             "municipios": "municipios.csv",
             "procedimentos": "procedimentos.csv",
-            "dado_ibge": "dado_ibge.csv"
+            "indicadores": "indicadores.csv"
         }
 
         for nome, csv_nome in arquivos_apoio.items():

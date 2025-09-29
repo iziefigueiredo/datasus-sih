@@ -1,23 +1,8 @@
 import polars as pl
 from typing import Dict, List, Tuple
 
-# Mapeamento de tipos Polars para PostgreSQL
-POLARS_TO_POSTGRES_TYPES = {
-    pl.Int8: "SMALLINT",
-    pl.Int16: "SMALLINT",
-    pl.Int32: "INTEGER",
-    pl.Int64: "BIGINT",
-    pl.UInt8: "SMALLINT",
-    pl.UInt16: "INTEGER",
-    pl.UInt32: "BIGINT",
-    pl.UInt64: "BIGINT",
-    pl.Float32: "REAL",
-    pl.Int32: "DOUBLE PRECISION",
-    pl.Boolean: "BOOLEAN",
-    pl.String: "TEXT",
-    pl.Date: "DATE",
-    pl.Datetime: "TIMESTAMP",
-}
+# O mapeamento de tipos foi movido para o load.py para evitar redundância.
+# Este arquivo agora contém apenas a definição do esquema.
 
 TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
     "internacoes": {
@@ -56,7 +41,7 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
     "atendimentos": {
         "table_name": "atendimentos",
         "columns": {
-            "id_atendimento": pl.UInt64, # Sinalizador para BIGSERIAL
+            "id_atendimento": pl.UInt64, 
             "N_AIH": pl.String,
             "PROC_REA": pl.String,
         },
@@ -292,35 +277,3 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
 
 
     }
-
-
-
-
-def get_create_table_sql(table_name: str, with_constraints: bool = True) -> str:
-    schema_info = TABLE_SCHEMAS.get(table_name)
-    if not schema_info:
-        raise ValueError(f"Esquema para a tabela '{table_name}' não encontrado.")
-
-    columns_sql = []
-    for col_name, col_type in schema_info["columns"].items():
-        postgres_type = POLARS_TO_POSTGRES_TYPES.get(col_type, "TEXT")
-
-        if col_name == "id" and col_name in schema_info["primary_key"] and col_type in [pl.Int32, pl.Int64]:
-            postgres_type = "SERIAL" if col_type == pl.Int32 else "BIGSERIAL"
-
-        if col_name in schema_info["primary_key"] and col_name != "id":
-            postgres_type += " NOT NULL"
-
-        columns_sql.append(f'"{col_name}" {postgres_type}')
-
-    if with_constraints and schema_info["primary_key"]:
-        pk_cols = [f'"{col}"' for col in schema_info["primary_key"]]
-        columns_sql.append(f"PRIMARY KEY ({', '.join(pk_cols)})")
-
-    if with_constraints:
-        for fk in schema_info["foreign_keys"]:
-            columns_sql.append(
-                f"FOREIGN KEY (\"{fk['column']}\") REFERENCES \"{fk['references_table']}\" (\"{fk['references_column']}\") ON DELETE CASCADE"
-            )
-
-    return f"CREATE TABLE IF NOT EXISTS \"{table_name}\" ({', '.join(columns_sql)})"

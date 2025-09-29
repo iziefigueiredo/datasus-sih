@@ -431,8 +431,6 @@ class TableSplitter:
             gc.collect()
 
 
-    # Em src/data/split.py, dentro da classe TableSplitter
-
     def split_diagnosticos(self):
         table_name = "diagnosticos"
         output_file = self.output_dir / Settings.DIAG_FILENAME
@@ -538,6 +536,7 @@ class TableSplitter:
             self.split_pernoite()
             self.split_diagnosticos()
             self.split_atendimentos()
+            
             # --- INÍCIO DO NOVO BLOCO DE LOG ---
             tempo_total = time.time() - inicio
             

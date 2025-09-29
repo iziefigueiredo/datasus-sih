@@ -1,0 +1,61 @@
+Tabelas verificadas e liberadas para uso:
+
+Tabela: internacoes
+- N_AIH       → PK da internação (não nulo, único)
+- CNES        → FK para hospital (não nulo, válido)
+- DIAG_PRINC  → FK para cid10 (não nulo, válido)
+- MUNIC_RES   → FK para municipios (não nulo, válido)
+- DT_INTER    → Data de internação (não nulo)
+- DT_SAIDA    → Data de saída (não nulo, ≥ DT_INTER)
+- DIAS_PERM   → Dias de permanência (não nulo, consistente)
+- IDADE       → Maior que 0
+- SEXO        → Aceitos: 1, 3
+- RACA_COR    → Aceitos: 01–05, 99
+- VAL_TOT     → Valor total (≥ 0, não nulo)
+- VAL_SH      → Valor serviços hospitalares (≥ 0, não nulo)
+- VAL_SP      → Valor serviços profissionais (≥ 0, não nulo)
+
+Tabela: hospital
+- CNES        → PK hospital (não nulo, único)
+- NATUREZA    → Categoria de natureza do hospital (não nulo)
+
+Tabela: instrucao
+- N_AIH       → FK para internacoes
+- INSTRU      → Aceitos: 01–11
+
+Tabela: procedimentos
+- PROC_REA    → Código do procedimento realizado (não nulo)
+
+Tabela: etnia
+- N_AIH       → FK para internacoes
+- ETNIA       → Código de etnia (não nulo, dentro do intervalo)
+
+Tabela: atendimentos
+- PROC_REA    → FK para procedimentos (não nulo, válido)
+- N_AIH       → FK para internacoes (não nulo)
+
+Tabela: pernoite
+- N_AIH       → FK para internacoes
+
+Tabela: obstetricos
+- N_AIH       → FK para internacoes
+
+Tabela: mortes
+- N_AIH       → FK para internacoes (único, não nulo)
+
+Tabela: diagnosticos
+- N_AIH       → FK para internacoes
+- DIAG_SECUN  → FK para cid10 (não nulo, válido)
+
+Tabela: cbor
+- N_AIH       → FK para internacoes
+
+Tabela: vincprev
+- N_AIH       → FK para internacoes
+
+Tabela: cid10
+- CID         → PK da tabela (não nulo, único)
+
+Tabela: municipios
+- codigo_6d   → PK da tabela (não nulo, único)
+

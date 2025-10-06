@@ -37,7 +37,6 @@ class SIHPreprocessor:
             if col in df.columns:
                 df = df.with_columns(
                     pl.col(col)
-                    .cast(pl.String, strict=False)
                     .cast(pl.Float64, strict=False)
                     .alias(col)
                 )
@@ -71,18 +70,16 @@ class SIHPreprocessor:
         # Padroniza outras colunas
         if 'NUM_FILHOS' in df.columns:
             df = df.with_columns([
-                pl.col("NUM_FILHOS").cast(pl.Int8, strict=False).fill_null(0).clip(0, None)
+                pl.col("NUM_FILHOS").cast(pl.Int8, strict=False)
             ])
       
         if 'ETNIA' in df.columns:
             df = df.with_columns([
-                pl.col("ETNIA").cast(pl.Int8, strict=False).fill_null(0).clip(0, None)
+                pl.col("ETNIA").cast(pl.Int8, strict=False)
             ])
         
               
 
-        # Garante que N_AIH não seja nulo para evitar problemas posteriores
-        df = df.filter(pl.col("N_AIH").is_not_null())
         
         return df
 

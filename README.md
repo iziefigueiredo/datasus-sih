@@ -60,7 +60,10 @@ datasus-sih/
 ├─ data/                           # Data layer
 │  ├─ raw/                         # Raw parquet files downloaded from DATASUS
 │  ├─ interim/                     # Unified and preprocessed parquet files
-│  └─ support/                     # Lookup CSVs (cid10.csv, municipios.csv, procedimentos.csv)
+│  └─ support/
+│
+├─ sih_analytics/                           # Documentation (for GitHub/Pages)
+│  ├─ models/                    # Schema and ETL diagrams                  # Lookup CSVs (cid10.csv, municipios.csv, procedimentos.csv)
 │
 ├─ docs/                           # Documentation (for GitHub/Pages)
 │  ├─ diagrams/                    # Schema and ETL diagrams

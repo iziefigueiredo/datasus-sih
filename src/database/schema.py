@@ -1,8 +1,8 @@
 import polars as pl
 from typing import Dict, List, Tuple
 
-# O mapeamento de tipos foi movido para o load.py para evitar redundância.
-# Este arquivo agora contém apenas a definição do esquema.
+# Define the schema for each table in the database
+# Each table schema includes column names, data types, primary keys, and foreign keys
 
 TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
     "internacoes": {

@@ -26,7 +26,7 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
             "IDADE": pl.Int16,
             "NACIONAL": pl.Int16,
             "NUM_FILHOS": pl.Int8,
-            "RACA_COR": pl.String,
+            "RACA_COR": pl.Int8,
             "MUNIC_RES": pl.Int32,
             "CEP": pl.Int64,
         },
@@ -96,8 +96,8 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
         "table_name": "municipios",
 
         "columns": {
-            "codigo_6d": pl.Int32,
-            "codigo_ibge": pl.Int32,
+            "codigo_6d": pl.Int64,
+            "codigo_ibge": pl.Int64,
             "nome": pl.String,
             "latitude": pl.Float32,
             "longitude": pl.Float32,

@@ -29,20 +29,42 @@ class SIHPreprocessor:
     
     def tratar_chunk_completo(self, df: pl.DataFrame) -> pl.DataFrame:
         """Aplica todos os tratamentos a um chunk"""
-        
-        # Tratamento para RACA_COR e ETNIA
-        if 'RACA_COR' in df.columns and 'ETNIA' in df.columns:
-            df = df.with_columns(
-                pl.col("RACA_COR").cast(pl.String, strict=False).str.strip_chars().fill_null("0"),
-                pl.col("ETNIA").cast(pl.String, strict=False).str.strip_chars().fill_null("0000")
-            )
-            etnia_invalida = pl.col("ETNIA").is_in(["0", "00", "000", "0000", ""])
-            df = df.with_columns(
-                pl.when(~etnia_invalida)
-                .then(pl.lit("05"))
-                .otherwise(pl.col("RACA_COR"))
-                .alias("RACA_COR")
-            )
+                
+        # === Conversão padronizada de tipos numéricos ===
+        # Colunas de identificadores e códigos (valores longos) → Int64
+        cols_int64 = [
+            "N_AIH", "CNES",  "PROC_REA", "CEP"
+        ]
+
+        # Colunas de contagem ou valores médios → Int32
+        cols_int32 = [
+            "DIAR_ACOM", "UTI_MES_TO", "UTI_INT_TO", "codigo_6d", "MUNIC_MOV", "MUNIC_RES"
+        ]
+
+        # Colunas com intervalos pequenos → Int8 / Int16
+        cols_int8 = [
+            "SEXO", "NUM_FILHOS", "ETNIA", "RACA_COR", "INSTRU"
+        ]
+        cols_int16 = [
+            "IDADE", "DIAS_PERM", "NACIONAL"
+        ]
+
+        # Conversão dos grupos, respeitando a existência das colunas
+        for col in cols_int64:
+            if col in df.columns:
+                df = df.with_columns(pl.col(col).cast(pl.Int64, strict=False).fill_null(0))
+
+        for col in cols_int32:
+            if col in df.columns:
+                df = df.with_columns(pl.col(col).cast(pl.Int32, strict=False).fill_null(0))
+
+        for col in cols_int16:
+            if col in df.columns:
+                df = df.with_columns(pl.col(col).cast(pl.Int16, strict=False).fill_null(0))
+
+        for col in cols_int8:
+            if col in df.columns:
+                df = df.with_columns(pl.col(col).cast(pl.Int8, strict=False).fill_null(0))
 
         # Converte campos de valor de texto para float, tratando vírgulas
         campos_valores = ['VAL_SH', 'VAL_SP', 'VAL_TOT', 'VAL_UTI']
@@ -108,92 +130,86 @@ class SIHPreprocessor:
             )
 
         # Padronização dos códigos de município para 6 dígitos/ Mapeamento de valores não encontrado
-        campos_municipio = ['MUNIC_RES', 'MUNIC_MOV']
-        
+        # === Tratamento dos códigos de município (agora numérico) ===
+        campos_municipio = ["MUNIC_RES", "MUNIC_MOV"]
+
         for col in campos_municipio:
             if col in df.columns:
                 df = df.with_columns(
-                    pl.col(col)
-                    .cast(pl.String, strict=False)
-                    .str.strip_chars()
-                    .fill_null("000000")
-                    
-                    # --- LÓGICA DE GENERALIZAÇÃO PARA O DISTRITO FEDERAL ---
-                    .pipe(lambda s:
-                        # SE o código começar com '53' (prefixo do DF)
-                        pl.when(s.str.starts_with("53"))
-                        .then(pl.lit("530010"))  # ENTÃO, substitui pelo código unificado de Brasília
-                        .otherwise(s)           # SENÃO, mantém o código original
-                    )
-                    
-                    # Continua com a padronização geral para 6 dígitos
-                    .str.slice(0, 6)
-                    .str.pad_start(length=6, fill_char='0')
+                    pl.when(pl.col(col).is_null() | (pl.col(col) < 0))
+                    .then(0)  # substitui nulos ou negativos por 0
+                    .otherwise(pl.col(col))
+                    .cast(pl.Int64, strict=False)
                     .alias(col)
                 )
 
+                # Corrige Distrito Federal (prefixo 53 → código 530010)
+                df = df.with_columns(
+                    pl.when((pl.col(col) // 1000) == 53)  # verifica prefixo 53
+                    .then(pl.lit(530010))
+                    .otherwise(pl.col(col))
+                    .alias(col)
+                )
+
+                # Garante que seja sempre um número de até 6 dígitos
+                df = df.with_columns(
+                    pl.when(pl.col(col) > 999999)
+                    .then(pl.col(col) // 10)
+                    .otherwise(pl.col(col))
+                    .alias(col)
+                )
+
+        # === Tratamento de RACA_COR e ETNIA ===
+        if "RACA_COR" in df.columns and "ETNIA" in df.columns:
+            df = df.with_columns([
+                pl.col("RACA_COR")
+                .cast(pl.Int8, strict=False)
+                .fill_null(0)
+                .clip(lower_bound=0, upper_bound=99)
+                .alias("RACA_COR"),
+
+                pl.col("ETNIA")
+                .cast(pl.Int16, strict=False)  # precisa ser Int16 pois vai até 264
+                .fill_null(0)
+                .clip(lower_bound=0, upper_bound=264)
+                .alias("ETNIA")
+            ])
+
+            # Se RACA_COR != 5 e ETNIA for válida (≠ 0)
+            df = df.with_columns(
+                pl.when((pl.col("RACA_COR") != 5) & (pl.col("ETNIA") != 0))
+                .then(pl.lit(5))
+                .otherwise(pl.col("RACA_COR"))
+                .alias("RACA_COR")
+            )
+
 
         # Padronização do código de procedimento (PROC_REA)
-        if 'PROC_REA' in df.columns:
+        if "PROC_REA" in df.columns:
             df = df.with_columns(
-                pl.col('PROC_REA')
-                .cast(pl.String, strict=False)
-                .str.strip_chars()
-                .fill_null("0")
-                .pipe(lambda s: 
-                    pl.when(s.str.starts_with('0'))
-                    .then(s.str.slice(1))
-                    .otherwise(s)
-                )
-                .alias('PROC_REA')
+                pl.col("PROC_REA")
+                .cast(pl.Int64, strict=False)
+                .fill_null(0)
+                .clip(lower_bound=0)
+                .alias("PROC_REA")
             )
 
-        # Tratamento de valores inteiros
-        campos_inteiros = ['UTI_MES_TO', 'UTI_INT_TO', 'DIAR_ACOM']
-        for col in campos_inteiros:
-            if col in df.columns:
-                df = df.with_columns(
-                    pl.col(col).cast(pl.Int32, strict=False).fill_null(0).clip(0, None).alias(col)
-                )
-        
-        # Tratamento da coluna NACIONAL
-        if 'NACIONAL' in df.columns:
+
+     
+
+        # === Tratamento da coluna NACIONAL ===
+        if "NACIONAL" in df.columns:
             df = df.with_columns(
                 pl.col("NACIONAL")
-                .cast(pl.Int16, strict=False) # Primeiro, tenta converter para Int16
-                .fill_null(0) # Preenche nulos resultantes da conversão com um valor temporário (0), para depois tratá-lo
-                .alias("NACIONAL_TEMP") # Cria uma coluna temporária para a lógica
+                .cast(pl.Int16, strict=False)
+                .fill_null(10)         # Substitui nulos diretamente por 10
+                .clip(lower_bound=0, upper_bound=350)  # Mantém dentro dos limites válidos
+                .alias("NACIONAL")
             )
-            
-            df = df.with_columns(
-                pl.when(pl.col("NACIONAL_TEMP") == 0) # Agora, verifica se o valor é 0 (que inclui os antigos nulos e os zeros originais)
-                .then(pl.lit(10))
-                .otherwise(pl.col("NACIONAL_TEMP"))
-                .clip(0, 350) # Aplica o clip
-                .alias("NACIONAL") # Renomeia de volta para NACIONAL
-            ).drop("NACIONAL_TEMP") # Remove a coluna temporária
-
-
-        # Padroniza outras colunas
-        if 'NUM_FILHOS' in df.columns:
-            df = df.with_columns([
-                pl.col("NUM_FILHOS").cast(pl.Int8, strict=False).fill_null(0).clip(0, None)
-            ])
-        if 'INSTRU' in df.columns:
-            df = df.with_columns([
-                pl.col("INSTRU").cast(pl.String).str.zfill(2).str.replace_all("nan", "0").fill_null("00")
-            ])
-        if 'SEXO' in df.columns:
-            df = df.with_columns([
-                pl.col("SEXO").cast(pl.Int8, strict=False).fill_null(0).clip(0, 3)
-            ])
+    
+  
         
-        if 'ETNIA' in df.columns:
-            df = df.with_columns([
-                pl.col("ETNIA").cast(pl.Int8, strict=False).fill_null(0).clip(0, None)
-            ])
         
-        #
         # Tratamento de campos CID
         campos_cid = ['DIAG_PRINC', 'DIAG_SECUN', 'CID_NOTIF', 'CID_ASSO', 'CID_MORTE']
         for col in campos_cid:

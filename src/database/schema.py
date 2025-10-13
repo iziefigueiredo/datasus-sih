@@ -8,7 +8,7 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
     "internacoes": {
         "table_name": "internacoes",
         "columns": {
-            "CNES": pl.String,
+            "CNES": pl.Int64,
             "N_AIH": pl.String,
             "ESPEC": pl.String,
             "IDENT": pl.String,
@@ -19,7 +19,7 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
             "VAL_SP": pl.Int32,
             "VAL_TOT": pl.Int32,
             "COMPLEX": pl.String,
-            "MUNIC_MOV": pl.String,
+            "MUNIC_MOV": pl.Int32,
             "DIAG_PRINC": pl.String,
             "NASC": pl.Date,
             "SEXO": pl.Int8,
@@ -27,8 +27,8 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
             "NACIONAL": pl.Int16,
             "NUM_FILHOS": pl.Int8,
             "RACA_COR": pl.String,
-            "MUNIC_RES": pl.String,
-            "CEP": pl.String,
+            "MUNIC_RES": pl.Int32,
+            "CEP": pl.Int64,
         },
         "primary_key": ["N_AIH"],
         "foreign_keys": [
@@ -70,7 +70,7 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
         "table_name": "etnia",
         "columns": {
             "N_AIH": pl.String,
-            "ETNIA": pl.String,
+            "ETNIA": pl.Int32,
             
         },
         "primary_key": ["N_AIH"],
@@ -96,11 +96,11 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
         "table_name": "municipios",
 
         "columns": {
-            "codigo_6d": pl.String,
-            "codigo_ibge": pl.String,
+            "codigo_6d": pl.Int32,
+            "codigo_ibge": pl.Int32,
             "nome": pl.String,
-            "latitude": pl.Int32,
-            "longitude": pl.Int32,
+            "latitude": pl.Float32,
+            "longitude": pl.Float32,
             "estado": pl.String
         },
         "primary_key": ["codigo_6d"],
@@ -132,7 +132,7 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
     "procedimentos": {
         "table_name": "procedimentos",
         "columns": {
-            "PROC_REA": pl.String,
+            "PROC_REA": pl.Int64,
             "NOME_PROC": pl.String
         },
         "primary_key": ["PROC_REA"],
@@ -154,7 +154,7 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
     "table_name": "instrucao",
     "columns": {
         "N_AIH": pl.String,   
-        "INSTRU": pl.String   
+        "INSTRU": pl.Int8   
     },
     "primary_key": ["N_AIH"],
     "foreign_keys": [

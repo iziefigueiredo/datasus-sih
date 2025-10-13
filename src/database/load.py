@@ -103,27 +103,45 @@ class PostgreSQLLoader:
 
     def polars_to_postgres_type(self, tipo, col_name=None, pk_cols=None):
         """
-        Converte um tipo Polars para um tipo PostgreSQL.
-        A lógica foi aprimorada para identificar chaves primárias e usar BIGSERIAL.
+        Converte tipos Polars para equivalentes PostgreSQL.
         """
-        # Se a coluna for uma chave primária e seu tipo for nosso "sinalizador",
-        # converta para BIGSERIAL.
-        if col_name in (pk_cols or []) and tipo == pl.UInt64:
+        # Se for chave primária numérica
+        if col_name in (pk_cols or []) and tipo in (pl.UInt64, pl.Int64):
             return "BIGSERIAL"
 
-        # O resto da lógica de conversão continua a mesma.
-        if tipo == pl.Int64 or tipo == pl.Int32 or tipo == pl.Int8 or tipo == pl.Int16:
-            return "BIGINT" if tipo == pl.Int64 else "INTEGER"
-        elif tipo == pl.Float64:
+        # Tipos inteiros
+        if tipo in (pl.Int8, pl.Int16, pl.Int32):
+            return "INTEGER"
+        elif tipo == pl.Int64 or tipo == pl.UInt64:
+            return "BIGINT"
+
+        # Tipos de ponto flutuante
+        elif tipo in (pl.Float32, pl.Float64):
             return "DOUBLE PRECISION"
-        elif tipo == pl.String or tipo == pl.Utf8: # Usar pl.String é mais moderno
-            return "TEXT"
+
+        # Booleanos
         elif tipo == pl.Boolean:
             return "BOOLEAN"
-        elif tipo == pl.Date or tipo == pl.Datetime:
+
+        # Datas e datetimes
+        elif tipo == pl.Date:
             return "DATE"
+        elif tipo == pl.Datetime:
+            return "TIMESTAMP"
+
+        # Strings / texto
+        elif tipo in (pl.String, pl.Utf8):
+            return "VARCHAR"
+
+        # Se for categoria (código ou label)
+        elif tipo == pl.Categorical:
+            return "VARCHAR"
+
+        # Fallback genérico
         else:
+            logger.warning(f"Tipo Polars não reconhecido ({tipo}), usando TEXT.")
             return "TEXT"
+ 
 
     def criar_tabelas(self, table_name=None):
         if table_name:
@@ -304,7 +322,7 @@ def run_db_load_pipeline():
         # Cria a instância do loader
         loader = PostgreSQLLoader(db_url=db_url, processed_dir=processed_dir)
         
-        # Executa a carga. (Lembre-se de remover 'self.conn.close()' de dentro do método run())
+        # Executa a carga. (Lembre-se de remover 's0elf.conn.close()' de dentro do método run())
         loader.run() 
 
         tempo_total = time.time() - inicio

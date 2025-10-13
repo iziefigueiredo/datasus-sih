@@ -1,5 +1,3 @@
--- Versão de teste final e mais robusta com CAST para BIGINT
-
 SELECT
     "N_AIH",
     "DIAS_PERM" AS dias_perm_registrado,

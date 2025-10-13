@@ -9,9 +9,9 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
         "table_name": "internacoes",
         "columns": {
             "CNES": pl.Int64,
-            "N_AIH": pl.String,
-            "ESPEC": pl.String,
-            "IDENT": pl.String,
+            "N_AIH": pl.Int64,
+            "ESPEC": pl.Int8,
+            "IDENT": pl.Int8,
             "DT_INTER": pl.Date,
             "DT_SAIDA": pl.Date,
             "DIAS_PERM":pl.Int16,
@@ -42,7 +42,7 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
         "table_name": "atendimentos",
         "columns": {
             "id_atendimento": pl.UInt64, 
-            "N_AIH": pl.String,
+            "N_AIH": pl.Int64,
             "PROC_REA": pl.String,
         },
         "primary_key": ["id_atendimento"],
@@ -54,7 +54,7 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
     "uti_detalhes": {
         "table_name": "uti_detalhes",
         "columns": {
-            "N_AIH": pl.String,
+            "N_AIH": pl.Int64,
             "UTI_MES_TO": pl.Int32,
             "MARCA_UTI": pl.String,
             "UTI_INT_TO": pl.Int32,
@@ -69,7 +69,7 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
      "etnia": {
         "table_name": "etnia",
         "columns": {
-            "N_AIH": pl.String,
+            "N_AIH": pl.Int64,
             "ETNIA": pl.Int32,
             
         },
@@ -82,7 +82,7 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
     "diagnosticos": {
         "table_name": "diagnosticos",
         "columns": {
-            "N_AIH": pl.String,
+            "N_AIH": pl.Int64,
             "DIAG_SECUN": pl.String,
         },
         "primary_key": ["N_AIH"],
@@ -110,7 +110,7 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
     "condicoes_especificas": {
         "table_name": "condicoes_especificas",
         "columns": {
-            "N_AIH": pl.String,
+            "N_AIH": pl.Int64,
             "IND_VDRL": pl.String
         },
         "primary_key": ["N_AIH"],
@@ -121,7 +121,7 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
     "hospital": {
         "table_name": "hospital",
         "columns": {
-            "CNES": pl.String,
+            "CNES": pl.Int64,
             "NATUREZA": pl.String,
             "GESTAO": pl.String,
             "NAT_JUR": pl.String
@@ -141,7 +141,7 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
     "obstetricos": {
         "table_name": "obstetricos",
         "columns": {
-            "N_AIH": pl.String,
+            "N_AIH": pl.Int64,
             "INSC_PN": pl.String
         },
         "primary_key": ["N_AIH"],
@@ -153,7 +153,7 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
     "instrucao": {
     "table_name": "instrucao",
     "columns": {
-        "N_AIH": pl.String,   
+        "N_AIH": pl.Int64,   
         "INSTRU": pl.Int8   
     },
     "primary_key": ["N_AIH"],
@@ -175,7 +175,7 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
     "mortes": {
             "table_name": "mortes",
             "columns": {
-                "N_AIH": pl.String,      # PK e FK para internacoes
+                "N_AIH": pl.Int64,      # PK e FK para internacoes
                 "CID_MORTE": pl.String   # Código CID da causa da morte
             },
             "primary_key": ["N_AIH"],
@@ -188,7 +188,7 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
     "infehosp": {
             "table_name": "infehosp",
             "columns": {
-                "N_AIH": pl.String,      
+                "N_AIH": pl.Int64,      
                 "INFEHOSP": pl.String   
                 },
                 
@@ -201,7 +201,7 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
     "vincprev": {
         "table_name": "vincprev",
         "columns": {
-            "N_AIH": pl.String,     
+            "N_AIH": pl.Int64,     
             "VINCPREV": pl.String   
         },
         "primary_key": ["N_AIH"],
@@ -213,7 +213,7 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
     "cbor": {
         "table_name": "cbor",
         "columns": {
-            "N_AIH": pl.String,   
+            "N_AIH": pl.Int64,   
             "CBOR": pl.String     
         },
         "primary_key": ["N_AIH"],
@@ -242,7 +242,7 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
     "contraceptivos": {
     "table_name": "contraceptivos",
     "columns": {
-        "N_AIH": pl.String,
+        "N_AIH": pl.Int64,
         "TIPO": pl.String,
         "CODIGO_METODO": pl.String,
     },
@@ -254,7 +254,7 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
     "notificacoes": {
     "table_name": "notificacoes",
     "columns": {
-        "N_AIH": pl.String,
+        "N_AIH": pl.Int64,
         "CID_NOTIF": pl.String,
     },
     "primary_key": ["N_AIH"],
@@ -266,7 +266,7 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
 
 "pernoite": {
     "columns": {
-        "N_AIH": pl.String,
+        "N_AIH": pl.Int64,
         "DIAR_ACOM": pl.Int32
     },
     "primary_key": ["N_AIH"],

@@ -18,7 +18,7 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
             "VAL_SH": pl.Int32,
             "VAL_SP": pl.Int32,
             "VAL_TOT": pl.Int32,
-            "COMPLEX": pl.String,
+            "COMPLEX": pl.Int8,
             "MUNIC_MOV": pl.Int32,
             "DIAG_PRINC": pl.String,
             "NASC": pl.Date,
@@ -43,7 +43,7 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
         "columns": {
             "id_atendimento": pl.UInt64, 
             "N_AIH": pl.Int64,
-            "PROC_REA": pl.String,
+            "PROC_REA": pl.Int64,
         },
         "primary_key": ["id_atendimento"],
         "foreign_keys": [
@@ -214,7 +214,7 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
         "table_name": "cbor",
         "columns": {
             "N_AIH": pl.Int64,   
-            "CBOR": pl.String     
+            "CBOR": pl.Int32     
         },
         "primary_key": ["N_AIH"],
         "foreign_keys": [
@@ -226,7 +226,7 @@ TABLE_SCHEMAS: Dict[str, Dict[str, any]] = {
     "indicadores": {
     "table_name": "indicadores",
     "columns": {
-        "codigo_6d": pl.String,
+        "codigo_6d": pl.Int64,
         "ano": pl.Int32,
         "metrica": pl.String,
         "valor": pl.Float64,

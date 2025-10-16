@@ -9,6 +9,7 @@ from pysus.online_data.SIH import SIH
 from tqdm import tqdm
 import logging
 import time
+import psutil
 
 SRC_DIR = Path(__file__).parent.parent
 sys.path.insert(0, str(SRC_DIR))
@@ -131,7 +132,28 @@ def main():
         
     except Exception as e:
         print(f"Erro: {e}")
+   
+    # --- LOG EXTRA DE DESEMPENHO ---
+    process = psutil.Process()
+    mem_mb = process.memory_info().rss / 1024 / 1024
 
+    # Conta pastas e arquivos no diretório RAW
+    num_pastas = sum(1 for p in Settings.RAW_DIR.iterdir() if p.is_dir())
+    num_arquivos = sum(1 for p in Settings.RAW_DIR.glob("*.parquet"))
+
+    # Conta registros totais (soma das linhas de cada parquet)
+    total_registros = 0
+    for arquivo in Settings.RAW_DIR.glob("*.parquet"):
+        try:
+            df = pl.read_parquet(arquivo, n_rows=5_000)  # leitura parcial p/ desempenho
+            total_registros += df.height
+        except Exception:
+            continue
+
+    logger.info(f" Pastas: {num_pastas} | Arquivos: {num_arquivos} | Registros (amostra): {total_registros:,}")
+    logger.info(f" Memória utilizada: {mem_mb:.2f} MB")
+    print(f"\n Pastas: {num_pastas} | Arquivos: {num_arquivos} | Registros (amostra): {total_registros:,}")
+    print(f" Memória utilizada: {mem_mb:.2f} MB")
     fim = time.time()
     duracao_min = (fim - inicio) / 60
     logger.info(f"Tempo total de execução da Etapa 1 (Download): {duracao_min:.2f} minutos")

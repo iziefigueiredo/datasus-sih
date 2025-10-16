@@ -7,6 +7,8 @@ import sys
 from pathlib import Path
 from pysus.online_data.SIH import SIH
 from tqdm import tqdm
+import logging
+import time
 
 SRC_DIR = Path(__file__).parent.parent
 sys.path.insert(0, str(SRC_DIR))
@@ -43,6 +45,9 @@ def filtrar_arquivos_novos(arquivos_encontrados, nomes_existentes):
 def main():
     """Execução principal do download"""
     
+    inicio = time.time()  
+    logger = logging.getLogger(__name__)
+
     print("=== DOWNLOAD DATASUS ===")
     
     Settings.criar_diretorios()
@@ -126,6 +131,11 @@ def main():
         
     except Exception as e:
         print(f"Erro: {e}")
+
+    fim = time.time()
+    duracao_min = (fim - inicio) / 60
+    logger.info(f"Tempo total de execução da Etapa 1 (Download): {duracao_min:.2f} minutos")
+    print(f"\nTempo total da etapa: {duracao_min:.2f} minutos")
 
 if __name__ == "__main__":
     main()

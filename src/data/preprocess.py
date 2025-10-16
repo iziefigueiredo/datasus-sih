@@ -301,7 +301,10 @@ class SIHPreprocessor:
         try:
             if self.saida.exists():
                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                backup = self.saida.with_suffix(f'.backup_{timestamp}.parquet')
+                
+                Settings.BACKUPS_DIR.mkdir(parents=True, exist_ok=True)
+                backup = Settings.BACKUPS_DIR / f"{self.saida.stem}_backup_{timestamp}.parquet"
+
                 self.saida.rename(backup)
                 logger.info(f"Backup criado: {backup.name}")
             

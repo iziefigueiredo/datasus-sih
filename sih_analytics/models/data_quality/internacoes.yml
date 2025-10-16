@@ -65,8 +65,8 @@ sources:
             description: "Idade do paciente em anos."
             tests:
               - not_null
-             
 
+          
           - name: '"SEXO"'
             description: "Sexo do paciente."
             tests:
@@ -96,6 +96,8 @@ sources:
             description: "Valor dos serviços profissionais."
             tests:
               - not_null
+
+        
 
       # --- Tabela: hospital ---
       - name: hospital
@@ -258,16 +260,20 @@ sources:
                   field: '"N_AIH"'
           # Adicione outras colunas de 'vincprev' aqui se houver, com suas descrições e testes.
 
+
+
       # --- Outros sources existentes (se houver e não listados antes) ---
-      # - name: cid10
-      #   columns:
-      #     - name: '"CID"'
-      #       tests:
-      #         - not_null
-      #         - unique
-      # - name: municipios
-      #   columns:
-      #     - name: '"codigo_6d"'
-      #       tests:
-      #         - not_null
-      #         - unique
+      - name: cid10
+        columns:
+          - name: '"CID"'
+            tests:
+              - not_null
+              - unique
+      
+      # --- Tabela: municipios ---
+      - name: municipios
+        columns:
+          - name: '"codigo_6d"'
+            tests:
+               - not_null
+               - unique

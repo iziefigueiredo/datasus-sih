@@ -38,6 +38,10 @@ class TableSplitter:
             "N_AIH", "IND_VDRL"
         ]
 
+        self.etnia_cols = [
+            "N_AIH",  "ETNIA"
+        ]
+
         self.hospital_cols = [
             "CNES", "NATUREZA", "GESTAO", "NAT_JUR"
         ]
@@ -45,6 +49,12 @@ class TableSplitter:
         self.obstetricos_cols = [
             "N_AIH", "INSC_PN"
         ]
+
+        self.diagnosticos_cols = [
+            "N_AIH", "DIAG_SECUN"
+        ]
+
+
 
         self.instrucao_cols = [
             "N_AIH", "INSTRU"
@@ -141,44 +151,58 @@ class TableSplitter:
 
     def split_hospital(self):
         table_name = "hospital"
-        output_file = self.output_dir / Settings.HOSPITAL_FILENAME 
+        output_file = self.output_dir / Settings.HOSPITAL_FILENAME
         logger.info(f"Iniciando divisão para a tabela '{table_name}'...")
         try:
             df = pl.read_parquet(self.input_parquet_path, columns=self.hospital_cols)
-            df_pd = df.to_pandas()
-            df_grouped = df_pd.groupby("CNES").agg(lambda x: x.mode().iloc[0] if not x.mode().empty else None).reset_index()
-            df_result = pl.from_pandas(df_grouped)
-            df_result.write_parquet(output_file, compression="snappy")
-            logger.info(f"Divisão para '{table_name}' concluída. {len(df_result):,} registros salvos.")
-            del df, df_pd, df_grouped, df_result
+
+            # Agrupa por CNES pegando o valor mais frequente (mode) de cada coluna
+            df_grouped = (
+                df.group_by("CNES")
+                .agg([pl.col(col).mode().first().alias(col) for col in df.columns if col != "CNES"])
+                .sort("CNES")
+            )
+
+            df_grouped.write_parquet(output_file, compression="snappy")
+            logger.info(f"Divisão para '{table_name}' concluída. {len(df_grouped):,} registros salvos.")
+            del df, df_grouped
             gc.collect()
+
         except Exception as e:
             logger.error(f"Erro durante a divisão para '{table_name}': {e}")
             raise
+
+
 
     def split_obstetricos(self):
         table_name = "obstetricos"
-        output_file = self.output_dir / Settings.OBSTETRICOS_FILENAME 
+        output_file = self.output_dir / Settings.OBSTETRICOS_FILENAME
         logger.info(f"Iniciando divisão para a tabela '{table_name}'...")
         try:
-            df = pd.read_parquet(self.input_parquet_path, columns=["N_AIH", "INSC_PN"])
-            df["N_AIH"] = df["N_AIH"].astype(str).str.strip()
-            df["INSC_PN"] = df["INSC_PN"].astype(str).str.strip()
+            df = pl.read_parquet(self.input_parquet_path, columns=["N_AIH", "INSC_PN"]).with_columns([
+                pl.col("N_AIH").cast(pl.Int64, strict=False),
+                pl.col("INSC_PN").cast(pl.String, strict=False).str.strip_chars()
+            ])
 
-            df = df[
-                df["INSC_PN"].notna() &
-                (df["INSC_PN"] != "") &
-                (df["INSC_PN"] != "0") &
-                (~df["INSC_PN"].str.fullmatch(r"0+"))
-            ]
+            df = df.filter(
+                df["INSC_PN"].is_not_null()
+                & (df["INSC_PN"] != "")
+                & (df["INSC_PN"] != "0")
+                & (~df["INSC_PN"].str.contains(r"^0+$"))
+            )
 
-            df.to_parquet(output_file, index=False)
+            df = df.unique(subset=["N_AIH"], keep="first").select(["N_AIH", "INSC_PN"])
+            df.write_parquet(output_file, compression="snappy")
+
             logger.info(f"Divisão para '{table_name}' concluída. {len(df):,} registros salvos.")
             del df
             gc.collect()
+
         except Exception as e:
             logger.error(f"Erro durante a divisão para '{table_name}': {e}")
             raise
+
+
 
     def split_instrucao(self):
         table_name = "instrucao"
@@ -186,27 +210,29 @@ class TableSplitter:
         logger.info(f"Iniciando divisão para a tabela '{table_name}'...")
 
         try:
-            df = pl.read_parquet(self.input_parquet_path, columns=["N_AIH", "INSTRU"]).with_columns(
-                pl.col("N_AIH").cast(pl.String, strict=False),
-                pl.col("INSTRU").cast(pl.String, strict=False)
+            df = pl.read_parquet(self.input_parquet_path, columns=["N_AIH", "INSTRU"]).with_columns([
+                pl.col("N_AIH").cast(pl.Int64, strict=False),
+                pl.col("INSTRU").cast(pl.Int8, strict=False)
+            ])
+
+            # Filtra apenas valores válidos (não nulos e diferentes de 0)
+            df = df.filter(
+                pl.col("INSTRU").is_not_null()
+                & (pl.col("INSTRU") != 0)
             )
-
-            total = df.height
-            nao_nulos = df.filter(pl.col("INSTRU").is_not_null()).height
-            validos = df.filter(pl.col("INSTRU").is_not_null() & (pl.col("INSTRU") != "00")).height
-            logger.info(f"instrucao: total={total:,} | INSTRU!=NULL={nao_nulos:,} | INSTRU!='00'={validos:,}")
-
-            df = df.filter(pl.col("INSTRU").is_not_null() & (pl.col("INSTRU") != "00"))
 
             df = df.unique(subset=["N_AIH"], keep="first").select(["N_AIH", "INSTRU"])
 
             df.write_parquet(output_file, compression="snappy")
-            logger.info(f"Divisão para '{table_name}' concluída. {len(df):,} registros salvos em {output_file.name}.")
+            logger.info(f"Divisão para '{table_name}' concluída. {len(df):,} registros salvos.")
             del df
             gc.collect()
+
         except Exception as e:
             logger.error(f"Erro durante a divisão para '{table_name}': {e}")
             raise
+
+
     
     def split_mortes(self):
         table_name = "mortes"
@@ -233,7 +259,7 @@ class TableSplitter:
         logger.info(f"Iniciando divisão para a tabela '{table_name}'...")
         try:
             df = pl.read_parquet(self.input_parquet_path, columns=["N_AIH", "INFEHOSP"]).with_columns(
-                pl.col("N_AIH").cast(pl.String, strict=False),
+                pl.col("N_AIH").cast(pl.Int64, strict=False),
                 pl.col("INFEHOSP").cast(pl.Int32, strict=False).fill_null(0)
             )
 
@@ -256,7 +282,7 @@ class TableSplitter:
         logger.info(f"Iniciando divisão para a tabela '{table_name}'...")
         try:
             df = pl.read_parquet(self.input_parquet_path, columns=["N_AIH", "VINCPREV"]).with_columns(
-                pl.col("N_AIH").cast(pl.String, strict=False),
+                pl.col("N_AIH").cast(pl.Int64, strict=False),
                 pl.col("VINCPREV").cast(pl.String, strict=False).str.strip_chars().str.to_uppercase()
             )
 
@@ -281,26 +307,29 @@ class TableSplitter:
         output_file = self.output_dir / Settings.CBOR_FILENAME
         logger.info(f"Iniciando divisão para a tabela '{table_name}'...")
         try:
-            df = pl.read_parquet(self.input_parquet_path, columns=["N_AIH", "CBOR"]).with_columns(
-                pl.col("N_AIH").cast(pl.String, strict=False),
-                pl.col("CBOR").cast(pl.String, strict=False).str.strip_chars().str.to_uppercase()
-            )
+            # Lê apenas as colunas necessárias e garante os tipos corretos
+            df = pl.read_parquet(self.input_parquet_path, columns=["N_AIH", "CBOR"]).with_columns([
+                pl.col("N_AIH").cast(pl.Int64, strict=False),
+                pl.col("CBOR").cast(pl.Int32, strict=False).fill_null(0)
+            ])
 
-            df = df.filter(
-                pl.col("CBOR").is_not_null()
-                & (pl.col("CBOR") != "")
-                & (~pl.col("CBOR").str.contains(r"^0+$"))
-            )
+            # Filtra apenas registros com CBOR válido (> 0)
+            df = df.filter(pl.col("CBOR") > 0)
 
+            # Garante unicidade por internação
             df = df.unique(subset=["N_AIH"], keep="first").select(["N_AIH", "CBOR"])
 
+            # Salva em Parquet
             df.write_parquet(output_file, compression="snappy")
+
             logger.info(f"Divisão para '{table_name}' concluída. {len(df):,} registros salvos.")
             del df
             gc.collect()
+
         except Exception as e:
             logger.error(f"Erro durante a divisão para '{table_name}': {e}")
             raise
+
     
     # Adicione esta função à classe TableSplitter
 
@@ -356,28 +385,27 @@ class TableSplitter:
 
     def split_etnia(self):
         table_name = "etnia"
-        output_file = self.output_dir / Settings.ETNIA_FILENAME  
+        output_file = self.output_dir / Settings.ETNIA_FILENAME
         logger.info(f"Iniciando a criação da tabela de {table_name}.")
         
         try:
-            # Lê as colunas N_AIH, RACA_COR e ETNIA
             df = pl.read_parquet(self.input_parquet_path, columns=["N_AIH", "RACA_COR", "ETNIA"])
+            df = df.with_columns([
+                pl.col("RACA_COR").cast(pl.Int8, strict=False),
+                pl.col("ETNIA").cast(pl.Int32, strict=False)
+            ])
             
-            # Filtra os registros onde a Raça/Cor é Indígena ('5') e a ETNIA é preenchida
             df = df.filter(
-                (pl.col("RACA_COR") == "05") & 
-                pl.col("ETNIA").is_not_null() & 
-                (pl.col("ETNIA") != 0)
-            )
-            
-            # Seleciona apenas as colunas desejadas e remove duplicatas
-            df = df.select(["N_AIH", "ETNIA"]).unique()
-            
+                (pl.col("RACA_COR") == 5) & (pl.col("ETNIA") > 0)
+            ).select(["N_AIH", "ETNIA"]).unique()
+
             df.write_parquet(output_file, compression="snappy")
             logger.info(f"Tabela de {table_name} criada com sucesso. Total de registros: {len(df):,}")
+        
         except Exception as e:
             logger.error(f"Erro ao criar a tabela de {table_name}: {e}")
             raise
+
 
 
     def split_cid_notif(self):
@@ -435,46 +463,21 @@ class TableSplitter:
         table_name = "diagnosticos"
         output_file = self.output_dir / Settings.DIAG_FILENAME
         logger.info(f"Iniciando divisão para a tabela '{table_name}'...")
-        
         try:
-            # Lê apenas as colunas necessárias do arquivo de entrada
             df = pl.read_parquet(self.input_parquet_path, columns=["N_AIH", "DIAG_SECUN"])
-
-            # --- LÓGICA DE FILTRAGEM APRIMORADA ---
-            
-            # Condição 1: O valor não pode ser nulo.
-            cond_nao_nulo = pl.col("DIAG_SECUN").is_not_null()
-            
-            # Condição 2: O valor não pode ser uma string que contém APENAS zeros (ex: '0', '00', '0000').
-            # A expressão regular `^0+$` verifica isso.
-            cond_nao_so_zeros = ~pl.col("DIAG_SECUN").str.contains(r"^0+$")
-            
-            # Condição 3 (NOVA): O valor não pode começar com '0'.
-            cond_nao_comeca_com_zero = ~pl.col("DIAG_SECUN").str.starts_with('0')
-
-            # Aplica todos os filtros combinados
-            df_filtrado = df.filter(
-                cond_nao_nulo &
-                cond_nao_so_zeros &
-                cond_nao_comeca_com_zero
-            )
-            
-            # Garante que as combinações de internação e diagnóstico são únicas
-            df_final = df_filtrado.unique(subset=["N_AIH", "DIAG_SECUN"])
-
-            # Salva o arquivo Parquet resultante
-            df_final.write_parquet(output_file, compression="snappy")
-            logger.info(f"Divisão para '{table_name}' concluída. {len(df_final):,} registros salvos.")
-        
+            df = df.filter(
+                pl.col("DIAG_SECUN").is_not_null()
+                & (~pl.col("DIAG_SECUN").str.contains(r"^0+$"))
+                & (~pl.col("DIAG_SECUN").str.starts_with("0"))
+            ).unique(subset=["N_AIH", "DIAG_SECUN"])
+            df.write_parquet(output_file, compression="snappy")
+            logger.info(f"Divisão para '{table_name}' concluída. {len(df):,} registros salvos.")
+            del df
+            gc.collect()
         except Exception as e:
             logger.error(f"Erro durante a divisão para '{table_name}': {e}")
             raise
-        finally:
-            # Garante a limpeza da memória
-            if 'df' in locals(): del df
-            if 'df_filtrado' in locals(): del df_filtrado
-            if 'df_final' in locals(): del df_final
-            gc.collect()
+
 
 
 

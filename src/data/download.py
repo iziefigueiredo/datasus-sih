@@ -10,6 +10,8 @@ from tqdm import tqdm
 import logging
 import time
 import psutil
+import pyarrow.parquet as pq
+
 
 SRC_DIR = Path(__file__).parent.parent
 sys.path.insert(0, str(SRC_DIR))
@@ -81,83 +83,90 @@ def main():
     
     arquivos_a_baixar = filtrar_arquivos_novos(arquivos_encontrados, nomes_existentes)
     
-    print(f"\nRESUMO:")
     print(f"   Total: {len(arquivos_encontrados)} | Baixados: {qtd_existentes} | Restam: {len(arquivos_a_baixar)}")
-    
+
     if not arquivos_a_baixar:
         print("Todos arquivos já baixados!")
         return
-    
+
     print("Primeiros arquivos:")
     for i, arquivo in enumerate(arquivos_a_baixar[:3]):
         print(f"   {i+1}. {arquivo}")
     if len(arquivos_a_baixar) > 3:
         print(f"   ... +{len(arquivos_a_baixar) - 3} arquivos")
-    
+
     if input(f"Baixar {len(arquivos_a_baixar)} arquivos? (s/N): ").lower() != 's':
         print("Cancelado")
         return
-    
+
     print(f"Baixando {len(arquivos_a_baixar)} arquivos...")
-    
+
     try:
         if len(arquivos_a_baixar) > 20:
             baixados_total = []
             lote_size = 18
-            
+
             for i in range(0, len(arquivos_a_baixar), lote_size):
                 lote = arquivos_a_baixar[i:i + lote_size]
                 lote_num = i // lote_size + 1
                 total_lotes = (len(arquivos_a_baixar) - 1) // lote_size + 1
-                
+
                 print(f"Lote {lote_num}/{total_lotes} ({len(lote)} arquivos)...")
-                
+
                 try:
                     baixados_lote = sih.download(lote, local_dir=Settings.RAW_DIR)
                     baixados_total.extend(baixados_lote)
-                    
+
                     progresso = len(baixados_total) / len(arquivos_a_baixar) * 100
                     print(f"{len(baixados_total)}/{len(arquivos_a_baixar)} ({progresso:.0f}%)")
-                    
+
                 except Exception as e:
                     print(f"Erro lote {lote_num}: {e}")
                     continue
-            
+
             baixados = baixados_total
         else:
             baixados = sih.download(arquivos_a_baixar, local_dir=Settings.RAW_DIR)
-        
+
         print("CONCLUÍDO!")
         print(f"{len(baixados)} baixados | Total: {qtd_existentes + len(baixados)} arquivos")
-        
+
     except Exception as e:
         print(f"Erro: {e}")
-   
+
     # --- LOG EXTRA DE DESEMPENHO ---
     process = psutil.Process()
-    mem_mb = process.memory_info().rss / 1024 / 1024
+    mem_mb = process.memory_info().rss / (1024 * 1024)
 
-    # Conta pastas e arquivos no diretório RAW
+    # Contagem recursiva de pastas e arquivos
     num_pastas = sum(1 for p in Settings.RAW_DIR.iterdir() if p.is_dir())
-    num_arquivos = sum(1 for p in Settings.RAW_DIR.glob("*.parquet"))
+    arquivos_parquet = list(Settings.RAW_DIR.rglob("*.parquet"))
+    num_arquivos = len(arquivos_parquet)
 
-    # Conta registros totais (soma das linhas de cada parquet)
+    # Conta registros e tamanho total usando metadados
     total_registros = 0
-    for arquivo in Settings.RAW_DIR.glob("*.parquet"):
+    tamanho_total_bytes = 0
+    for arquivo in arquivos_parquet:
         try:
-            df = pl.read_parquet(arquivo, n_rows=5_000)  # leitura parcial p/ desempenho
-            total_registros += df.height
+            meta = pq.ParquetFile(arquivo).metadata
+            total_registros += meta.num_rows
+            tamanho_total_bytes += arquivo.stat().st_size
         except Exception:
             continue
 
-    logger.info(f" Pastas: {num_pastas} | Arquivos: {num_arquivos} | Registros (amostra): {total_registros:,}")
-    logger.info(f" Memória utilizada: {mem_mb:.2f} MB")
-    print(f"\n Pastas: {num_pastas} | Arquivos: {num_arquivos} | Registros (amostra): {total_registros:,}")
-    print(f" Memória utilizada: {mem_mb:.2f} MB")
+    tamanho_total_gb = tamanho_total_bytes / (1024 ** 3)
+
+    logger.info(f"Pastas: {num_pastas} | Arquivos: {num_arquivos} | Registros: {total_registros:,}")
+    logger.info(f"Tamanho total: {tamanho_total_gb:.2f} GB | Memória utilizada: {mem_mb:.2f} MB")
+
+    print(f"\nPastas: {num_pastas} | Arquivos: {num_arquivos} | Registros: {total_registros:,}")
+    print(f"Tamanho total: {tamanho_total_gb:.2f} GB | Memória utilizada: {mem_mb:.2f} MB")
+
     fim = time.time()
     duracao_min = (fim - inicio) / 60
     logger.info(f"Tempo total de execução da Etapa 1 (Download): {duracao_min:.2f} minutos")
     print(f"\nTempo total da etapa: {duracao_min:.2f} minutos")
+
 
 if __name__ == "__main__":
     main()

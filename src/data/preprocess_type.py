@@ -6,6 +6,7 @@ import time
 import gc
 import tempfile
 from datetime import datetime
+import pandas as pd
 
 # Garante que o script pode importar de src/
 SRC_DIR = Path(__file__).parent.parent
@@ -29,7 +30,46 @@ class SIHPreprocessor:
     
     def tratar_chunk_completo(self, df: pl.DataFrame) -> pl.DataFrame:
         """Aplica todos os tratamentos a um chunk"""
-        
+                
+        # === Conversão padronizada de tipos numéricos ===
+        cols_int64 = [
+            "N_AIH", "CNES", "CEP", "PROC_REA"
+        ]
+
+        # Colunas de contagem ou valores médios → Int32
+        cols_int32 = [
+            "DIAR_ACOM", "UTI_MES_TO", "UTI_INT_TO", "codigo_6d", "NAT_JUR", "CBOR"
+        ]
+
+        # Colunas com intervalos pequenos → Int16 
+        cols_int16 = [
+            "IDADE", "DIAS_PERM", "NACIONAL", "GESTAO", "NATUREZA"
+        ]
+
+        # Colunas com intervalos pequenos → Int8 
+        cols_int8 = [
+            "SEXO", "NUM_FILHOS", "ETNIA", "RACA_COR", "INSTRU", "COMPLEX"
+        ]
+
+       
+
+        # Conversão dos grupos, respeitando a existência das colunas
+        for col in cols_int64:
+            if col in df.columns:
+                df = df.with_columns(pl.col(col).cast(pl.Int64, strict=False).fill_null(0))
+
+        for col in cols_int32:
+            if col in df.columns:
+                df = df.with_columns(pl.col(col).cast(pl.Int32, strict=False).fill_null(0))
+
+        for col in cols_int16:
+            if col in df.columns:
+                df = df.with_columns(pl.col(col).cast(pl.Int16, strict=False).fill_null(0))
+
+        for col in cols_int8:
+            if col in df.columns:
+                df = df.with_columns(pl.col(col).cast(pl.Int8, strict=False).fill_null(0))
+
         
         # Converte campos de valor de texto para float, tratando vírgulas
         campos_valores = ['VAL_SH', 'VAL_SP', 'VAL_TOT', 'VAL_UTI']
@@ -37,7 +77,13 @@ class SIHPreprocessor:
             if col in df.columns:
                 df = df.with_columns(
                     pl.col(col)
+                    .cast(pl.String, strict=False)
+                    .str.replace_all(",", ".")
+                    .str.replace_all(" ", "")
+                    .str.replace_all("-", "")
                     .cast(pl.Float64, strict=False)
+                    .fill_null(0.0)
+                    .clip(lower_bound=0.0)
                     .alias(col)
                 )
 
@@ -55,7 +101,22 @@ class SIHPreprocessor:
                 ])
 
           
-     
+        if "IDADE" in df.columns and "COD_IDADE" in df.columns:
+            df = (
+                df.with_columns([
+                    pl.col("IDADE").cast(pl.Float64, strict=False).fill_null(0),
+                    pl.col("COD_IDADE").cast(pl.Int64, strict=False).fill_null(0)
+                ])
+                .with_columns(
+                    pl.when(pl.col("COD_IDADE") == 1).then(0)
+                    .when(pl.col("COD_IDADE") == 2).then((pl.col("IDADE") / 365).floor())
+                    .when(pl.col("COD_IDADE") == 3).then((pl.col("IDADE") / 12).floor())
+                    .otherwise(pl.col("IDADE").floor())
+                    .cast(pl.Int64)
+                    .alias("IDADE")
+                )
+                .drop("COD_IDADE")
+            )
  
    
         # Tratamento da coluna NACIONAL

@@ -14,7 +14,7 @@ Main objectives:
 - Share schema diagrams and documentation
 - Enable exploratory analysis and predictive studies
 
-⚠️ **Performance note**: the pipeline processes **23,792,498 hospital admission records** and was tested on a machine with **32GB RAM**, which is recommended for smooth execution.  
+⚠️ **Performance note**: the pipeline processes **23,792,498 hospital admission records** and was tested on a machine with **32GB RAM**, which is recommended for smooth execution. 
 
 
 ---
@@ -23,6 +23,18 @@ Main objectives:
 
 
 ## Getting Started  
+
+### ⚠️ Compatibilidade de Plataforma
+
+O pacote `pysus` (usado para download dos dados DATASUS) **não funciona no Windows** por depender de bibliotecas Unix/Linux.
+
+**Se você está no Windows, utilize:**
+
+#### WSL2 (Windows Subsystem for Linux) - Recomendado
+
+
+
+
 
 ### Create and activate a virtual environment  
 

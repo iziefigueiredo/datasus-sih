@@ -24,16 +24,42 @@ Main objectives:
 
 ## Getting Started  
 
-### ⚠️ Compatibilidade de Plataforma
+### Requirements
 
-O pacote `pysus` (usado para download dos dados DATASUS) **não funciona no Windows** por depender de bibliotecas Unix/Linux.
+- **Python 3.12**
+- **PostgreSQL 12+**
+- **Git**
 
-**Se você está no Windows, utilize:**
+### ⚠️ Platform Compatibility
 
-#### WSL2 (Windows Subsystem for Linux) - Recomendado
+The `pysus` package (used to download DATASUS data) **does not work on Windows** because it depends on Unix/Linux libraries.
 
+**If you are on Windows, use:**
 
+#### WSL2 (Windows Subsystem for Linux) - Recommended
 
+1. Enable WSL2 on Windows
+2. Install Ubuntu from Microsoft Store
+3. Follow the Linux/Mac instructions below
+
+#### Or use Docker
+
+---
+
+## Installation Steps
+
+### 1️⃣ Install PostgreSQL
+
+#### Windows
+
+1. Download from [postgresql.org](https://www.postgresql.org/download/windows/)
+2. Run the installer
+3. **Important:** When prompted for a password, set it to `1234`
+4. Keep the default port `5432`
+5. Finish the installation
+
+<span>    </span><span class="token" style="color:#7c00aa">sudo</span><span> -u postgres psql
+</span> 
 
 
 ### Create and activate a virtual environment  

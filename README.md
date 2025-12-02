@@ -50,16 +50,12 @@ The `pysus` package (used to download DATASUS data) **does not work on Windows**
 
 ### 1️⃣ Install PostgreSQL
 
-#### Windows
 
-1. Download from [postgresql.org](https://www.postgresql.org/download/windows/)
-2. Run the installer
-3. **Important:** When prompted for a password, set it to `1234`
-4. Keep the default port `5432`
-5. Finish the installation
+###  Create Database
 
-<span>    </span><span class="token" style="color:#7c00aa">sudo</span><span> -u postgres psql
-</span> 
+### Install Python
+
+###
 
 
 ### Create and activate a virtual environment  

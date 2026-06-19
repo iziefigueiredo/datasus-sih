@@ -1,0 +1,33 @@
+name: 'dbt_sih'
+version: '1.0.0'
+config-version: 2
+
+profile: 'dbt_sih'
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+models:
+  dbt_sih:
+    +materialized: table
+
+seeds:
+  dbt_sih:
+    cid_manuais:
+      +column_types:
+        CID: varchar
+        DESCRICAO: varchar
+        TP_NIVEL: varchar
+        RESTRSEXO: varchar
+        DS_CATEGORIA: varchar
+        DS_GRUPO: varchar
+        DS_CAPITULO: varchar
+    
+    procedimentos_manuais:
+      +column_types:
+        PROC_REA: varchar
+        NOME_PROC: varchar

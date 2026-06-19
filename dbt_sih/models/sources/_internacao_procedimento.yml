@@ -1,0 +1,31 @@
+version: 2
+
+sources:
+  - name: main
+    schema: main
+    tags: ['t1']
+    tables:
+      - name: internacao_procedimento
+        
+        description: >
+          Tabela fato de granularidade N_AIH × PROC_REA. Registra todos os procedimentos
+          realizados em cada internação hospitalar (AIH), vinculando a tabela internacoes
+          ao dicionário SIGTAP de procedimentos SUS.
+        columns:
+          - name: id_atendimento
+            description: Identificador único do atendimento (surrogate key gerado no pipeline).
+            tests:
+              - unique
+              - not_null
+          - name: N_AIH
+            description: Número da AIH — chave estrangeira para a tabela internacoes.
+            tests:
+              - not_null
+              
+          - name: PROC_REA
+            description: Código SIGTAP do procedimento realizado (10 dígitos, armazenado como Int64) — chave estrangeira para a tabela procedimentos.
+            tests:
+              - not_null
+              - relationships:
+                  to: source('main', 'procedimentos')
+                  field: PROC_REA

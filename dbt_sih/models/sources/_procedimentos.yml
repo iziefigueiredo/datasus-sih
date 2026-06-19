@@ -1,0 +1,29 @@
+version: 2
+
+sources:
+  - name: main
+    schema: main
+    tags: ['t1']
+    tables:
+      - name: procedimentos
+        
+        description: >
+          Dimensão de procedimentos realizados durante a internação. Contém
+          5.395 procedimentos da Tabela Unificada de Procedimentos do SUS
+          (SIGTAP). Códigos variam de '0101010010' a '0803010141'.
+          
+        columns:
+          - name: PROC_REA
+            description: >
+              Código do procedimento realizado, com 10 dígitos e zeros à
+              esquerda obrigatórios. Armazenado como String para preservar
+              o padding. Ex: '0301060029'. Chave primária da dimensão.
+            tests:
+              - not_null
+              - unique
+
+          - name: NOME_PROC
+            description: Descrição textual do procedimento conforme SIGTAP.
+            tests:
+              - not_null
+              - unique

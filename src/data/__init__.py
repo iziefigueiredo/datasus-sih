@@ -1,17 +1,13 @@
 """
-Módulo de processamento de dados do projeto SIH/SUS
+Modulo de processamento de dados do projeto DataVisSUS
+
+Subpacotes:
+    extract/   — download de dados de fontes externas (DATASUS, IBGE)
+    transform/ — pre-processamento
 """
 
-from .unify import SIHUnifier, main as unify_main
-from .preprocess import SIHPreprocessor, main as preprocess_main
-from .split import TableSplitter, main as split_main
-from .aggregate import SIHContractor, main as aggregate
-
-
+from .transform.preprocess import SIHPreprocessor, main as preprocess_main
 
 __all__ = [
-    'SIHUnifier', 'unify_main',
     'SIHPreprocessor', 'preprocess_main',
-    'TableSplitter', 'split_main',
-    'SIHContractor', 'aggregate'
 ]

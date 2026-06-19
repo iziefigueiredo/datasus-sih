@@ -1,0 +1,29 @@
+version: 2
+
+sources:
+  - name: main
+    schema: main
+    tags: ['t1']
+    tables:
+      - name: vincprev
+        
+        description: >
+          Dimensão de vínculo previdenciário do paciente no momento da
+          internação. Fonte: TAB_SIH / VINCPREV.cnv.
+        columns:
+          - name: VINCPREV
+            description: >
+              Código do vínculo previdenciário. Domínio:
+              1=Autônomo, 2=Desempregado, 3=Aposentado, 4=Não segurado,
+              5=Empregado, 6=Empregador.
+            tests:
+              - not_null
+              - unique
+              - accepted_values:
+                  values: [1, 2, 3, 4, 5, 6]
+
+          - name: DESCRICAO
+            description: Descrição textual do vínculo previdenciário.
+            tests:
+              - not_null
+              - unique

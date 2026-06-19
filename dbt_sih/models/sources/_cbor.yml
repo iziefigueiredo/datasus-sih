@@ -1,0 +1,39 @@
+version: 2
+
+sources:
+  - name: main
+    schema: main
+    tags: ['t1']
+    tables:
+      - name: cbor
+        
+        description: >
+          Dimensão de ocupação do paciente, baseada na Classificação Brasileira
+          de Ocupações (CBO). Compatível com CBO 1994 (alfanumérico, ex: '1999A2')
+          e CBO 2002 (numérico). 
+        columns:
+          - name: CBOR
+            description: >
+              Código de ocupação CBO. Armazenado como String para compatibilidade
+              com versões históricas do CBO (1994 e 2002). 
+            tests:
+              - not_null
+              - unique
+
+          - name: DESCRICAO
+            description: Descrição textual da ocupação conforme a CBO.
+            tests:
+              - not_null
+              - unique
+
+
+
+
+
+
+
+
+
+
+
+

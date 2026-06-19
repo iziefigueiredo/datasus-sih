@@ -1,0 +1,13 @@
+version: 2
+
+models:
+  - name: stg_cbor
+    tags: ['t2']
+    description: >
+      Tabela de CBOR com transformações realizadas em T2.
+
+    columns:
+      - name: DESCRICAO
+        description: DESCRICAO do CBOR.
+        tests:
+          - unique

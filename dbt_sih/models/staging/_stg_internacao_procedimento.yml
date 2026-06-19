@@ -1,0 +1,18 @@
+version: 2
+
+models:
+  - name: stg_internacao_procedimento
+    tags: ['t2']
+    description: >
+      Tabela de internacao_procedimento com transformações realizadas em T2.
+
+    columns:
+      - name: PROC_REA
+        description: >
+          Código SIGTAP do procedimento realizado (10 dígitos, armazenado
+          como String) — chave estrangeira para stg_procedimentos.
+        tests:
+          
+          - relationships:
+              to: ref('stg_procedimentos')
+              field: PROC_REA

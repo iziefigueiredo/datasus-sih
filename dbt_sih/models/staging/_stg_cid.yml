@@ -1,0 +1,13 @@
+version: 2
+
+models:
+  - name: stg_cid
+    tags: ['t2']
+    description: >
+      Tabela de CID com transformações realizadas em T2.
+
+    columns:
+      - name: DESCRICAO
+        description: Código do CID.
+        tests:
+          - unique

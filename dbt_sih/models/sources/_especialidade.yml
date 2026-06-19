@@ -1,0 +1,49 @@
+version: 2
+
+sources:
+  - name: main
+    schema: main
+    tags: ['t1']
+    tables:
+      - name: especialidade
+        
+        description: >
+          Dimensão de especialidade do leito utilizado na internação. 
+          
+          
+        columns:
+          - name: ESPEC
+            description: >
+              Código da especialidade do leito. Domínio:
+              0=Não informado, 1=Cirúrgico, 2=Obstétrico, 3=Clínico,
+              4=Crônicos, 5=Psiquiatria, 6=Pneumologia Sanitária,
+              7=Pediátrico, 8=Reabilitação, 9=Leito Dia / Cirúrgico,
+              10=Leito Dia / AIDS, 11=Leito Dia / Fibrose Cística,
+              12=Leito Dia / Intercorrência Pós-Transplante,
+              13=Leito Dia / Geriatria, 14=Leito Dia / Saúde Mental,
+              17=Não Documentado, 64=Unidade Intermediária,
+              65=Unidade Intermediária Neonatal,
+              74=UTI Adulto Tipo I, 75=UTI Adulto Tipo II, 76=UTI Adulto Tipo III,
+              77=UTI Infantil Tipo I, 78=UTI Infantil Tipo II, 79=UTI Infantil Tipo III,
+              80=UTI Neonatal Tipo I, 81=UTI Neonatal Tipo II, 82=UTI Neonatal Tipo III,
+              83=UTI de Queimados,
+              85=UTI Coronariana Tipo II, 86=UTI Coronariana Tipo III,
+              87=Saúde Mental Longa Permanência,
+              88=Queimado Clínico Adulto, 89=Queimado Clínico Pediátrico,
+              90=Queimado Cirúrgico Adulto, 91=Queimado Cirúrgico Pediátrico,
+              92=UCI Neonatal Convencional, 93=UCI Neonatal Canguru,
+              94=UCI Pediátrica, 95=UCI Adulto.
+            tests:
+              - not_null
+              - unique
+              - accepted_values:
+                  values: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,
+                    31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,
+                    61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,
+                    81,82,83,84,85,86,87,88,89,90,91,92,93,94,95]
+
+          - name: DESCRICAO
+            description: Descrição textual da especialidade do leito.
+            tests:
+              - not_null
+              - unique

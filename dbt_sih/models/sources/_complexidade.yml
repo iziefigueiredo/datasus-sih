@@ -1,0 +1,30 @@
+version: 2
+
+sources:
+  - name: main
+    schema: main
+    tags: ['t1']
+    tables:
+      - name: complexidade
+        
+        description: >
+          Dimensão de complexidade assistencial da internação. Classifica o nível
+          de complexidade do procedimento realizado em três categorias.
+         
+        columns:
+          - name: COMPLEX
+            description: >
+              Código de complexidade assistencial. Armazenado como String com
+              zero à esquerda. Domínio: 1=Atenção Básica,
+              2=Média Complexidade, 3=Alta Complexidade.
+            tests:
+              - not_null
+              - unique
+              - accepted_values:
+                  values: [1, 2, 3]
+
+          - name: DESCRICAO
+            description: Descrição textual do nível de complexidade assistencial.
+            tests:
+              - not_null
+              - unique

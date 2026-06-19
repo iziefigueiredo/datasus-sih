@@ -1,0 +1,61 @@
+version: 2
+
+sources:
+  - name: main
+    schema: main
+    tags: ['t1']
+    tables:
+      - name: municipios
+        
+        description: >
+          Dimensão de municípios brasileiros. Contém os 5.570 municípios do Brasil
+          com enriquecimento de região de saúde e coordenadas geográficas.
+          
+        columns:
+          - name: CO_MUNICIPIO_6D
+            description: >
+              Código do município com 6 dígitos, sem dígito verificador.
+              Chave de junção utilizada no pipeline. Chave primária da dimensão.
+              Valor 0 indica não informado (sentinela).
+            tests:
+              - not_null
+              - unique
+
+          - name: CO_MUNICIPIO_7D
+            description: >
+              Código completo IBGE com 7 dígitos, incluindo dígito verificador.
+              Max: 5.300.108, compatível com Int32.
+            tests:
+              
+              - unique
+
+          - name: NO_MUNICIPIO
+            description: Nome do município conforme IBGE.
+            tests:
+              - not_null
+
+          - name: SG_UF
+            description: Sigla da Unidade Federativa do município.
+            tests:
+              - not_null
+              
+
+          - name: NO_REGIAO_SAUDE
+            description: >
+              Nome da região de saúde à qual o município pertence. Nullable —
+              enriquecimento externo, pode não estar disponível para todos
+              os municípios.
+
+          - name: latitude
+            description: Latitude do município em graus decimais. Nullable.
+            tests:
+              - dbt_utils.accepted_range:
+                  min_value: -33.75
+                  max_value: 5.27
+
+          - name: longitude
+            description: Longitude do município em graus decimais. Nullable.
+            tests:
+              - dbt_utils.accepted_range:
+                  min_value: -73.99
+                  max_value: -28.84

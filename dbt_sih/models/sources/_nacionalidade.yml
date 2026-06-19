@@ -1,0 +1,32 @@
+version: 2
+
+sources:
+  - name: main
+    schema: main
+    tags: ['t1']
+    tables:
+      - name: nacionalidade
+        
+        description: >
+          Dimensão de nacionalidade do paciente. Contém 333 nacionalidades
+          catalogadas, com códigos não sequenciais entre 1 e 350.
+          
+          
+        columns:
+          - name: NACIONAL
+            description: >
+              Código de nacionalidade do paciente. Armazenado como Int16
+              para suportar códigos acima do limite do Int8 (max 350).
+              
+            tests:
+              - not_null
+              - unique
+              - dbt_utils.accepted_range:
+                  min_value: 1
+                  max_value: 350
+
+          - name: DESCRICAO
+            description: Descrição textual da nacionalidade.
+            tests:
+              - not_null
+              - unique

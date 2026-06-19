@@ -1,0 +1,61 @@
+version: 2
+
+sources:
+  - name: main
+    schema: main
+    tags: ['t1']
+    tables:
+      - name: cid
+       
+        description: >
+          Dimensão de diagnósticos baseada na Classificação Internacional de Doenças,
+          10ª revisão (CID-10).
+          
+        columns:
+          - name: CID
+            description: >
+              Código CID-10. Pode ser de 3 caracteres (categoria, ex: 'J18') ou
+              4 caracteres (subcategoria, ex: 'J18.1'). Chave primária da dimensão.
+            tests:
+              - not_null
+              - unique
+
+          - name: DESCRICAO
+            description: Descrição textual do código CID-10 conforme DATASUS.
+            tests:
+              - not_null
+              - unique
+
+          - name: TP_NIVEL
+            description: >
+              Nível hierárquico do código. Domínio: 'CAT' = categoria (3 chars),
+              'SUBCAT' = subcategoria (4 chars).
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ['CAT', 'SUBCAT']
+
+          - name: RESTRSEXO
+            description: >
+              Restrição de sexo para o diagnóstico.
+              Domínio: '1'=Masculino, '3'=Feminino, '5'=Ambos.
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ['1', '3', '5']
+
+
+          - name: DS_CATEGORIA
+            description: >
+              Descrição da categoria CID-10 (3 caracteres), derivada do S_CID.DBF.
+              Ex: 'J18' = 'Pneumonia não especificada'.
+
+          - name: DS_GRUPO
+            description: >
+              Descrição do grupo CID-10, correspondente a uma faixa de categorias.
+              Ex: 'J09-J18 Influenza e pneumonia'.
+
+          - name: DS_CAPITULO
+            description: >
+              Descrição do capítulo CID-10, nível mais alto da hierarquia.
+              Ex: 'X. Doenças do aparelho respiratório'.

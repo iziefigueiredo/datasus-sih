@@ -1,0 +1,13 @@
+version: 2
+
+models:
+  - name: stg_procedimentos
+    tags: ['t2']
+    description: >
+      Tabela de procedimentos com transformações realizadas em T2.
+
+    columns:
+      - name: NOME_PROC
+        description: "Nome do procedimento SIGTAP."
+        tests:
+          - unique

@@ -1,0 +1,16 @@
+version: 2
+
+models:
+  - name: stg_hospital
+    tags: ['t2']
+    description: >
+      Tabela hospital transformações realizadas em T2.
+      
+    columns:
+      - name: MUNIC_MOV
+        description: "MUNIC_MOV códigos 530xxx do DF normalizados para 530010 (Brasília)."
+        tests:
+          
+          - relationships:
+              to: source('main', 'municipios')
+              field: CO_MUNICIPIO_6D

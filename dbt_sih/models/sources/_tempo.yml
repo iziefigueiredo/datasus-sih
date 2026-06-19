@@ -1,0 +1,55 @@
+version: 2
+
+sources:
+  - name: main
+    schema: main
+    tags: ['t1']
+    tables:
+      - name: tempo
+        
+        description: >
+          Dimensão de tempo gerada pelo pipeline. Contém um registro por dia
+          no período de 2008-01-01 a 2024-12-31. Utilizada para análises
+          temporais por data, mês, trimestre e dia da semana.
+        columns:
+          - name: data
+            description: Data completa. Chave primária da dimensão.
+            tests:
+              - not_null
+              - unique
+              - dbt_utils.accepted_range:
+                  min_value: "'2008-01-01'"
+                  max_value: "'2024-12-31'"
+
+          - name: ano
+            description: Ano da data.
+            tests:
+              - not_null
+              - dbt_utils.accepted_range:
+                  min_value: 2008
+                  max_value: 2024
+
+          - name: mes
+            description: Mês da data, de 1 a 12.
+            tests:
+              - not_null
+              - dbt_utils.accepted_range:
+                  min_value: 1
+                  max_value: 12
+
+          - name: trimestre
+            description: Trimestre da data, de 1 a 4.
+            tests:
+              - not_null
+              - accepted_values:
+                  values: [1, 2, 3, 4]
+
+          - name: dia_semana
+            description: >
+              Dia da semana conforme ISO: 1=Segunda-feira, 2=Terça-feira,
+              3=Quarta-feira, 4=Quinta-feira, 5=Sexta-feira, 6=Sábado,
+              7=Domingo.
+            tests:
+              - not_null
+              - accepted_values:
+                  values: [1, 2, 3, 4, 5, 6, 7]

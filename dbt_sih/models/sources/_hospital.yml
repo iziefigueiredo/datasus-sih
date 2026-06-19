@@ -1,0 +1,54 @@
+version: 2
+
+sources:
+  - name: main
+    schema: main
+    tags: ['t1']
+    tables:
+      - name: hospital
+        
+        description: >
+          Dimensão de estabelecimentos hospitalares. Dimensão degenerada derivada
+          dos dados transacionais do SIH-RD, enriquecida com o cadastro CNES.
+          Granularidade: um registro por CNES único, com valor modal por coluna
+          quando há múltiplos registros para o mesmo estabelecimento.
+         
+        columns:
+          - name: CNES
+            description: >
+              Código Nacional de Estabelecimentos de Saúde. Identificador único
+              do estabelecimento hospitalar. 7 dígitos numéricos, armazenado
+              como Int32.
+            tests:
+              - not_null
+              - unique
+
+          - name: NO_HOSPITAL
+            description: >
+              Nome/razão social do estabelecimento hospitalar. Obtido por
+              enriquecimento externo via cadastro CNES. Nullable — nem todos
+              os estabelecimentos possuem correspondência no cadastro.
+
+          - name: MUNIC_MOV
+            description: >
+              Código do município de localização do estabelecimento, com 6 dígitos
+              sem dígito verificador. Chave estrangeira para a dimensão municipios
+              (CO_MUNICIPIO_6D).
+            tests:
+              - not_null
+              - relationships:
+                  to: source('main', 'municipios')
+                  field: CO_MUNICIPIO_6D
+
+          - name: NATUREZA
+            description: Natureza jurídica do estabelecimento hospitalar.
+
+          - name: GESTAO
+            description: >
+              Tipo de gestão do estabelecimento. Indica se a gestão é municipal,
+              estadual ou federal.
+
+          - name: NAT_JUR
+            description: >
+              Código CONCLA de natureza jurídica, com 4 dígitos.
+              Ex: '1023' = Empresa Pública.

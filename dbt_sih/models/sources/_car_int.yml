@@ -1,0 +1,27 @@
+version: 2
+
+sources:
+  - name: main
+    schema: main
+    tags: ['t1']
+    tables:
+      - name: car_int
+        
+        description: >
+          Dimensão de caráter da internação. Classifica o tipo de admissão hospitalar
+          
+        columns:
+          - name: CAR_INT
+            description: >
+              Código do caráter da internação. Domínio: 1=Eletivo, 2=Urgência,
+              3=Acidente de trabalho, 4=Acidente de trânsito, 5=Outros acidentes,
+              6=Cirurgia eletiva. Fonte: TAB_SIH.
+            tests:
+              - not_null
+              - unique
+
+          - name: DESCRICAO
+            description: Descrição textual do caráter da internação.
+            tests:
+              - not_null
+              - unique

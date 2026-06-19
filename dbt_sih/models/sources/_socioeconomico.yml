@@ -1,0 +1,107 @@
+version: 2
+
+sources:
+  - name: main
+    schema: main
+    tags: ['t1']
+    tables:
+      - name: socioeconomico
+       
+        description: >
+          Tabela analítica de indicadores socioeconômicos por município e ano.
+          Modelo wide com uma métrica por coluna. Granularidade: município x ano.
+          Cobertura: 2008-2023, com exceção do PIB per capita (2008-2021, lag
+          de aproximadamente 2 anos — IBGE PIB Municipal).
+         
+          Fonte: IBGE, SIM, SINASC, CNES.
+        columns:
+          - name: CO_MUNICIPIO_6D
+            description: >
+              Código do município com 6 dígitos, sem dígito verificador.
+              Chave estrangeira para a dimensão municipios.
+            tests:
+              - not_null
+              - relationships:
+                  to: source('main', 'municipios')
+                  field: CO_MUNICIPIO_6D
+
+          - name: NU_ANO
+            description: Ano de referência dos indicadores.
+            tests:
+              - not_null
+              - dbt_utils.accepted_range:
+                  min_value: 2008
+                  max_value: 2024
+
+          - name: QT_POPULACAO
+            description: >
+              População residente no município no ano de referência. Fonte: IBGE.
+            tests:
+              - not_null
+              - dbt_utils.accepted_range:
+                  min_value: 0
+
+          - name: VL_PIB_PERCAPITA
+            description: >
+              PIB per capita em reais correntes. Nullable para anos após 2021,
+              devido ao lag de publicação do IBGE PIB Municipal.
+            
+
+          - name: QT_OBITOS_INFANTIS
+            description: >
+              Quantidade de óbitos infantis (menores de 1 ano) no município
+              no ano de referência. Fonte: SIM.
+            tests:
+              - not_null
+              - dbt_utils.accepted_range:
+                  min_value: 0
+
+          - name: QT_NASCIDOS_VIVOS
+            description: >
+              Quantidade de nascidos vivos no município no ano de referência.
+              Fonte: SINASC.
+            tests:
+              - not_null
+              - dbt_utils.accepted_range:
+                  min_value: 0
+
+          - name: VL_MORT_INFANTIL
+            description: >
+              Taxa de mortalidade infantil: óbitos menores de 1 ano por
+              1.000 nascidos vivos. Calculada como
+              QT_OBITOS_INFANTIS / QT_NASCIDOS_VIVOS x 1.000.
+            tests:
+              - dbt_utils.accepted_range:
+                  min_value: 0
+
+          - name: QT_LEITOS_SUS
+            description: >
+              Quantidade de leitos SUS no município, excluindo leitos
+              psiquiátricos por decisão metodológica. Fonte: CNES/LT.
+            tests:
+              - dbt_utils.accepted_range:
+                  min_value: 0
+
+          - name: VL_LEITOS_SUS_1000
+            description: >
+              Razão de leitos SUS por 1.000 habitantes, excluindo leitos
+              psiquiátricos. Calculada como QT_LEITOS_SUS / QT_POPULACAO x 1.000.
+            tests:
+              - dbt_utils.accepted_range:
+                  min_value: 0
+
+          - name: QT_MEDICOS
+            description: >
+              Quantidade de médicos únicos (deduplicados por CPF) atuando
+              no município. Fonte: CNES/PF.
+            tests:
+              - dbt_utils.accepted_range:
+                  min_value: 0
+
+          - name: VL_MEDICOS_1000
+            description: >
+              Razão de médicos por 1.000 habitantes. Calculada como
+              QT_MEDICOS / QT_POPULACAO x 1.000.
+            tests:
+              - dbt_utils.accepted_range:
+                  min_value: 0

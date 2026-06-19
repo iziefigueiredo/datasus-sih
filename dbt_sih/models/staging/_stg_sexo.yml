@@ -1,0 +1,19 @@
+version: 2
+
+models:
+  - name: stg_sexo
+    description: >
+      Dimensão de sexo do paciente.
+    columns:
+      - name: SEXO
+        description: >
+          Código do sexo do paciente. Domínio:
+          1=Masculino, 3=Feminino.
+        tests:
+          - accepted_values:
+              values: [1, 3]
+
+      - name: DESCRICAO
+        description: Descrição textual do sexo.
+        tests:
+          - unique

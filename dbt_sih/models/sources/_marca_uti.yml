@@ -1,0 +1,37 @@
+version: 2
+
+sources:
+  - name: main
+    schema: main
+    tags: ['t1']
+    tables:
+      - name: marca_uti
+       
+        description: >
+          Dimensão do tipo de UTI utilizada durante a internação. Inclui
+          categorias introduzidas durante a pandemia de COVID-19 (códigos 51 e 52).
+        columns:
+          - name: MARCA_UTI
+            description: >
+              Código do tipo de UTI. Domínio: 0=Não utilizou UTI,
+              1=Utilizou mais de um tipo de UTI,
+              51=UTI adulto tipo II COVID-19,
+              52=UTI pediátrica tipo II COVID-19,
+              74=UTI adulto tipo I, 75=UTI adulto tipo II, 76=UTI adulto tipo III,
+              77=UTI infantil tipo I, 78=UTI infantil tipo II, 79=UTI infantil tipo III,
+              80=UTI neonatal tipo I, 81=UTI neonatal tipo II, 82=UTI neonatal tipo III,
+              83=UTI de queimados,
+              85=UTI coronariana tipo II, 86=UTI coronariana tipo III,
+              99=UTI Doador.
+            tests:
+              - not_null
+              - unique
+              - accepted_values:
+                  values: [0, 1, 51, 52, 74, 75, 76, 77, 78, 79,
+                           80, 81, 82, 83, 85, 86, 99]
+
+          - name: DESCRICAO
+            description: Descrição textual do tipo de UTI.
+            tests:
+              - not_null
+              - unique

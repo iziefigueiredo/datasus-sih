@@ -1,0 +1,396 @@
+version: 2
+
+sources:
+  - name: main
+    schema: main
+    tags: ['t1']
+    tables:
+      - name: internacoes
+        
+        description: >
+          Tabela fato central do modelo. Cada registro representa uma internação
+          hospitalar única, identificada pela N_AIH. Granularidade: uma linha por
+          AIH contraída, após agregação dos arquivos mensais por N_AIH.
+          Cobre o período de 2008 a 2024. Fonte: SIH-RD / DATASUS.
+        
+           
+                
+        columns:
+
+          # --- Identificação ---
+          - name: N_AIH
+            description: >
+              Número da Autorização de Internação Hospitalar. Armazenado como
+              int64, possui 13 dígitos numéricos e é a chave primária da tabela. 
+            tests:
+              - not_null
+              - unique
+              - relationships:
+                  to: source('main', 'internacao_procedimento')
+                  field: N_AIH
+
+          - name: CNES
+            description: >
+              Código Nacional de Estabelecimentos de Saúde do hospital onde
+              ocorreu a internação. 7 dígitos numéricos. Chave estrangeira
+              para a dimensão hospital.
+            tests:
+              - not_null
+              - relationships:
+                  to: source('main', 'hospital')
+                  field: CNES
+
+          # --- Datas e permanência ---
+          - name: DT_INTER
+            description: Data de internação do paciente.
+            tests:
+              - not_null
+
+          - name: DT_SAIDA
+            description: Data de saída do paciente.
+            tests:
+              - not_null
+
+          - name: DIAS_PERM
+            description: >
+              Número de dias de permanência, calculado a partir de DT_INTER
+              e DT_SAIDA.
+            tests:
+              - not_null
+              - dbt_utils.accepted_range:
+                  min_value: 0
+                  
+
+          - name: DIAR_ACOM
+            description: Número de diárias de acompanhante durante a internação.
+            
+              
+
+          
+          - name: CAR_INT
+            description: Caráter da internação. Chave estrangeira para a dimensão car_int.
+            tests:
+              - not_null
+              - relationships:
+                  to: source('main', 'car_int')
+                  field: CAR_INT
+              - accepted_values:
+                  values: [1, 2, 3, 4, 5, 6]
+
+          - name: ESPEC
+            description: Especialidade do leito utilizado. Chave estrangeira para a dimensão especialidade.
+            tests:
+              - not_null
+              - relationships:
+                  to: source('main', 'especialidade')
+                  field: ESPEC
+              - accepted_values:
+                    values: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,
+                          31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,
+                          61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95]
+
+
+          - name: COMPLEX
+            description: Complexidade assistencial do procedimento. Chave estrangeira para a dimensão complexidade.
+            tests:
+              - not_null
+              - relationships:
+                  to: source('main', 'complexidade')
+                  field: COMPLEX
+              - accepted_values:
+                  values: ['01', '02', '03']
+
+          - name: MARCA_UTI
+            description: Tipo de UTI utilizada durante a internação. Chave estrangeira para a dimensão marca_uti.
+            tests:
+              - not_null
+              - relationships:
+                  to: source('main', 'marca_uti')
+                  field: MARCA_UTI
+              - accepted_values:
+                  values: [0, 51, 52, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 85, 86, 99, 1]
+
+          - name: UTI_INT_TO
+            description: Total de diárias de UTI durante a internação.
+            
+              
+
+          # --- Indicadores clínicos ---
+          - name: IND_VDRL
+            description: >
+              Indica se foi o resultado do exame VDRL durante a internação.
+            tests:
+              - not_null
+              - accepted_values:
+                  values: [0, 1]
+
+          - name: MORTE
+            description: Indica se o paciente foi a óbito durante a internação.
+            tests:
+              - not_null
+              - accepted_values:
+                  values: [0, 1]
+
+          - name: GESTRISCO
+            description: Indica se a internação foi classificada como gestação de risco. 
+            tests:
+              - not_null
+              - accepted_values:
+                  values: [0, 1]
+
+          # --- Diagnósticos ---
+          - name: DIAG_PRINC
+            description: >
+              Código CID-10 do diagnóstico principal da internação.
+              Chave estrangeira para a dimensão cid.
+            tests:
+              - not_null
+              - relationships:
+                  to: source('main', 'cid')
+                  field: CID
+
+          - name: DIAG_SECUN
+            description: >
+              Código CID-10 do diagnóstico secundário. Preenchido no período
+              2008-2014. Zerado a partir de 2015, substituído pelos slots DIAGSEC1-9.
+            tests:
+              - relationships:
+                  to: source('main', 'cid')
+                  field: CID
+
+          - name: CID_MORTE
+            description: Código CID-10 da causa da morte. 
+            tests:
+              - relationships:
+                  to: source('main', 'cid')
+                  field: CID
+
+          - name: CID_NOTIF
+            description: Código CID-10 de notificação compulsória. 
+            tests:
+              - relationships:
+                  to: source('main', 'cid')
+                  field: CID
+
+          - name: DIAGSEC1
+            description: Código CID-10 do 1º diagnóstico secundário. Introduzido em 2015.
+            tests:
+              - relationships:
+                  to: source('main', 'cid')
+                  field: CID
+
+          - name: DIAGSEC2
+            description: Código CID-10 do 2º diagnóstico secundário. 
+            tests:
+              - relationships:
+                  to: source('main', 'cid')
+                  field: CID
+
+          - name: DIAGSEC3
+            description: Código CID-10 do 3º diagnóstico secundário. 
+            tests:
+              - relationships:
+                  to: source('main', 'cid')
+                  field: CID
+
+          - name: DIAGSEC4
+            description: Código CID-10 do 4º diagnóstico secundário. 
+            tests:
+              - relationships:
+                  to: source('main', 'cid')
+                  field: CID
+
+          - name: DIAGSEC5
+            description: Código CID-10 do 5º diagnóstico secundário. 
+            tests:
+              - relationships:
+                  to: source('main', 'cid')
+                  field: CID
+
+          - name: DIAGSEC6
+            description: Código CID-10 do 6º diagnóstico secundário. 
+            tests:
+              - relationships:
+                  to: source('main', 'cid')
+                  field: CID
+
+          - name: DIAGSEC7
+            description: Código CID-10 do 7º diagnóstico secundário. 
+            tests:
+              - relationships:
+                  to: source('main', 'cid')
+                  field: CID
+
+          - name: DIAGSEC8
+            description: Código CID-10 do 8º diagnóstico secundário. 
+            tests:
+              - relationships:
+                  to: source('main', 'cid')
+                  field: CID
+
+          - name: DIAGSEC9
+            description: Código CID-10 do 9º diagnóstico secundário. 
+            tests:
+              - relationships:
+                  to: source('main', 'cid')
+                  field: CID
+
+          # --- Valores financeiros ---
+          - name: VAL_SH
+            description: >
+              Valor dos serviços hospitalares em reais. 
+            tests:
+              - not_null
+              - dbt_utils.accepted_range:
+                  min_value: 0
+
+          - name: VAL_SP
+            description: Valor dos serviços profissionais em reais.
+            tests:
+              - not_null
+              - dbt_utils.accepted_range:
+                  min_value: 0
+
+          - name: VAL_UTI
+            description: Valor das diárias de UTI em reais. Zero quando não houve utilização de UTI.
+            tests:
+              - not_null
+              - dbt_utils.accepted_range:
+                  min_value: 0
+
+          - name: VAL_TOT
+            description: >
+              Valor total da internação em reais. 
+            tests:
+              - not_null
+              - dbt_utils.accepted_range:
+                  min_value: 0
+
+          # --- Dados do paciente ---
+          - name: NASC
+            description: "Data de nascimento do paciente."
+
+          - name: IDADE
+            description: >
+              Idade do paciente em anos completos no momento da internação.
+              
+            tests:
+              - not_null
+              - dbt_utils.accepted_range:
+                  min_value: 0
+                  max_value: 150
+
+          - name: SEXO
+            description: "Sexo do paciente. Domínio: 1=Masculino, 3=Feminino."
+            tests:
+              - not_null
+              - accepted_values:
+                  values: [1, 3]
+              - relationships:
+                  to: source('main', 'sexo')
+                  field: SEXO
+
+          - name: RACA_COR
+            description: "Raça/cor do paciente. Domínio:  1=Branca, 2=Preta, 3=Parda, 4=Amarela, 5=Indígena"
+            tests:
+              - not_null
+              - accepted_values:
+                  values: [1, 2, 3, 4, 5]
+              - relationships:
+                  to: source('main', 'raca_cor')
+                  field: RACA_COR
+
+          - name: ETNIA
+            description: "Código da etnia indígena. Nullable — preenchido exclusivamente quando RACA_COR = 5."
+            tests:
+              - relationships:
+                  to: source('main', 'etnia')
+                  field: ETNIA
+              - dbt_utils.accepted_range:
+                  min_value: 1
+                  max_value: 264
+
+          - name: NACIONAL
+            description: "Código de nacionalidade do paciente. Range: 0 a 350."
+            tests:
+              - not_null
+              - dbt_utils.accepted_range:
+                  min_value: 0
+                  max_value: 350
+              - relationships:
+                  to: source('main', 'nacionalidade')
+                  field: NACIONAL
+
+          - name: INSTRU
+            description: "Grau de instrução. Domínio:  1=Analfabeto, 2=1º grau, 3=2º grau, 4=3º grau"
+            tests:
+              - not_null
+              - accepted_values:
+                  values: [ 1, 2, 3, 4]
+              - relationships:
+                  to: source('main', 'instrucao')
+                  field: INSTRU
+
+          - name: VINCPREV
+            description: "Vínculo previdenciário. Domínio: 1=Autônomo, 2=Desempregado, 3=Aposentado, 4=Não segurado, 5=Empregado, 6=Empregador."
+            tests:
+              - not_null
+              - accepted_values:
+                  values: [1, 2, 3, 4, 5, 6]
+              - relationships:
+                  to: source('main', 'vincprev')
+                  field: VINCPREV
+
+          - name: CBOR
+            description: "Código de ocupação CBO do paciente." 
+            tests:
+              - relationships:
+                  to: source('main', 'cbor')
+                  field: CBOR
+
+          - name: MUNIC_RES
+            description: >
+              Código do município de residência do paciente, com 6 dígitos
+              sem dígito verificador. Chave estrangeira para municipios.
+            tests:
+              - not_null
+              - relationships:
+                  to: source('main', 'municipios')
+                  field: CO_MUNICIPIO_6D
+
+          - name: CEP
+            description: >
+              CEP do endereço do paciente, com 8 dígitos e zeros à esquerda.
+              Em conformidade com a LGPD, alguns registros apresentam os 3
+              últimos dígitos zerados.
+
+          - name: NUM_FILHOS
+            description: "Número de filhos da paciente. "
+            tests:
+              - not_null
+              - dbt_utils.accepted_range:
+                  min_value: 0
+
+          - name: CONTRACEP1
+            description: "Código do primeiro método contraceptivo. Domínio: 1 a 12."
+            tests:
+              - not_null
+              - accepted_values:
+                  values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+              - relationships:
+                  to: source('main', 'contraceptivos')
+                  field: CONTRACEPTIVO
+
+          - name: CONTRACEP2
+            description: "Código do segundo método contraceptivo. Domínio: 1 a 12."
+            tests:
+              - not_null
+              - accepted_values:
+                  values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+              - relationships:
+                  to: source('main', 'contraceptivos')
+                  field: CONTRACEPTIVO
+
+          - name: INSC_PN
+            description: >
+              Número de inscrição no pré-natal. 

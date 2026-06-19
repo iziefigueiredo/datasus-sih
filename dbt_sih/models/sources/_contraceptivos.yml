@@ -1,0 +1,43 @@
+version: 2
+
+sources:
+  - name: main
+    schema: main
+    tags: ['t1']
+    tables:
+      - name: contraceptivos
+        
+        description: >
+          Dimensão de métodos contraceptivos utilizados pela paciente no momento
+          da internação. Registra até dois métodos simultâneos (CONTRACEP1 e
+          CONTRACEP2) na tabela fato. 
+        columns:
+          - name: CONTRACEPTIVO
+            description: >
+              Código do método contraceptivo. Domínio: 1=LAM,
+              2=Ogino Knaus, 3=Temperatura basal, 4=Billings, 5=Cinto térmico,
+              6=DIU, 7=Diafragma, 8=Preservativo, 9=Espermicida,
+              10=Hormônio oral, 11=Hormônio injetável, 12=Coito interrompido.
+            tests:
+              - not_null
+              - unique
+              - accepted_values:
+                  values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+
+          - name: DESCRICAO
+            description: Descrição textual do método contraceptivo.
+            tests:
+              - not_null
+              - unique
+
+
+
+
+
+
+
+
+
+
+
+

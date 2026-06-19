@@ -1,0 +1,30 @@
+version: 2
+
+sources:
+  - name: main
+    schema: main
+    tags: ['t1']
+    tables:
+      - name: raca_cor
+      
+        description: >
+          Dimensão de raça/cor do paciente conforme classificação IBGE.
+          Armazenado como String C(02) com zero à esquerda obrigatório.
+          Auditoria empírica RS 2014 (n=764.856) confirmou padding obrigatório.
+          Fonte: TAB_SIH / RACACOR.cnv.
+        columns:
+          - name: RACA_COR
+            description: >
+              Código de raça/cor. Domínio: '00'=Não informado, '01'=Branca,
+              '02'=Preta, '03'=Parda, '04'=Amarela, '05'=Indígena
+            tests:
+              - not_null
+              - unique
+              - accepted_values:
+                  values: [1, 2, 3, 4, 5]
+
+          - name: DESCRICAO
+            description: Descrição textual da raça/cor.
+            tests:
+              - not_null
+              - unique

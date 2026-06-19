@@ -1,0 +1,29 @@
+version: 2
+
+sources:
+  - name: main
+    schema: main
+    tags: ['t1']
+    tables:
+      - name: instrucao
+       
+        description: >
+          Dimensão de grau de instrução do paciente no momento da internação.
+          Qualidade: aproximadamente 99% dos registros sem informação.
+          
+        columns:
+          - name: INSTRU
+            description: >
+              Código do grau de instrução. Domínio: 0=Não informado,
+              1=Analfabeto, 2=1º grau, 3=2º grau, 4=3º grau, 0=Ignorado.
+            tests:
+              - not_null
+              - unique
+              - accepted_values:
+                  values: [1, 2, 3, 4]
+
+          - name: DESCRICAO
+            description: Descrição textual do grau de instrução.
+            tests:
+              - not_null
+              - unique

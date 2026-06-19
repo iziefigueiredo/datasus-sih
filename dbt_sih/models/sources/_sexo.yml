@@ -1,0 +1,27 @@
+version: 2
+
+sources:
+  - name: main
+    schema: main
+    tags: ['t1']
+    tables:
+      - name: sexo
+       
+        description: >
+          Dimensão de sexo do paciente. Fonte: TAB_SIH / SEXO.cnv.
+        columns:
+          - name: SEXO
+            description: >
+              Código do sexo do paciente. Domínio: 0=Não informado,
+              1=Masculino, 3=Feminino.
+            tests:
+              - not_null
+              - unique
+              - accepted_values:
+                  values: [1, 3]
+
+          - name: DESCRICAO
+            description: Descrição textual do sexo.
+            tests:
+              - not_null
+              - unique

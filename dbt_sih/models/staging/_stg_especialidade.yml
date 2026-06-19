@@ -1,0 +1,13 @@
+version: 2
+
+models:
+  - name: stg_especialidade
+    tags: ['t2']
+    description: >
+      Tabela de especialidade com transformações realizadas em T2.
+
+    columns:
+      - name: DESCRICAO
+        description: DESCRICAO da especialidade.
+        tests:
+          - unique

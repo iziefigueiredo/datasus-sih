@@ -1,7 +1,7 @@
 
 from .schema import  TABLE_SCHEMAS
 
-from .load import run_db_load_pipeline
+from .load import main as db_pipeline
 
 
-__all__ = ['TABLE_SCHEMAS', 'run_db_load_pipeline']
+__all__ = ['TABLE_SCHEMAS', 'db_pipeline']

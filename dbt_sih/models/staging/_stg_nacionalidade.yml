@@ -1,0 +1,13 @@
+version: 2
+
+models:
+  - name: stg_nacionalidade
+    tags: ['t2']
+    description: >
+      Tabela de nacionalidade apos aplicada (T2).
+
+    columns:
+      - name: DESCRICAO
+        description: Descrição da nacionalidade.
+        tests:
+          - unique

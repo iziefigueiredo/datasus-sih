@@ -90,54 +90,106 @@ python main.py
 ## Repository Structure
 
 ```
-datasus-sih/
-├─ data/                           # Data layer
-│  ├─ raw/                         # Raw parquet files downloaded from DATASUS
-│  ├─ interim/                     # Intermediate transformations during preprocessing/unification
-│  ├─ processed/                   # Final datasets ready to be loaded into PostgreSQL
-│  └─ support/                     # Auxiliary data (IBGE, IPEA, CID-10, etc.)
-│
-│ 
-├─ src/                            # Source code (ETL and database)
-│  ├─ config/                      # Global settings
-│  │  ├─ __init__.py
-│  │  └─ settings.py               # Paths, DB, UF, years, months
-│  │
-│  ├─ data/                        # ETL scripts
-│  │  ├─ __init__.py
-│  │  ├─ download.py               # EXTRACT: Download DATASUS → parquet
-│  │  ├─ unify.py                  # TRANSFORM 1: Merge parquet files
-│  │  ├─ preprocess.py             # TRANSFORM 2: Clean & standardize
-│  │  ├─ aggregate.py              # TRANSFORM 3: Aggregations 
-│  │  └─ split.py                  # TRANSFORM 4: Split into fact/dim tables
-│  │
-│  ├─ database/                    # Database schema and loader
-│  │  ├─ __init__.py
-│  │  ├─ schema.py                 # Table schemas (columns, PK, FK, types)
-│  │  └─ load.py                   # LOAD: Insert parquet tables into PostgreSQL
-│
-│
-├─ sih_analytics/                  # Analytical and governance layer
-│  ├─ dbt/                         # dbt project for SQL and YAML validations
-│  │  ├─ models/
-│  │  ├─ seeds/
-│  │  └─ tests/
-│  │
-│  ├─ predictive_models/           # Predictive layer (Python ML models)
-│  │  ├─ model.py
-│  │  ├─ preprocessing.py          # Optional: data preparation for ML
-│  │  └─ results/                  # Saved outputs (predictions, metrics)
-│
-├─ docs/                           # Documentation
-│
-├─ reports/                        # Generated reports (logs, quality, viz)
-│  ├─ logs/
-│
-├─ .gitignore                      # Ignore rules (exclude large data folders)
-├─ requirements.txt                # Dependencies
-├─ main.py                         # Orchestration: runs ETL steps 1–5
-└─ README.md                       # Documentation: install, run, DB setup
+Aqui está o conteúdo para o README:
 
+---
+
+```markdown
+# datasus-sih
+
+Pipeline ETL/ELT para microdados de internações hospitalares do SUS (SIH/RD),
+cobrindo 2008–2024, todas as 27 UFs brasileiras.
+
+---
+
+## Stack
+
+- **Python**: `polars`, `pysus`, `duckdb`, `pandas`
+- **Banco analítico**: DuckDB local (`sihrd6.duckdb`)
+- **Transformações SQL**: dbt-duckdb
+- **Download**: multiprocessing com 6 workers via FTP DATASUS
+
+---
+
+## Fluxo do pipeline
+
+Execute `python main.py` e escolha a etapa no menu:
+
+```
+Etapa 1 — Download dos microdados SIH/RD (FTP DATASUS → parquets raw)
+Etapa 2 — Download de documentação + tabelas de domínio (TAB_SIH.zip)
+Etapa 3 — Extração de indicadores socioeconômicos (IBGE, CNES/LT, CNES/PF, SIM, SINASC)
+Etapa 4 — Carga ELT incremental por UF no DuckDB + transformações dbt
+```
+
+A Etapa 4 executa automaticamente ao fim:
+`dbt deps → dbt seed → dbt run (staging) → dbt test (auditoria)`
+
+---
+
+## Estrutura de diretórios
+
+```
+datasus-sih/
+├── main.py                        # menu de etapas
+├── requirements.txt
+├── src/
+│   ├── config/
+│   │   ├── settings.py            # configurações centralizadas (paths, UFs, anos)
+│   │   └── logging_config.py
+│   ├── data/
+│   │   ├── extract/
+│   │   │   ├── download_sih.py          # Etapa 1
+│   │   │   ├── download_docs.py         # Etapa 2
+│   │   │   ├── download_domain_tables.py
+│   │   │   ├── extract_socioeconomic.py # Etapa 3
+│   │   │   ├── download_cnes.py
+│   │   │   ├── download_sim_sinasc.py
+│   │   │   └── datasus_fetch_parallel.py
+│   │   ├── transform/
+│   │   │   └── preprocess.py      # cast de tipos, datas, normalização por chunk
+│   │   └── pipeline_load.py       # Etapa 4: ELT incremental por UF
+│   └── database/
+│       ├── schema.py              # definição canônica do schema DuckDB
+│       └── load.py
+├── dbt_sih/                       # projeto dbt principal
+│   ├── models/
+│   │   ├── sources/               # definições das tabelas fonte
+│   │   └── staging/               # correções T2 (stg_*.sql)
+│   ├── seeds/                     # tabelas auxiliares (cid_manuais, procedimentos_manuais)
+│   ├── tests/                     # SQLs de auditoria
+│   ├── dbt_project.yml
+│   └── profiles.yml
+├── sih_analytics/                 # projeto dbt analítico (views)
+│   ├── models/
+│   │   ├── sources.yml
+│   │   └── data_quality/
+│   ├── tests/                     # validações (age_val, cid_padrao, cnes_munic, etc.)
+│   └── predictive_models/
+│       └── preditivo_transplante.ipynb
+└── data/
+    ├── raw/
+    │   ├── sih/        # parquets brutos RDUF<ano><mes>.parquet
+    │   ├── sim/        # óbitos (SIM)
+    │   ├── sinasc/     # nascimentos (SINASC)
+    │   ├── cnes_lt/    # leitos (CNES/LT)
+    │   └── cnes_pf/    # profissionais (CNES/PF)
+    ├── interim/        # artefatos intermediários
+    ├── processed/      # parquets finais prontos para carga
+    ├── support/        # tabelas de domínio CSV
+    └── backups/        # snapshots automáticos
+```
+
+
+
+## Dependências
+
+```bash
+pip install -r requirements.txt
+```
+
+Requer Python 3.10+.
+```
 
 ```
 

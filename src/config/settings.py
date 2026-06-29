@@ -89,17 +89,9 @@ class Settings:
     # =========================================================================
 
     # DuckDB — banco analítico local gerado pelo pipeline
-    DB_PATH = BASE_DIR / "sihrd6.duckdb"
+    DB_PATH = BASE_DIR / "sihrd8.duckdb"
 
-    # PostgreSQL — reservado para deploy em ambiente compartilhado
-    DB_CONFIG = {
-        "host":     "localhost",
-        "port":     5432,
-        "database": "sihrd5",
-        "user":     "postgres",
-        "password": "1234",  # substituir por variável de ambiente em produção
-    }
-
+  
     # =========================================================================
     # 5. ARQUIVOS DE APOIO — tabelas de domínio (dimensões estáticas)
     #

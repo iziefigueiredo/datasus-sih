@@ -1,0 +1,13 @@
+CID,DESCRICAO,TP_NIVEL,RESTRSEXO,DS_CATEGORIA,DS_GRUPO,DS_CAPITULO
+U04,Síndrome respiratória aguda grave [SARS],SUBCAT,5,Síndrome respiratória aguda grave,U00-U49 Designação provisória de novas doenças,XXII. Códigos para propósitos especiais
+U09,Condição pós-COVID-19,CAT,5,Condição pós-COVID-19,U00-U49 Designação provisória de novas doenças,XXII. Códigos para propósitos especiais
+U099,Condição pós-COVID-19 não especificada,SUBCAT,5,Condição pós-COVID-19,U00-U49 Designação provisória de novas doenças,XXII. Códigos para propósitos especiais
+U10,Síndrome inflamatória multissistêmica associada a COVID-19,CAT,5,Síndrome inflamatória multissistêmica associada a COVID-19,U00-U49 Designação provisória de novas doenças,XXII. Códigos para propósitos especiais
+U109,Síndrome inflamatória multissistêmica assoc. COVID-19 não especificada,SUBCAT,5,Síndrome inflamatória multissistêmica associada a COVID-19,U00-U49 Designação provisória de novas doenças,XXII. Códigos para propósitos especiais
+U80,Agente resistente a penicilina e antibióticos relacionados,SUBCAT,5,Agente resistente a penicilina e antibióticos relacionados,U50-U99 Resistência a drogas antimicrobianas,XXII. Códigos para propósitos especiais
+U81,Agente resistente a vancomicina e antibióticos relacionados,SUBCAT,5,Agente resistente a vancomicina e antibióticos relacionados,U50-U99 Resistência a drogas antimicrobianas,XXII. Códigos para propósitos especiais
+U89,Resistência a outros agentes antimicrobianos,SUBCAT,5,Resistência a outros agentes antimicrobianos,U50-U99 Resistência a drogas antimicrobianas,XXII. Códigos para propósitos especiais
+N182,Doença renal crônica estádio 2,SUBCAT,5,Doença renal crônica,N17-N19 Insuficiência renal,XIV. Doenças do aparelho geniturinário
+N183,Doença renal crônica estádio 3,SUBCAT,5,Doença renal crônica,N17-N19 Insuficiência renal,XIV. Doenças do aparelho geniturinário
+N184,Doença renal crônica estádio 4,SUBCAT,5,Doença renal crônica,N17-N19 Insuficiência renal,XIV. Doenças do aparelho geniturinário
+N185,Doença renal crônica estádio 5,SUBCAT,5,Doença renal crônica,N17-N19 Insuficiência renal,XIV. Doenças do aparelho geniturinário

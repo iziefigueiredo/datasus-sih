@@ -58,9 +58,7 @@ class Settings:
     # =========================================================================
 
     # Escopo padrão de UFs — pode ser sobrescrito via CLI em cada script
-    UF_DEFAULT = ["AC","AL","AM","AP","BA","CE","DF","ES","GO","MA","MG","MS",
-              "MT","PA","PB","PE","PI","PR","RJ","RN","RO","RR","RS","SC",
-              "SE","SP","TO"]
+    UF_DEFAULT = ["AC"]
     
     # Janela temporal do pipeline
     ANOS_INICIO  = 2008
@@ -181,7 +179,7 @@ class Settings:
     LEITOS_FILENAME         = "leitos.parquet"
     MEDICOS_FILENAME        = "medicos.parquet"
     SOCIOECONOMICO_FILENAME = "socioeconomico.parquet"
-
+    IPEA_FILENAME           = "ipea_saude.parquet"
     # =========================================================================
     # MÉTODOS
     # =========================================================================

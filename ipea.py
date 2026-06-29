@@ -1,9 +1,10 @@
-import ipeadatapy as ipea
+import ipeadatapy as ip
 
-meta = ipea.metadata()
-anuais = meta[meta["FREQUENCY"] == "Anual"].copy()
-
-temas_interesse = anuais[anuais["BIG THEME"].isin(["Regional", "Social"])]
-
-temas_interesse[["CODE", "NAME", "SOURCE ACRONYM", "MEASURE", "THEME CODE", "BIG THEME"]].to_csv("ipea_series.csv", index=False)
-print(f"{len(temas_interesse)} séries salvas em ipea_series.csv")
+for code in ["AVS_IVS", "PNADCA_TXETOTUF"]:
+    print(f"\n=== {code} ===")
+    df = ip.timeseries(code)
+    print(f"Colunas: {df.columns.tolist()}")
+    print(f"Total registros: {len(df)}")
+    print(f"Anos disponíveis: {sorted(df['YEAR'].unique().tolist())}")
+    print(f"Registros por ano (primeiros 5 anos):")
+    print(df.groupby('YEAR').size().head())

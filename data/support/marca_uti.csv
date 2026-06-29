@@ -1,0 +1,18 @@
+MARCA_UTI,DESCRICAO
+00,Não utilizou UTI
+51,UTI adulto - tipo II COVID 19
+52,UTI pediátrica - tipo II COVID 19
+74,UTI adulto - tipo I
+75,UTI adulto - tipo II
+76,UTI adulto - tipo III
+77,UTI infantil - tipo I
+78,UTI infantil - tipo II
+79,UTI infantil - tipo III
+80,UTI neonatal - tipo I
+81,UTI neonatal - tipo II
+82,UTI neonatal - tipo III
+83,UTI de queimados
+85,UTI coronariana tipo II - UCO tipo II
+86,UTI coronariana tipo III - UCO tipo III
+99,UTI Doador
+01,Utilizou mais de um tipo de UTI

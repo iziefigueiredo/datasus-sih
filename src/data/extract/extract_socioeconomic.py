@@ -23,6 +23,7 @@ import sys
 import time
 import requests
 from pathlib import Path
+import ipeadatapy as ip
 
 import pandas as pd
 from tqdm import tqdm
@@ -57,8 +58,17 @@ MES_MUDANCA_CBO = 8
 SIDRA_POP_URL = "https://apisidra.ibge.gov.br/values/t/6579/n6/all/v/9324/p/{ano}"
 SIDRA_PIB_URL = "https://apisidra.ibge.gov.br/values/t/5938/n6/all/v/37/p/{ano}"
 
-INDICADORES_DISPONIVEIS = ["populacao", "leitos", "medicos", "mort_infantil", "pib"]
+INDICADORES_DISPONIVEIS = ["populacao", "leitos", "medicos", "mort_infantil", "pib", "ipea"]
 
+IPEA_SERIES = {
+    "ANS_BNFPLSAUDEUF":      ("QT_BENEFICIARIOS_PLANO_SAUDE", "Int64"),
+    "SIS_ESTABINTSUSUF":     ("QT_ESTAB_INTERNACAO_SUS",      "Int64"),
+    "SIS_ESTABSAUDEUF":      ("QT_ESTAB_SAUDE",               "Int64"),
+    "SIS_ESTABURGSUSUF":     ("QT_ESTAB_URGENCIA_SUS",        "Int64"),
+    "SIS_NMENF1000HUF":      ("VL_ENFERMEIROS_1000",          "float64"),
+    "SIS_NMTEC1000HUF":      ("VL_TECNICOS_SAUDE_1000",       "float64"),
+    "SIS_NMLTCMPSUS1000HUF": ("VL_LEITOS_UTI_SUS_1000",       "float64"),
+}
 
 # ─────────────────────────────────────────────────────────────────────
 # Helpers compartilhados
@@ -816,9 +826,94 @@ def extrair_pib(codigos_uf, anos, escopo_label, csv=False):
 
     _salvar(resultado, "pib_percapita", escopo_label, min(anos), max(anos), csv)
 
+# ─────────────────────────────────────────────────────────────────────
+# 6. INDICADORES IPEA — IPEADATA (7 séries de saúde municipal)
+# ─────────────────────────────────────────────────────────────────────
+
+def extrair_ipea(codigos_uf, anos, escopo_label, csv=False):
+    """Extrai 7 indicadores de saúde municipais via IPEADATA."""
+    try:
+        import ipeadatapy as ip
+    except ImportError:
+        print("  ERRO: ipeadatapy não instalado. Execute: pip install ipeadatapy")
+        return
+
+    print("\n=== INDICADORES IPEA (IPEADATA) ===")
+    ano_min, ano_max = min(anos), max(anos)
+
+    frames = {}
+    for codigo, (coluna, dtype) in IPEA_SERIES.items():
+        print(f"  {codigo} → {coluna}...", end=" ", flush=True)
+        df_serie = None
+        for tentativa in range(1, 4):
+            try:
+                df_serie = ip.timeseries(codigo)
+                break
+            except Exception as e:
+                if tentativa < 3:
+                    time.sleep(5 * tentativa)
+                else:
+                    print(f"ERRO ({e}) — pulando.")
+        if df_serie is None:
+            continue
+
+        val_col = next((c for c in df_serie.columns if c.startswith("VALUE")), None)
+        if val_col is None:
+            print("sem coluna VALUE — pulando.")
+            continue
+
+        # Em ipeadatapy, CODE = TERCODIGO (código IBGE do território)
+        df_serie = df_serie.rename(columns={"CODE": "CO_MUN_RAW"})
+        df_serie["CO_MUN_RAW"] = df_serie["CO_MUN_RAW"].astype(str).str.strip()
+        df_serie["CO_MUNICIPIO_6D"] = df_serie["CO_MUN_RAW"].str[:6].str.zfill(6)
+
+        df_serie = df_serie[df_serie["YEAR"].between(ano_min, ano_max)].copy()
+        if codigos_uf:
+            df_serie = df_serie[df_serie["CO_MUNICIPIO_6D"].str[:2].isin(codigos_uf)]
+
+        df_serie = (df_serie[["CO_MUNICIPIO_6D", "YEAR", val_col]]
+                    .rename(columns={"YEAR": "NU_ANO", val_col: coluna}))
+     
+        df_serie[coluna] = pd.to_numeric(df_serie[coluna], errors="coerce")
+        if dtype == "Int64":
+            df_serie[coluna] = df_serie[coluna].round(0).astype("Int64")
+        elif dtype == "float64":
+            df_serie[coluna] = df_serie[coluna] / 10
+
+        registros_por_ano = df_serie.groupby("NU_ANO").size().median()
+        print(f"{len(df_serie):,} registros | {registros_por_ano:.0f}/ano")
+
+        if registros_por_ano < 100:
+            print(f"  AVISO: {codigo} com {registros_por_ano:.0f} obs/ano — granularidade pode não ser municipal.")
+
+        frames[codigo] = df_serie
+        time.sleep(1)
+
+    if not frames:
+        print("  ERRO: nenhuma série IPEA obtida.")
+        return
+
+    mun = carregar_municipios()
+    if codigos_uf:
+        mun = mun[mun["CO_MUNICIPIO_6D"].str[:2].isin(codigos_uf)]
+
+    grade = pd.MultiIndex.from_product(
+        [mun["CO_MUNICIPIO_6D"].unique(), anos],
+        names=["CO_MUNICIPIO_6D", "NU_ANO"]
+    ).to_frame(index=False)
+
+    resultado = grade
+    for codigo, df_s in frames.items():
+        coluna = IPEA_SERIES[codigo][0]
+        df_agg = (df_s.groupby(["CO_MUNICIPIO_6D", "NU_ANO"], as_index=False)[coluna]
+                  .first())
+        resultado = resultado.merge(df_agg, on=["CO_MUNICIPIO_6D", "NU_ANO"], how="left")
+
+    resultado = resultado.sort_values(["CO_MUNICIPIO_6D", "NU_ANO"]).reset_index(drop=True)
+    _salvar(resultado, "ipea_saude", escopo_label, ano_min, ano_max, csv)
 
 # ─────────────────────────────────────────────────────────────────────
-# 6. merge dos 5 parquets em socioeconomico.parquet
+# 7. merge dos 5 parquets em socioeconomico.parquet
 # ─────────────────────────────────────────────────────────────────────
 
 def consolidar_socioeconomico(escopo_label, anos, csv=False):
@@ -849,6 +944,12 @@ def consolidar_socioeconomico(escopo_label, anos, csv=False):
                                     "VL_LEITOS_SUS_1000"]),
         ("medicos.parquet",        ["CO_MUNICIPIO_6D", "NU_ANO", "QT_MEDICOS",
                                     "VL_MEDICOS_1000"]),
+        
+        ("ipea_saude.parquet",     ["CO_MUNICIPIO_6D", "NU_ANO",
+                                    "QT_BENEFICIARIOS_PLANO_SAUDE", "QT_ESTAB_INTERNACAO_SUS",
+                                    "QT_ESTAB_SAUDE", "QT_ESTAB_URGENCIA_SUS",
+                                    "VL_ENFERMEIROS_1000", "VL_TECNICOS_SAUDE_1000",
+                                    "VL_LEITOS_UTI_SUS_1000"]),
     ]
 
     resultado = base
@@ -934,6 +1035,8 @@ def main():
         extrair_mort_infantil(codigos_uf, ufs_siglas, anos, escopo_label, args.csv)
     if "pib"           in indicadores:
         extrair_pib(codigos_uf, anos, escopo_label, args.csv)
+    if "ipea"          in indicadores:
+        extrair_ipea(codigos_uf, anos, escopo_label, args.csv)
 
     # Consolidação final: merge dos parquets intermediários em socioeconomico.parquet
     consolidar_socioeconomico(escopo_label, anos, args.csv)

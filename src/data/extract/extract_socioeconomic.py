@@ -2,12 +2,14 @@
 Extração de Indicadores Socioeconômicos Municipais
 Localização: sihrd5/src/data/extract_socioeconomic.py
 
-Consolida os 5 indicadores que alimentam TF_SOCIOECONOMICO:
-    1. populacao       — IBGE SIDRA (API, tabela 6579)
-    2. leitos          — CNES/LT (download automático via pysus se necessário)
-    3. medicos         — CNES/PF (download automático via pysus se necessário)
-    4. mort_infantil   — SIM + SINASC (download automático via pysus)
-    5. pib             — IBGE SIDRA (API, tabela 5938)
+Consolida os indicadores que alimentam TF_SOCIOECONOMICO:
+    1.   populacao        — IBGE SIDRA (API, tabela 6579)
+    2.   leitos           — CNES/LT (download automático via pysus se necessário)
+    3.   medicos          — CNES/PF (download automático via pysus se necessário)
+    3.5  enfermeiros_tec  — CNES/PF (reutiliza arquivos de médicos; CBO 2235/3222/5162)
+    4.   mort_infantil    — SIM + SINASC (download automático via pysus)
+    4.5  obitos_transito  — SIM (reutiliza arquivos de mort_infantil; CID V01-V89)
+    5.   pib              — IBGE SIDRA (API, tabela 5938)
 
 Uso:
     python extract_socioeconomic.py                  # todos os indicadores
@@ -23,7 +25,6 @@ import sys
 import time
 import requests
 from pathlib import Path
-import ipeadatapy as ip
 
 import pandas as pd
 from tqdm import tqdm
@@ -48,27 +49,22 @@ UF_PARA_CODIGO = {
 CODLEITO_PSIQUIATRICO  = "33"
 # CBO-2002: família de médicos mudou de codificação ao longo do tempo:
 #   2007-~2010: família 2231 (Médicos)
-#   ~2010+:     família 225  (Médicos clínicos, cirurgiões, diagnóstico, etc.)
+#   ~2010+:     família 225  (Médicos clínicos, cirürgiões, diagnóstico, etc.)
 # Ambos os prefixos são válidos e devem ser aceitos em qualquer ano.
 CBO2002_MEDICOS_PREFIXO = ("2231", "225")
 CBO1994_MEDICOS_PREFIXO = ("22",)
 ANO_MUDANCA_CBO = 2007
 MES_MUDANCA_CBO = 8
 
+CBO2002_ENFERMEIROS_PREFIXO = ("2235",)
+CBO2002_TEC_SAUDE_PREFIXO   = ("3222", "5162")
+CID10_TRANSITO_REGEX = r'^V[0-8]'  # V00–V89: acidentes de transporte terrestre
+
 SIDRA_POP_URL = "https://apisidra.ibge.gov.br/values/t/6579/n6/all/v/9324/p/{ano}"
 SIDRA_PIB_URL = "https://apisidra.ibge.gov.br/values/t/5938/n6/all/v/37/p/{ano}"
 
-INDICADORES_DISPONIVEIS = ["populacao", "leitos", "medicos", "mort_infantil", "pib", "ipea"]
-
-IPEA_SERIES = {
-    "ANS_BNFPLSAUDEUF":      ("QT_BENEFICIARIOS_PLANO_SAUDE", "Int64"),
-    "SIS_ESTABINTSUSUF":     ("QT_ESTAB_INTERNACAO_SUS",      "Int64"),
-    "SIS_ESTABSAUDEUF":      ("QT_ESTAB_SAUDE",               "Int64"),
-    "SIS_ESTABURGSUSUF":     ("QT_ESTAB_URGENCIA_SUS",        "Int64"),
-    "SIS_NMENF1000HUF":      ("VL_ENFERMEIROS_1000",          "float64"),
-    "SIS_NMTEC1000HUF":      ("VL_TECNICOS_SAUDE_1000",       "float64"),
-    "SIS_NMLTCMPSUS1000HUF": ("VL_LEITOS_UTI_SUS_1000",       "float64"),
-}
+INDICADORES_DISPONIVEIS = ["populacao", "leitos", "medicos", "enfermeiros_tec",
+                            "mort_infantil", "obitos_transito", "pib"]
 
 # ─────────────────────────────────────────────────────────────────────
 # Helpers compartilhados
@@ -580,6 +576,126 @@ def extrair_medicos(codigos_uf, ufs_siglas, anos, escopo_label, csv=False):
 
 
 # ─────────────────────────────────────────────────────────────────────
+# 3.5. ENFERMEIROS E TÉCNICOS/AUXILIARES — CNES/PF
+# ─────────────────────────────────────────────────────────────────────
+
+def _enfermeiros_tec_ano(raw_dir, ufs_siglas, ano):
+    frames_enf = []
+    frames_tec = []
+    for uf in ufs_siglas:
+        arq = mes_ref = None
+        for mes in range(12, 0, -1):
+            arq = _descobrir_parquet(raw_dir, "PF", uf, ano, mes)
+            if arq:
+                mes_ref = mes
+                break
+        if arq is None:
+            continue
+        try:
+            try:
+                df = pd.read_parquet(arq, columns=["CODUFMUN", "CBO_OCUPACAO", "CPF_PROF"])
+            except (KeyError, Exception):
+                df = pd.read_parquet(arq, columns=["CODUFMUN", "CBO", "CPF_PROF"])
+                df = df.rename(columns={"CBO": "CBO_OCUPACAO"})
+        except Exception:
+            try:
+                df_full = _ler_parquet_seguro(arq)
+                if df_full is None:
+                    continue
+                col_cbo = "CBO_OCUPACAO" if "CBO_OCUPACAO" in df_full.columns else "CBO"
+                df = df_full[["CODUFMUN", col_cbo, "CPF_PROF"]].copy()
+                df = df.rename(columns={col_cbo: "CBO_OCUPACAO"})
+            except Exception as e:
+                print(f"  Erro {arq}: {e}")
+                continue
+        df["CODUFMUN"]     = df["CODUFMUN"].astype(str).str.strip().str.zfill(6)
+        df["CBO_OCUPACAO"] = df["CBO_OCUPACAO"].astype(str).str.strip()
+        df["CPF_PROF"]     = df["CPF_PROF"].astype(str).str.strip()
+        df_clean = (df.dropna(subset=["CPF_PROF"])
+                      .query("CPF_PROF != '' and CPF_PROF != 'nan'"))
+        dedup_enf = (df_clean[df_clean["CBO_OCUPACAO"].apply(
+                        lambda x: x.startswith(CBO2002_ENFERMEIROS_PREFIXO))]
+                     .drop_duplicates(subset=["CODUFMUN", "CPF_PROF"]))
+        if not dedup_enf.empty:
+            agg = dedup_enf.groupby("CODUFMUN", as_index=False).size().rename(columns={"size": "QT_ENFERMEIROS"})
+            agg[["NU_ANO", "NU_MES_REF"]] = ano, mes_ref
+            frames_enf.append(agg)
+        dedup_tec = (df_clean[df_clean["CBO_OCUPACAO"].apply(
+                        lambda x: x.startswith(CBO2002_TEC_SAUDE_PREFIXO))]
+                     .drop_duplicates(subset=["CODUFMUN", "CPF_PROF"]))
+        if not dedup_tec.empty:
+            agg = dedup_tec.groupby("CODUFMUN", as_index=False).size().rename(columns={"size": "QT_TEC_SAUDE"})
+            agg[["NU_ANO", "NU_MES_REF"]] = ano, mes_ref
+            frames_tec.append(agg)
+    df_enf = pd.concat(frames_enf, ignore_index=True) if frames_enf else pd.DataFrame()
+    df_tec = pd.concat(frames_tec, ignore_index=True) if frames_tec else pd.DataFrame()
+    return df_enf, df_tec
+
+
+def extrair_enfermeiros_tec(codigos_uf, ufs_siglas, anos, escopo_label, csv=False):
+    """Extrai enfermeiros e técnicos/auxiliares únicos por município/ano (CNES/PF)."""
+    print("\n=== ENFERMEIROS E TÉCNICOS/AUXILIARES (CNES/PF) ===")
+    _garantir_cnes("PF", Settings.RAW_CNES_PF_DIR, ufs_siglas, anos)
+    frames_enf, frames_tec, anos_sem_dados = [], [], []
+    for ano in tqdm(anos, desc="Anos"):
+        df_enf, df_tec = _enfermeiros_tec_ano(Settings.RAW_CNES_PF_DIR, ufs_siglas, ano)
+        if not df_enf.empty:
+            frames_enf.append(df_enf)
+        if not df_tec.empty:
+            frames_tec.append(df_tec)
+        if df_enf.empty and df_tec.empty:
+            anos_sem_dados.append(ano)
+    if anos_sem_dados:
+        print(f"  CNES/PF: sem dados para {_formatar_faixas(anos_sem_dados)}")
+    if not frames_enf and not frames_tec:
+        print("  ERRO: nenhum dado CNES/PF encontrado.")
+        return
+    pop_path = Settings.PROCESSED_DIR / "populacao.parquet"
+    if not pop_path.exists():
+        print("  ERRO: populacao.parquet não encontrado. Execute --indicador populacao primeiro.")
+        return
+    pop = pd.read_parquet(pop_path, columns=["CO_MUNICIPIO_6D", "NU_ANO", "VL_POPULACAO"])
+    mun = carregar_municipios()
+    mun_filtrada = mun[mun["CO_MUNICIPIO_6D"].str[:2].isin(codigos_uf)] if codigos_uf else mun
+    grade = pd.MultiIndex.from_product(
+        [mun_filtrada["CO_MUNICIPIO_6D"].unique(), anos],
+        names=["CO_MUNICIPIO_6D", "NU_ANO"]
+    ).to_frame(index=False)
+    resultado = grade.merge(pop, on=["CO_MUNICIPIO_6D", "NU_ANO"], how="left")
+    if frames_enf:
+        enf = pd.concat(frames_enf, ignore_index=True)
+        if codigos_uf:
+            enf = enf[enf["CODUFMUN"].str[:2].isin(codigos_uf)]
+        enf = enf.rename(columns={"CODUFMUN": "CO_MUNICIPIO_6D"})
+        resultado = resultado.merge(enf[["CO_MUNICIPIO_6D", "NU_ANO", "QT_ENFERMEIROS"]],
+                                    on=["CO_MUNICIPIO_6D", "NU_ANO"], how="left")
+    else:
+        resultado["QT_ENFERMEIROS"] = pd.NA
+    resultado["VL_ENFERMEIROS_1000"] = resultado.apply(
+        lambda r: round(r["QT_ENFERMEIROS"] / r["VL_POPULACAO"] * 1000, 4)
+        if pd.notna(r.get("QT_ENFERMEIROS")) and pd.notna(r["VL_POPULACAO"]) and r["VL_POPULACAO"] > 0
+        else None, axis=1
+    )
+    if frames_tec:
+        tec = pd.concat(frames_tec, ignore_index=True)
+        if codigos_uf:
+            tec = tec[tec["CODUFMUN"].str[:2].isin(codigos_uf)]
+        tec = tec.rename(columns={"CODUFMUN": "CO_MUNICIPIO_6D"})
+        resultado = resultado.merge(tec[["CO_MUNICIPIO_6D", "NU_ANO", "QT_TEC_SAUDE"]],
+                                    on=["CO_MUNICIPIO_6D", "NU_ANO"], how="left")
+    else:
+        resultado["QT_TEC_SAUDE"] = pd.NA
+    resultado["VL_TEC_SAUDE_1000"] = resultado.apply(
+        lambda r: round(r["QT_TEC_SAUDE"] / r["VL_POPULACAO"] * 1000, 4)
+        if pd.notna(r.get("QT_TEC_SAUDE")) and pd.notna(r["VL_POPULACAO"]) and r["VL_POPULACAO"] > 0
+        else None, axis=1
+    )
+    resultado = (resultado.drop(columns=["VL_POPULACAO"])
+                 .sort_values(["CO_MUNICIPIO_6D", "NU_ANO"]).reset_index(drop=True))
+    _salvar(resultado, "enfermeiros_tec", escopo_label, min(anos), max(anos), csv)
+
+
+# ─────────────────────────────────────────────────────────────────────
 # 4. MORTALIDADE INFANTIL — SIM + SINASC
 # ─────────────────────────────────────────────────────────────────────
 
@@ -757,6 +873,79 @@ def extrair_mort_infantil(codigos_uf, ufs_siglas, anos, escopo_label, csv=False)
 
 
 # ─────────────────────────────────────────────────────────────────────
+# 4.5. ÓBITOS POR ACIDENTE DE TRÂNSITO — SIM
+# ─────────────────────────────────────────────────────────────────────
+
+def _obitos_transito_sim(ufs_siglas, anos):
+    raw_dir = Settings.RAW_SIM_DIR
+    frames = []
+    for uf in ufs_siglas:
+        for pq_path in sorted(raw_dir.glob(f"DO{uf.upper()}*.parquet")):
+            try:
+                df = _ler_parquet_seguro(pq_path)
+                if df is None or df.empty:
+                    continue
+                col_causa = next((c for c in ["CAUSABAS", "CAUSABAS_O"] if c in df.columns), None)
+                if col_causa is None or "CODMUNRES" not in df.columns:
+                    continue
+                df["NU_ANO"] = pd.to_datetime(df["DTOBITO"], format="%d%m%Y", errors="coerce").dt.year
+                df = df[df["NU_ANO"].isin(set(anos))]
+                df_tran = df[df[col_causa].astype(str).str.match(CID10_TRANSITO_REGEX, na=False)].copy()
+                if df_tran.empty:
+                    continue
+                df_tran["CO_MUNICIPIO_6D"] = df_tran["CODMUNRES"].astype(str).str.zfill(7).str[:6]
+                cod_uf = UF_PARA_CODIGO.get(uf.upper(), uf.zfill(2))
+                df_tran = df_tran[df_tran["CO_MUNICIPIO_6D"].str[:2] == cod_uf]
+                frames.append(
+                    df_tran.groupby(["CO_MUNICIPIO_6D", "NU_ANO"]).size()
+                           .reset_index(name="QT_OBITOS_TRANSITO")
+                )
+            except Exception as e:
+                print(f"    Erro {pq_path.name}: {e}")
+    if not frames:
+        return pd.DataFrame(columns=["CO_MUNICIPIO_6D", "NU_ANO", "QT_OBITOS_TRANSITO"])
+    return (pd.concat(frames)
+              .groupby(["CO_MUNICIPIO_6D", "NU_ANO"])["QT_OBITOS_TRANSITO"]
+              .sum().reset_index())
+
+
+def extrair_obitos_transito(codigos_uf, ufs_siglas, anos, escopo_label, csv=False):
+    """Extrai óbitos por acidente de trânsito por município/ano (SIM, CID V01-V89)."""
+    print("\n=== ÓBITOS POR ACIDENTE DE TRÂNSITO (SIM) ===")
+    sim_files = list(Settings.RAW_SIM_DIR.glob("DO*.parquet"))
+    if not sim_files:
+        print("  AVISO: nenhum arquivo SIM encontrado — execute --indicador mort_infantil primeiro.")
+        return
+    df_tran = _obitos_transito_sim(ufs_siglas, anos)
+    pop_path = Settings.PROCESSED_DIR / "populacao.parquet"
+    if not pop_path.exists():
+        print("  ERRO: populacao.parquet não encontrado.")
+        return
+    pop = pd.read_parquet(pop_path, columns=["CO_MUNICIPIO_6D", "NU_ANO", "VL_POPULACAO"])
+    mun = carregar_municipios()
+    if codigos_uf:
+        mun = mun[mun["CO_MUNICIPIO_6D"].str[:2].isin(codigos_uf)]
+    grade = pd.MultiIndex.from_product(
+        [mun["CO_MUNICIPIO_6D"].unique(), anos],
+        names=["CO_MUNICIPIO_6D", "NU_ANO"]
+    ).to_frame(index=False)
+    res = (grade
+           .merge(df_tran, on=["CO_MUNICIPIO_6D", "NU_ANO"], how="left")
+           .merge(pop,     on=["CO_MUNICIPIO_6D", "NU_ANO"], how="left"))
+    res["QT_OBITOS_TRANSITO"] = res["QT_OBITOS_TRANSITO"].fillna(0).astype(int)
+    res["VL_MORT_TRANSITO_100K"] = res.apply(
+        lambda r: round(r["QT_OBITOS_TRANSITO"] / r["VL_POPULACAO"] * 100_000, 4)
+        if pd.notna(r["VL_POPULACAO"]) and r["VL_POPULACAO"] > 0 else None, axis=1
+    )
+    res = (res.drop(columns=["VL_POPULACAO"])
+              .merge(mun[["CO_MUNICIPIO_6D", "NO_MUNICIPIO", "SG_UF"]], on="CO_MUNICIPIO_6D", how="left")
+              [["CO_MUNICIPIO_6D", "NO_MUNICIPIO", "SG_UF", "NU_ANO",
+                "QT_OBITOS_TRANSITO", "VL_MORT_TRANSITO_100K"]]
+              .sort_values(["CO_MUNICIPIO_6D", "NU_ANO"]).reset_index(drop=True))
+    _salvar(res, "obitos_transito", escopo_label, min(anos), max(anos), csv)
+
+
+# ─────────────────────────────────────────────────────────────────────
 # 5. PIB PER CAPITA — IBGE SIDRA tabela 5938
 # ─────────────────────────────────────────────────────────────────────
 
@@ -826,99 +1015,14 @@ def extrair_pib(codigos_uf, anos, escopo_label, csv=False):
 
     _salvar(resultado, "pib_percapita", escopo_label, min(anos), max(anos), csv)
 
-# ─────────────────────────────────────────────────────────────────────
-# 6. INDICADORES IPEA — IPEADATA (7 séries de saúde municipal)
-# ─────────────────────────────────────────────────────────────────────
-
-def extrair_ipea(codigos_uf, anos, escopo_label, csv=False):
-    """Extrai 7 indicadores de saúde municipais via IPEADATA."""
-    try:
-        import ipeadatapy as ip
-    except ImportError:
-        print("  ERRO: ipeadatapy não instalado. Execute: pip install ipeadatapy")
-        return
-
-    print("\n=== INDICADORES IPEA (IPEADATA) ===")
-    ano_min, ano_max = min(anos), max(anos)
-
-    frames = {}
-    for codigo, (coluna, dtype) in IPEA_SERIES.items():
-        print(f"  {codigo} → {coluna}...", end=" ", flush=True)
-        df_serie = None
-        for tentativa in range(1, 4):
-            try:
-                df_serie = ip.timeseries(codigo)
-                break
-            except Exception as e:
-                if tentativa < 3:
-                    time.sleep(5 * tentativa)
-                else:
-                    print(f"ERRO ({e}) — pulando.")
-        if df_serie is None:
-            continue
-
-        val_col = next((c for c in df_serie.columns if c.startswith("VALUE")), None)
-        if val_col is None:
-            print("sem coluna VALUE — pulando.")
-            continue
-
-        # Em ipeadatapy, CODE = TERCODIGO (código IBGE do território)
-        df_serie = df_serie.rename(columns={"CODE": "CO_MUN_RAW"})
-        df_serie["CO_MUN_RAW"] = df_serie["CO_MUN_RAW"].astype(str).str.strip()
-        df_serie["CO_MUNICIPIO_6D"] = df_serie["CO_MUN_RAW"].str[:6].str.zfill(6)
-
-        df_serie = df_serie[df_serie["YEAR"].between(ano_min, ano_max)].copy()
-        if codigos_uf:
-            df_serie = df_serie[df_serie["CO_MUNICIPIO_6D"].str[:2].isin(codigos_uf)]
-
-        df_serie = (df_serie[["CO_MUNICIPIO_6D", "YEAR", val_col]]
-                    .rename(columns={"YEAR": "NU_ANO", val_col: coluna}))
-     
-        df_serie[coluna] = pd.to_numeric(df_serie[coluna], errors="coerce")
-        if dtype == "Int64":
-            df_serie[coluna] = df_serie[coluna].round(0).astype("Int64")
-        elif dtype == "float64":
-            df_serie[coluna] = df_serie[coluna] / 10
-
-        registros_por_ano = df_serie.groupby("NU_ANO").size().median()
-        print(f"{len(df_serie):,} registros | {registros_por_ano:.0f}/ano")
-
-        if registros_por_ano < 100:
-            print(f"  AVISO: {codigo} com {registros_por_ano:.0f} obs/ano — granularidade pode não ser municipal.")
-
-        frames[codigo] = df_serie
-        time.sleep(1)
-
-    if not frames:
-        print("  ERRO: nenhuma série IPEA obtida.")
-        return
-
-    mun = carregar_municipios()
-    if codigos_uf:
-        mun = mun[mun["CO_MUNICIPIO_6D"].str[:2].isin(codigos_uf)]
-
-    grade = pd.MultiIndex.from_product(
-        [mun["CO_MUNICIPIO_6D"].unique(), anos],
-        names=["CO_MUNICIPIO_6D", "NU_ANO"]
-    ).to_frame(index=False)
-
-    resultado = grade
-    for codigo, df_s in frames.items():
-        coluna = IPEA_SERIES[codigo][0]
-        df_agg = (df_s.groupby(["CO_MUNICIPIO_6D", "NU_ANO"], as_index=False)[coluna]
-                  .first())
-        resultado = resultado.merge(df_agg, on=["CO_MUNICIPIO_6D", "NU_ANO"], how="left")
-
-    resultado = resultado.sort_values(["CO_MUNICIPIO_6D", "NU_ANO"]).reset_index(drop=True)
-    _salvar(resultado, "ipea_saude", escopo_label, ano_min, ano_max, csv)
 
 # ─────────────────────────────────────────────────────────────────────
-# 7. merge dos 5 parquets em socioeconomico.parquet
+# 6. merge dos parquets em socioeconomico.parquet
 # ─────────────────────────────────────────────────────────────────────
 
 def consolidar_socioeconomico(escopo_label, anos, csv=False):
     """
-    Merge dos 5 parquets intermediários em socioeconomico.parquet final.
+    Merge dos parquets intermediários em socioeconomico.parquet final.
     Colunas alinhadas ao schema: VL_POPULACAO → QT_POPULACAO.
     Parquets ausentes geram NULLs nas colunas correspondentes.
     """
@@ -937,19 +1041,18 @@ def consolidar_socioeconomico(escopo_label, anos, csv=False):
 
     # Merge sequencial dos outros indicadores
     merges = [
-        ("pib_percapita.parquet",  ["CO_MUNICIPIO_6D", "NU_ANO", "VL_PIB_PERCAPITA"]),
-        ("mort_infantil.parquet",  ["CO_MUNICIPIO_6D", "NU_ANO", "QT_OBITOS_INFANTIS",
-                                    "QT_NASCIDOS_VIVOS", "VL_MORT_INFANTIL"]),
-        ("leitos.parquet",         ["CO_MUNICIPIO_6D", "NU_ANO", "QT_LEITOS_SUS",
-                                    "VL_LEITOS_SUS_1000"]),
-        ("medicos.parquet",        ["CO_MUNICIPIO_6D", "NU_ANO", "QT_MEDICOS",
-                                    "VL_MEDICOS_1000"]),
-        
-        ("ipea_saude.parquet",     ["CO_MUNICIPIO_6D", "NU_ANO",
-                                    "QT_BENEFICIARIOS_PLANO_SAUDE", "QT_ESTAB_INTERNACAO_SUS",
-                                    "QT_ESTAB_SAUDE", "QT_ESTAB_URGENCIA_SUS",
-                                    "VL_ENFERMEIROS_1000", "VL_TECNICOS_SAUDE_1000",
-                                    "VL_LEITOS_UTI_SUS_1000"]),
+        ("pib_percapita.parquet",   ["CO_MUNICIPIO_6D", "NU_ANO", "VL_PIB_PERCAPITA"]),
+        ("mort_infantil.parquet",   ["CO_MUNICIPIO_6D", "NU_ANO", "QT_OBITOS_INFANTIS",
+                                     "QT_NASCIDOS_VIVOS", "VL_MORT_INFANTIL"]),
+        ("leitos.parquet",          ["CO_MUNICIPIO_6D", "NU_ANO", "QT_LEITOS_SUS",
+                                     "VL_LEITOS_SUS_1000"]),
+        ("medicos.parquet",         ["CO_MUNICIPIO_6D", "NU_ANO", "QT_MEDICOS",
+                                     "VL_MEDICOS_1000"]),
+        ("enfermeiros_tec.parquet", ["CO_MUNICIPIO_6D", "NU_ANO",
+                                     "QT_ENFERMEIROS", "VL_ENFERMEIROS_1000",
+                                     "QT_TEC_SAUDE", "VL_TEC_SAUDE_1000"]),
+        ("obitos_transito.parquet", ["CO_MUNICIPIO_6D", "NU_ANO",
+                                     "QT_OBITOS_TRANSITO", "VL_MORT_TRANSITO_100K"]),
     ]
 
     resultado = base
@@ -1025,18 +1128,20 @@ def main():
     print(f"  Período    : {ano_inicio}–{ano_fim}")
     print(f"  Indicadores: {indicadores}")
 
-    if "populacao"     in indicadores:
+    if "populacao"      in indicadores:
         extrair_populacao(codigos_uf, anos, escopo_label, args.csv)
-    if "leitos"        in indicadores:
+    if "leitos"         in indicadores:
         extrair_leitos(codigos_uf, ufs_siglas, anos, escopo_label, args.csv, args.incluir_psiquiatrico)
-    if "medicos"       in indicadores:
+    if "medicos"        in indicadores:
         extrair_medicos(codigos_uf, ufs_siglas, anos, escopo_label, args.csv)
-    if "mort_infantil" in indicadores:
+    if "enfermeiros_tec" in indicadores:
+        extrair_enfermeiros_tec(codigos_uf, ufs_siglas, anos, escopo_label, args.csv)
+    if "mort_infantil"  in indicadores:
         extrair_mort_infantil(codigos_uf, ufs_siglas, anos, escopo_label, args.csv)
-    if "pib"           in indicadores:
+    if "obitos_transito" in indicadores:
+        extrair_obitos_transito(codigos_uf, ufs_siglas, anos, escopo_label, args.csv)
+    if "pib"            in indicadores:
         extrair_pib(codigos_uf, anos, escopo_label, args.csv)
-    if "ipea"          in indicadores:
-        extrair_ipea(codigos_uf, anos, escopo_label, args.csv)
 
     # Consolidação final: merge dos parquets intermediários em socioeconomico.parquet
     consolidar_socioeconomico(escopo_label, anos, args.csv)

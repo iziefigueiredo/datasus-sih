@@ -12,7 +12,7 @@
 #                       complexidade, sexo, raca_cor, etnia, nacionalidade,
 #                       instrucao, vincprev, contraceptivos, car_int, cbor,
 #                       marca_uti, tempo
-#   TD_ Analítico     : socioeconomico (wide — uma métrica por coluna, V5)
+#   TD_ Analítico     : socioeconomico (wide — uma métrica por coluna, V6)
 #
 # Convenção de idioma (C1):
 #   Nomes de tabelas e colunas seguem nomenclatura DATASUS/IBGE (PT)
@@ -27,9 +27,11 @@
 #         DIAG_SECUN mantido para compatibilidade retroativa 2008-2014.
 #   [D34] Leitos psiquiátricos excluídos do VL_LEITOS_SUS_1000 por decisão
 #         metodológica (ref: ODR/MDR TAB_0135).
-#   [V5]  Modelo socioeconômico wide com 4 métricas anuais: PIB per capita,
-#         mortalidade infantil, leitos SUS/1000 hab, médicos/1000 hab.
-#         IDH e cobertura de saneamento descartados (cobertura insuficiente).
+#   [V6]  Modelo socioeconômico wide: PIB per capita, mortalidade infantil,
+#         leitos SUS/1000 hab, médicos/1000 hab, enfermeiros/1000 hab
+#         (CNES/PF CBO 2235), técnicos+auxiliares/1000 hab (CBO 3222+5162),
+#         óbitos trânsito/100k hab (SIM CID V01-V89).
+#         Séries IPEA UF-nível removidas (granularidade inadequada).
 
 import polars as pl
 from typing import Any, Dict
@@ -403,20 +405,24 @@ _RL_INTERNACAO_PROCEDIMENTO: TableSchema = {
 
 
 # ---------------------------------------------------------------------------
-# TD_ ANALÍTICO — tabela wide socioeconômica (V5)
+# TD_ ANALÍTICO — tabela wide socioeconômica (V6)
 # ---------------------------------------------------------------------------
 
 _TD_SOCIOECONOMICO: TableSchema = {
     # Modelo wide — uma métrica por coluna.
     # Granularidade: município x ano.
     # Fonte: pipeline socioeconômico (extrair_populacao, extrair_pib,
-    #        extrair_mort_infantil, extrair_leitos, extrair_medicos).
+    #        extrair_mort_infantil, extrair_leitos, extrair_medicos,
+    #        extrair_enfermeiros_tec, extrair_obitos_transito).
     #
     # Cobertura temporal por métrica:
-    #   VL_PIB_PERCAPITA   : 2008-2021 (lag ~2 anos — IBGE PIB Municipal)
-    #   VL_MORT_INFANTIL   : 2008-2023 (lag ~15 meses — SIM + SINASC)
-    #   VL_LEITOS_SUS_1000 : 2008-2023 (lag mensal — CNES/LT, excl. psiquiátrico [D34])
-    #   VL_MEDICOS_1000    : 2008-2023 (lag mensal — CNES/PF, dedup por CPF x município)
+    #   VL_PIB_PERCAPITA      : 2008-2021 (lag ~2 anos — IBGE PIB Municipal)
+    #   VL_MORT_INFANTIL      : 2008-2023 (lag ~15 meses — SIM + SINASC)
+    #   VL_LEITOS_SUS_1000    : 2008-2023 (lag mensal — CNES/LT, excl. psiquiátrico [D34])
+    #   VL_MEDICOS_1000       : 2008-2023 (lag mensal — CNES/PF, dedup por CPF x município)
+    #   VL_ENFERMEIROS_1000   : 2008-2023 (lag mensal — CNES/PF CBO 2235, dedup por CPF)
+    #   VL_TEC_SAUDE_1000     : 2008-2023 (lag mensal — CNES/PF CBO 3222+5162, dedup por CPF)
+    #   VL_MORT_TRANSITO_100K : 2008-2023 (lag ~15 meses — SIM CID V01-V89)
     #
     # IDH e cobertura de saneamento descartados [V5]:
     #   IDH        — calculado apenas a cada 10 anos (censo), incompatível com série anual.
@@ -433,13 +439,12 @@ _TD_SOCIOECONOMICO: TableSchema = {
         "VL_LEITOS_SUS_1000": pl.Float64,  # leitos SUS (excl. psiq.) / pop x 1.000
         "QT_MEDICOS":         pl.Int32,
         "VL_MEDICOS_1000":    pl.Float64,  # medicos unicos (CPF) / pop x 1.000
-        "QT_BENEFICIARIOS_PLANO_SAUDE": pl.Int64,    # beneficiários planos privados (ANS)
-        "QT_ESTAB_INTERNACAO_SUS":      pl.Int32,    # estabelecimentos de internação SUS
-        "QT_ESTAB_SAUDE":               pl.Int32,    # estabelecimentos de saúde (total)
-        "QT_ESTAB_URGENCIA_SUS":        pl.Int32,    # estabelecimentos de urgência SUS
-        "VL_ENFERMEIROS_1000":          pl.Float64,  # enfermeiros / pop x 1.000
-        "VL_TECNICOS_SAUDE_1000":       pl.Float64,  # aux./técnicos de saúde / pop x 1.000
-        "VL_LEITOS_UTI_SUS_1000":       pl.Float64,  # leitos UTI SUS / pop x 1.000
+        "QT_ENFERMEIROS":        pl.Int32,   # enfermeiros únicos (CPF) CNES/PF — CBO 2235
+        "VL_ENFERMEIROS_1000":   pl.Float64, # enfermeiros / pop x 1.000
+        "QT_TEC_SAUDE":          pl.Int32,   # técnicos+auxiliares (CPF) CNES/PF — CBO 3222+5162
+        "VL_TEC_SAUDE_1000":     pl.Float64, # técnicos+auxiliares / pop x 1.000
+        "QT_OBITOS_TRANSITO":    pl.Int32,   # óbitos acidente de trânsito SIM (CID V01-V89)
+        "VL_MORT_TRANSITO_100K": pl.Float64, # óbitos trânsito / pop x 100.000
     },
     "primary_key": ["CO_MUNICIPIO_6D", "NU_ANO"],
     "foreign_keys": [

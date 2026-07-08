@@ -1,5 +1,0 @@
-Nome: orderly-set
-Versão: 5.5.0
-Licença: MIT License
-
-UNKNOWN

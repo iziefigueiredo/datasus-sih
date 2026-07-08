@@ -93,6 +93,15 @@ FORCE_STRING = {
     "cid":           {"RESTRSEXO": pl.String},
 }
 
+COLUMN_RENAME = {
+    "municipios": {
+        "codigo_6d":   "CO_MUNICIPIO_6D",
+        "codigo_ibge": "CO_MUNICIPIO_7D",
+        "nome":        "NO_MUNICIPIO",
+        "estado":      "SG_UF",
+    },
+}
+
 SENTINELAS = {
     # --- Confirmados úteis pelo check_sentinels.py ---
     #"instrucao":      [{"INSTRU": 0, "DESCRICAO": "Não informado"},   # 182M registros
@@ -212,6 +221,10 @@ def carregar_dimensoes(con: duckdb.DuckDBPyConnection):
         overrides = FORCE_STRING.get(nome, {})
         df = pl.read_csv(csv_path, infer_schema_length=10000,
                          encoding="utf8", schema_overrides=overrides)
+        
+        if nome in COLUMN_RENAME:
+            rename_map = {k: v for k, v in COLUMN_RENAME[nome].items() if k in df.columns}
+            df = df.rename(rename_map)
 
         # Injeta sentinelas (verifica PK antes de inserir)
         if nome in SENTINELAS:
@@ -233,9 +246,22 @@ def carregar_dimensoes(con: duckdb.DuckDBPyConnection):
         colunas_destino = [c for c in con.table(nome).columns if c in df.columns]
         df_load = df.select(colunas_destino)
 
+        pk_cols = TABLE_SCHEMAS.get(nome, {}).get("primary_key", [])
+        pk_ausentes = [c for c in pk_cols if c not in df_load.columns]
+        if pk_ausentes:
+            logger.warning(f"  {nome}: PK ausente no CSV {pk_ausentes} — colunas disponíveis: {df.columns[:10]}")
+        for pk_col in [c for c in pk_cols if c in df_load.columns]:
+            n_antes = len(df_load)
+            df_load = df_load.filter(pl.col(pk_col).is_not_null())
+            if df_load[pk_col].dtype in (pl.Utf8, pl.String, pl.Categorical):
+                df_load = df_load.filter(pl.col(pk_col).str.strip_chars().str.len_chars() > 0)
+            n_removidas = n_antes - len(df_load)
+            if n_removidas > 0:
+                logger.warning(f"  {nome}: {n_removidas} linha(s) com {pk_col} nulo removidas")
         con.execute(f'INSERT INTO "{nome}" BY NAME SELECT * FROM df_load')
         logger.info(f"  {nome:<25s} {len(df_load):>10,}")
 
+        
         del df, df_load
 
 

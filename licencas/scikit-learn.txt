@@ -1,0 +1,5 @@
+Nome: scikit-learn
+Versão: 1.5.1
+Licença: BSD License
+
+UNKNOWN

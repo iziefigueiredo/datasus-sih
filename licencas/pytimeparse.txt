@@ -1,0 +1,5 @@
+Nome: pytimeparse
+Versão: 1.1.8
+Licença: MIT License
+
+UNKNOWN

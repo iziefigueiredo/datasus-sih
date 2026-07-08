@@ -1,10 +1,13 @@
 import ipeadatapy as ip
+import time
 
-for code in ["AVS_IVS", "PNADCA_TXETOTUF"]:
-    print(f"\n=== {code} ===")
-    df = ip.timeseries(code)
-    print(f"Colunas: {df.columns.tolist()}")
-    print(f"Total registros: {len(df)}")
-    print(f"Anos disponíveis: {sorted(df['YEAR'].unique().tolist())}")
-    print(f"Registros por ano (primeiros 5 anos):")
-    print(df.groupby('YEAR').size().head())
+for code in [ 'AVIOL12_ACIDT']:
+    try:
+        df = ip.timeseries(code)
+        obs = df.groupby('YEAR').size()
+        mediana = obs.median()
+        ano_ref = obs.index[-2]
+        print(f"{code}: {mediana:.0f} obs/ano (ex: {ano_ref}={obs[ano_ref]})")
+        time.sleep(1)
+    except Exception as e:
+        print(f"{code}: ERRO — {e}")

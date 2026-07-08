@@ -440,7 +440,7 @@ SIS_RDPCMEDIANO,Rendimento domiciliar per capita mediano (SIS/IBGE),SIS-IBGE,R$ 
 SIS_RDPCMEDIO,Rendimento domiciliar per capita médio (SIS/IBGE),SIS-IBGE,R$ médio do ano,102,Social
 ANS_BNFPLSAUDEUF,Beneficiários de plano de saúde (ANS),ANS,-,106,Social
 SIS_ESTABDTSUSUF,Número de estabelecimentos de diagnose e terapia pelo SUS,DATASUS,-,106,Social
-SIS_ESTABINTSUSUF,Número de estabelecimentos de internação pelo SUS,DATASUS,-,106,Social
+SIS_ESTABINTSUSUF,,DATASUS,-,106,Social
 SIS_ESTABSAUDEUF,Número de estabelecimentos de saúde,DATASUS,-,106,Social
 SIS_ESTABURGSUSUF,Número de estabelecimentos de urgência pelo SUS,DATASUS,-,106,Social
 SIS_ESTATAMBUF,Número de estabelecimentos de atendimento ambulatorial pelo SUS,DATASUS,-,106,Social

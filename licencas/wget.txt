@@ -1,0 +1,5 @@
+Nome: wget
+Versão: 3.2
+Licença: Public Domain
+
+UNKNOWN

@@ -1,0 +1,5 @@
+Nome: dbfread
+Versão: 2.0.7
+Licença: MIT
+
+UNKNOWN

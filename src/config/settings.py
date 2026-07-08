@@ -58,9 +58,7 @@ class Settings:
     # =========================================================================
 
     # Escopo padrão de UFs — pode ser sobrescrito via CLI em cada script
-    UF_DEFAULT = ["AC","AL","AM","AP","BA","CE","DF","ES","GO","MA","MG","MS",
-              "MT","PA","PB","PE","PI","PR","RJ","RN","RO","RR","RS","SC",
-              "SE","SP","TO"]
+    UF_DEFAULT = ["AC"]
     
     # Janela temporal do pipeline
     ANOS_INICIO  = 2008
@@ -91,17 +89,9 @@ class Settings:
     # =========================================================================
 
     # DuckDB — banco analítico local gerado pelo pipeline
-    DB_PATH = BASE_DIR / "sihrd6.duckdb"
+    DB_PATH = BASE_DIR / "sihrd8.duckdb"
 
-    # PostgreSQL — reservado para deploy em ambiente compartilhado
-    DB_CONFIG = {
-        "host":     "localhost",
-        "port":     5432,
-        "database": "sihrd5",
-        "user":     "postgres",
-        "password": "1234",  # substituir por variável de ambiente em produção
-    }
-
+  
     # =========================================================================
     # 5. ARQUIVOS DE APOIO — tabelas de domínio (dimensões estáticas)
     #
@@ -175,21 +165,12 @@ class Settings:
     #   VL_MORT_INFANTIL              : 2008–2023 (SIM+SINASC)
     #   VL_LEITOS_SUS_1000            : 2008–2023 (CNES/LT)
     #   VL_MEDICOS_1000               : 2008–2023 (CNES/PF)
-    #   QT_BENEFICIARIOS_PLANO_SAUDE  : 2000–2025 (ANS via IPEADATA)
-    #   QT_ESTAB_INTERNACAO_SUS       : 2010–2025 (DATASUS via IPEADATA)
-    #   QT_ESTAB_SAUDE                : 2010–2025 (DATASUS via IPEADATA)
-    #   QT_ESTAB_URGENCIA_SUS         : 2010–2025 (DATASUS via IPEADATA)
-    #   VL_ENFERMEIROS_1000           : 2010–2025 (DATASUS via IPEADATA)
-    #   VL_TECNICOS_SAUDE_1000        : 2010–2025 (DATASUS via IPEADATA)
-    #   VL_LEITOS_UTI_SUS_1000        : 2010–2025 (DATASUS via IPEADATA)
     POPULACAO_FILENAME      = "populacao.parquet"
     PIB_FILENAME            = "pib_percapita.parquet"
     MORT_INFANTIL_FILENAME  = "mort_infantil.parquet"
     LEITOS_FILENAME         = "leitos.parquet"
     MEDICOS_FILENAME        = "medicos.parquet"
-    IPEA_FILENAME           = "ipea_saude.parquet"
     SOCIOECONOMICO_FILENAME = "socioeconomico.parquet"
-
     # =========================================================================
     # MÉTODOS
     # =========================================================================

@@ -8,7 +8,6 @@ __pycache__/
 *.pyo
 
 # Large data files
-*.csv
 *.parquet
 *.db
 *.dbf

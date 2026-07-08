@@ -1,0 +1,496 @@
+CODE,NAME,SOURCE ACRONYM,MEASURE,THEME CODE,BIG THEME
+CONSUMOCOM,Energia elétrica - consumo final energia - comércio - quantidade,MME,MWh,2,Regional
+CONSUMOIND,Energia elétrica - consumo final energia - indústria - quantidade,MME,MWh,2,Regional
+CONSUMOOUT,Energia elétrica - consumo final energia - não-identificado - quantidade,MME,MWh,2,Regional
+CONSUMORES,Energia elétrica - consumo final energia - residência - quantidade,MME,MWh,2,Regional
+CONSUMOTOT,Energia elétrica - consumo final energia - quantidade,MME,MWh,2,Regional
+AGENCIAS,Número de agências bancárias,BCB,Unidade,3,Regional
+APLICACOES,Operações de Crédito,BCB,"R$, a preços do ano 2010",3,Regional
+COMAGR,Estoque de crédito rural - comercialização - agrícola,BCB,"R$, a preços do ano 2010",3,Regional
+COMAGRE,Fluxo de crédito rural - comercialização - agrícola,BCB,"R$, a preços do ano 2010",3,Regional
+COMERC,Estoque de crédito rural - comercialização,BCB,"R$, a preços do ano 2010",3,Regional
+COMERCE,Fluxo de crédito rural - comercialização,BCB,"R$, a preços do ano 2010",3,Regional
+COMPEC,Estoque de crédito rural - comercialização - pecuária,BCB,"R$, a preços do ano 2010",3,Regional
+COMPECE,Fluxo de crédito rural - comercialização - pecuária,BCB,"R$, a preços do ano 2010",3,Regional
+CREAT,Estoque de crédito rural,BCB,"R$, a preços do ano 2010",3,Regional
+CREATE,Fluxo de crédito rural,BCB,"R$, a preços do ano 2010",3,Regional
+CUSAGR,Estoque de crédito rural - custeio - agrícola,BCB,"R$, a preços do ano 2010",3,Regional
+CUSAGRE,Fluxo de crédito rural - custeio - agrícola,BCB,"R$, a preços do ano 2010",3,Regional
+CUSGIO,Estoque de crédito rural - custeio,BCB,"R$, a preços do ano 2010",3,Regional
+CUSGIOE,Fluxo de crédito rural - custeio,BCB,"R$, a preços do ano 2010",3,Regional
+CUSPEC,Estoque de crédito rural - custeio - pecuária,BCB,"R$, a preços do ano 2010",3,Regional
+CUSPECE,Fluxo de crédito rural - custeio - pecuária,BCB,"R$, a preços do ano 2010",3,Regional
+DEPOSITAV,Depósitos bancários à vista,BCB,"R$, a preços do ano 2010",3,Regional
+DEPOSITPRA,Depósitos bancários a prazo,BCB,"R$, a preços do ano 2010",3,Regional
+INVAGR,Estoque de crédito rural - investimento - agrícola,BCB,"R$, a preços do ano 2010",3,Regional
+INVAGRE,Fluxo de crédito rural - investimento - agrícola,BCB,"R$, a preços do ano 2010",3,Regional
+INVEST,Estoque de crédito rural - investimento,BCB,"R$, a preços do ano 2010",3,Regional
+INVESTE,Fluxo de crédito rural - investimento,BCB,"R$, a preços do ano 2010",3,Regional
+INVPEC,Estoque de crédito rural - investimento - pecuária,BCB,"R$, a preços do ano 2010",3,Regional
+INVPECE,Fluxo de crédito rural - investimento - pecuária,BCB,"R$, a preços do ano 2010",3,Regional
+NCOMAG,Total de contratos de crédito rural - comercialização - agrícola,BCB,Unidade,3,Regional
+NCOMER,Total de contratos de crédito rural - comercialização,BCB,Unidade,3,Regional
+NCOMPC,Total de contratos de crédito rural - comercialização - pecuária,BCB,Unidade,3,Regional
+NCREAT,Total de contratos de crédito rural,BCB,Unidade,3,Regional
+NCUSAG,Total de contratos de crédito rural - custeio - agrícola,BCB,Unidade,3,Regional
+NCUSGI,Total de contratos de crédito rural - custeio,BCB,Unidade,3,Regional
+NCUSPC,Total de contratos de crédito rural - custeio - pecuária,BCB,Unidade,3,Regional
+NINVAG,Total de contratos de crédito rural - investimento - agrícola,BCB,Unidade,3,Regional
+NINVES,Total de contratos de crédito rural - investimento,BCB,Unidade,3,Regional
+NINVPC,Total de contratos de crédito rural - investimento - pecuária,BCB,Unidade,3,Regional
+OBRIGREC,Obrigações por recebimento,BCB,"R$, a preços do ano 2010",3,Regional
+POUPANCA,Poupança,BCB,"R$, a preços do ano 2010",3,Regional
+EXPORTACAO,Exportações (FOB),MDIC/SECEX,US$ FOB,5,Regional
+IMPORTACAO,Importações (FOB),MDIC/SECEX,US$ FOB,5,Regional
+DAMODIVE,Despesa de capital - amortização da dívida - empenhada - estadual,Min. Fazenda/STN,R$,6,Regional
+DEDIVE,Despesa corrente - juros e encargos da dívida - empenhada - estadual,Min. Fazenda/STN,R$,6,Regional
+DESPCORRE,Despesa corrente - empenhada - estadual,Min. Fazenda/STN,R$,6,Regional
+DESPCORRM,Despesa corrente - empenhada - municipal,Min. Fazenda/STN,R$,6,Regional
+DESPCUPM,Despesa corrente - pessoal e encargos sociais - empenhada - municipal,Min. Fazenda/STN,R$,6,Regional
+DESPCUTE,Despesa de custeio - empenhada - estadual,Min. Fazenda/STN,R$,6,Regional
+DESPCUTM,Despesa de custeio - municipal,Min. Fazenda/STN,R$,6,Regional
+DESPEENE,Despesa corrente - pessoal e encargos sociais - empenhada - estadual,Min. Fazenda/STN,R$,6,Regional
+DESPKE,Despesa de capital - empenhada - estadual,Min. Fazenda/STN,R$,6,Regional
+DESPKM,Despesa de capital - municipal,Min. Fazenda/STN,R$,6,Regional
+DESPORM,Despesa total - empenhada - municipal,Min. Fazenda/STN,R$,6,Regional
+DFADME,Despesa por função - administração - empenhada - estadual,Min. Fazenda/STN,R$,6,Regional
+DFADMM,Despesa por função - administração - empenhada - municipal,Min. Fazenda/STN,R$,6,Regional
+DFAGRE,"Despesa por função - gestão ambiental, agricultura e organização agrária - empenhada - estadual",Min. Fazenda/STN,R$,6,Regional
+DFAGRM,"Despesa por função - gestão ambiental, agricultura e organização agrária - empenhada - municipal",Min. Fazenda/STN,R$,6,Regional
+DFASPRE,Despesa por função - assistência social e previdência social - empenhada - estadual,Min. Fazenda/STN,R$,6,Regional
+DFASPRM,Despesa por função - assistência social e previdência social - empenhada - municipal,Min. Fazenda/STN,R$,6,Regional
+DFCETE,Despesa por função - ciência e tecnologia - empenhada - estadual,Min. Fazenda/STN,R$,6,Regional
+DFCETM,Despesa por função - ciência e tecnologia - empenhada - municipal,Min. Fazenda/STN,R$,6,Regional
+DFCOME,Despesa por função - comunicações - empenhada - estadual,Min. Fazenda/STN,R$,6,Regional
+DFCOMM,Despesa por função - comunicações - empenhada - municipal,Min. Fazenda/STN,R$,6,Regional
+DFDEFSE,Despesa por função - segurança pública e defesa nacional - empenhada - estadual,Min. Fazenda/STN,R$,6,Regional
+DFDEFSM,Despesa por função - segurança pública e defesa nacional - empenhada - municipal,Min. Fazenda/STN,R$,6,Regional
+DFDELE,Despesa por função - desportes e lazer - empenhada - estadual,Min. Fazenda/STN,R$,6,Regional
+DFDELM,Despesa por função - desportes e lazer - empenhada - municipal,Min. Fazenda/STN,R$,6,Regional
+DFEDUCE,Despesa por função - educação e cultura - empenhada - estadual,Min. Fazenda/STN,R$,6,Regional
+DFEDUCM,Despesa por função - educação e cultura - empenhada - municipal,Min. Fazenda/STN,R$,6,Regional
+DFENCEE,Despesa por função - encargos especiais - empenhada - estadual,Min. Fazenda/STN,R$,6,Regional
+DFENCEM,Despesa por função - encargos especiais - empenhada - municipal,Min. Fazenda/STN,R$,6,Regional
+DFENERE,Despesa por função - energia - empenhada - estadual,Min. Fazenda/STN,R$,6,Regional
+DFENERM,Despesa por função - energia - empenhada - municipal,Min. Fazenda/STN,R$,6,Regional
+DFHABE,Despesa por função - urbanismo e habitação - empenhada - estadual,Min. Fazenda/STN,R$,6,Regional
+DFHABM,Despesa por função - urbanismo e habitação - empenhada - municipal,Min. Fazenda/STN,R$,6,Regional
+DFICSE,Despesa por função - indústria e comércio e serviços - empenhada - estadual,Min. Fazenda/STN,R$,6,Regional
+DFICSM,Despesa por função - indústria e comércio e serviços - empenhada - municipal,Min. Fazenda/STN,R$,6,Regional
+DFJEDCE,Despesa por função - essencial à justiça e direito da cidadania - empenhada - estadual,Min. Fazenda/STN,R$,6,Regional
+DFJEDCM,Despesa por função - essencial à justiça e direito da cidadania - empenhada - municipal,Min. Fazenda/STN,R$,6,Regional
+DFJUDE,Despesa por função - judiciária - empenhada - estadual,Min. Fazenda/STN,R$,6,Regional
+DFJUDM,Despesa por função - judiciária - empenhada - municipal,Min. Fazenda/STN,R$,6,Regional
+DFLEGE,Despesa por função - legislativa - empenhada - estadual,Min. Fazenda/STN,R$,6,Regional
+DFLEGM,Despesa por função - legislativa - empenhada - municipal,Min. Fazenda/STN,R$,6,Regional
+DFOFE,Despesa por função - empenhada - estadual,Min. Fazenda/STN,R$,6,Regional
+DFOFM,Despesa por função - empenhada - municipal,Min. Fazenda/STN,R$,6,Regional
+DFRELEXE,Despesa por função - relações exteriores - empenhada - estadual,Min. Fazenda/STN,R$,6,Regional
+DFRELEXM,Despesa por função - relações exteriores - empenhada - municipal,Min. Fazenda/STN,R$,6,Regional
+DFSAUSE,Despesa por função - saúde e saneamento - empenhada - estadual,Min. Fazenda/STN,R$,6,Regional
+DFSAUSM,Despesa por função - saúde e saneamento - empenhada - municipal,Min. Fazenda/STN,R$,6,Regional
+DFTRABE,Despesa por função - trabalho - empenhada - estadual,Min. Fazenda/STN,R$,6,Regional
+DFTRABM,Despesa por função - trabalho - empenhada - municipal,Min. Fazenda/STN,R$,6,Regional
+DFTRAE,Despesa por função - transporte - empenhada - estadual,Min. Fazenda/STN,R$,6,Regional
+DFTRAM,Despesa por função - transporte - empenhada - municipal,Min. Fazenda/STN,R$,6,Regional
+DINVESTE,Despesa de capital - investimento e inversão financeira - empenhada - estadual,Min. Fazenda/STN,R$,6,Regional
+DINVESTM,Despesa de capital - investimento - municipal,Min. Fazenda/STN,R$,6,Regional
+DINVFINAM,Despesa de capital - inversão financeira - municipal,Min. Fazenda/STN,R$,6,Regional
+DTRCINTEE,Despesa corrente - transferências intergovernamentais - empenhada - estadual,Min. Fazenda/STN,R$,6,Regional
+DTRCORTOE,Despesa corrente - transferências correntes - empenhada - estadual,Min. Fazenda/STN,R$,6,Regional
+DTRCORTOM,Despesa corrente - transferências correntes - empenhada - municipal,Min. Fazenda/STN,R$,6,Regional
+DTRKINTEE,Despesa de capital - transferências intergovernamentais - empenhada - estadual,Min. Fazenda/STN,R$,6,Regional
+DTRKTOE,Despesa de capital - transferências de capital - empenhada - estadual,Min. Fazenda/STN,R$,6,Regional
+DTRKTOM,Despesa de capital - transferências de capital - empenhada - municipal,Min. Fazenda/STN,R$,6,Regional
+IPTUCH,Arrecadação do IPTU incluindo receitas da dívida ativa e de multas e juros - INATIVA,IPEA,R$,6,Regional
+ISSCH,"Arrecadação do ISS incluindo receitas da dívida ativa, multas e juros - INATIVA",IPEA,R$,6,Regional
+ITBICH,"Arrecadação do ITBI incluindo receitas da dívida ativa, multas e juros - INATIVA",IPEA,R$,6,Regional
+RALIBENSM,Receita de capital - receita bruta - alienação de bens - municipal,Min. Fazenda/STN,R$,6,Regional
+RECCAPCH,Receitas de capital totais - INATIVA,IPEA,R$,6,Regional
+RECCORRCH,Receitas correntes totais - INATIVA,IPEA,R$,6,Regional
+RECORM,Receita orçamentária - receita bruta - municipal,Min. Fazenda/STN,R$,6,Regional
+RECOROUTE,Receita corrente - receita bruta - outras - estadual,Min. Fazenda/STN,R$,6,Regional
+RECOROUTM,Receita corrente - receita bruta - outras - municipal,Min. Fazenda/STN,R$,6,Regional
+RECORRE,Receita corrente - receita bruta - estadual,Min. Fazenda/STN,R$,6,Regional
+RECORRM,Receita corrente - receita bruta - municipal,Min. Fazenda/STN,R$,6,Regional
+RECPROPCH,"Arrecadação total dos impostos municipais (IPTU, ITBI e ISS), incluindo dívida ativa, multas e juros - INATIVA",IPEA,R$,6,Regional
+RECTOTCH,Receitas totais - INATIVA,IPEA,R$,6,Regional
+RECTRIBE,"Receita corrente - receita bruta - impostos, taxas e contribuições de melhoria - estadual",Min. Fazenda/STN,R$,6,Regional
+RECTRIBM,"Receita corrente - receita bruta - impostos, taxas e contribuições de melhoria - municipal",Min. Fazenda/STN,R$,6,Regional
+REICMSE,"Receita corrente - receita bruta - impostos, taxas e contribuições de melhoria - ICMS - estadual",Min. Fazenda/STN,R$,6,Regional
+REKE,Receita de capital - receita bruta - estadual,Min. Fazenda/STN,R$,6,Regional
+REKM,Receita de capital - receita bruta - municipal,Min. Fazenda/STN,R$,6,Regional
+RICMSM,Transferências correntes de tributos estaduais - cota-parte ICMS - municipal,Min. Fazenda/STN,R$,6,Regional
+RIPTUM,"Receita corrente - receita bruta - impostos, taxas e contribuições de melhoria - IPTU - municipal",Min. Fazenda/STN,R$,6,Regional
+RIPVAM,Transferências correntes de tributos estaduais - cota-parte IPVA - municipal,Min. Fazenda/STN,R$,6,Regional
+RISSM,"Receita corrente - receita bruta - impostos, taxas e contribuições de melhoria - ISS - municipal",Min. Fazenda/STN,R$,6,Regional
+ROPCREDE,Receita de capital - receita bruta - operações de crédito - estadual,Min. Fazenda/STN,R$,6,Regional
+ROPCREDM,Receita de capital - receita bruta - operações de crédito - municipal,Min. Fazenda/STN,R$,6,Regional
+RTAXASM,"Receita corrente - receita bruta - impostos, taxas e contribuições de melhoria - taxas - municipal",Min. Fazenda/STN,R$,6,Regional
+RTRCOESTM,Transferências correntes de tributos estaduais - cota-parte ICMS e IPVA - municipal,Min. Fazenda/STN,R$,6,Regional
+RTRCOFPMM,Cota-parte do fundo de participação dos municípios (FPM),Min. Fazenda/STN,R$,6,Regional
+RTRCORTOE,Receita corrente - receita bruta - transferências correntes - estadual,Min. Fazenda/STN,R$,6,Regional
+RTRCORTOM,Receita corrente - receita bruta - transferências correntes - municipal,Min. Fazenda/STN,R$,6,Regional
+RTRFPEE,Cota-parte do fundo de participação dos estados e do distrito federal (FPE),Min. Fazenda/STN,R$,6,Regional
+RTRKESTM,"Receita de capital - receita bruta - transferências de capital - transferências dos estados, do Distrito Federal e de suas entidades",Min. Fazenda/STN,R$,6,Regional
+RTRKFPMM,Receita de capital - receita bruta - transferências de capital - transferências da União e de suas entidades,Min. Fazenda/STN,R$,6,Regional
+RTRKTOE,Receita de capital - receita bruta - transferências de capital - estadual,Min. Fazenda/STN,R$,6,Regional
+RTRKTOM,Receita de capital - receita bruta - transferências de capital - municipal,Min. Fazenda/STN,R$,6,Regional
+RTRPRUE,Receita corrente - receita bruta - transferências correntes - participação na receita da União - estadual,Min. Fazenda/STN,R$,6,Regional
+ESTIMA_PO,População residente - 1º de julho - estimativas,IBGE,Habitante,14,Regional
+POP_PROJE,População residente - 1º de julho - projeção,IBGE,Habitante,14,Regional
+UNDATA_POPTOT,População: residente total (países),UNdata,Mil pessoas,14,Regional
+AVIOL12_ACIDT,Número de vítimas a óbito em acidente de trânsito,DATASUS,Unidade,20,Regional
+AVIOL12_ACIDTF,Número de vítimas a óbito em acidente de trânsito do sexo feminino,DATASUS,Unidade,20,Regional
+AVIOL12_ACIDTFJ,Número de vítimas a óbito em acidente de trânsito de jovens de 15 a 29 anos do sexo feminino,DATASUS,Unidade,20,Regional
+AVIOL12_ACIDTJ,Número de vítimas a óbito em acidente de trânsito de jovens de 15 a 29 anos,DATASUS,Unidade,20,Regional
+AVIOL12_ACIDTM,Número de vítimas a óbito em acidente de trânsito do sexo masculino,DATASUS,Unidade,20,Regional
+AVIOL12_ACIDTMJ,Número de vítimas a óbito em acidente de trânsito de jovens de 15 a 29 anos do sexo masculino,DATASUS,Unidade,20,Regional
+AVIOL12_HOMIC,Número de homicídios,DATASUS,Unidade,20,Regional
+AVIOL12_HOMICF,Número de homicídios do sexo feminino,DATASUS,Unidade,20,Regional
+AVIOL12_HOMICFJ,Número de homicídios de jovens de 15 a 29 anos do sexo feminino,DATASUS,Unidade,20,Regional
+AVIOL12_HOMICJ,Número de homicídios de jovens de 15 a 29 anos,DATASUS,Unidade,20,Regional
+AVIOL12_HOMICM,Número de homicídios do sexo masculino,DATASUS,Unidade,20,Regional
+AVIOL12_HOMICMJ,Número de homicídios de jovens de 15 a 29 anos do sexo masculino,DATASUS,Unidade,20,Regional
+AVIOL12_SUICID,Número de suicídios,DATASUS,Unidade,20,Regional
+AVIOL12_SUICIDF,Número de suicídios do sexo feminino,DATASUS,Unidade,20,Regional
+AVIOL12_SUICIDFJ,Número de suicídios de jovens de 15 a 29 anos do sexo feminino,DATASUS,Unidade,20,Regional
+AVIOL12_SUICIDJ,Número de suicídios de jovens de 15 a 29 anos,DATASUS,Unidade,20,Regional
+AVIOL12_SUICIDM,Número de suicídios do sexo masculino,DATASUS,Unidade,20,Regional
+AVIOL12_SUICIDMJ,Número de suicídios de jovens de 15 a 29 anos do sexo masculino,DATASUS,Unidade,20,Regional
+AVIOL12_TACIDT,Taxa de vítimas de acidentes de trânsito a óbito (100.000 Habitantes),IPEA,(%),20,Regional
+AVIOL12_THOMIC,Taxa de homicídios (100.000 Habitantes),IPEA,(%),20,Regional
+AVIOL12_TSUICID,Taxa de suicídios (100.000 Habitantes),IPEA,(%),20,Regional
+BPC_defi,Benefício de Prestação Continuada (BPC) para deficientes - número de benefícios em dezembro - INATIVA,MDS,Benefício,23,Social
+BPC_idos,Benefício de Prestação Continuada (BPC) para idosos - número de benefícios em dezembro - INATIVA,MDS,Benefício,23,Social
+BPCVAL_defi,Benefício de Prestação Continuada (BPC) para deficientes - valor total dos benefícios em dezembro - INATIVA,MDS,R$ (mil),23,Social
+BPCVAL_idos,Benefício de Prestação Continuada (BPC) para idosos - valor total dos benefícios em dezembro - INATIVA,MDS,R$ (mil),23,Social
+FAM_PBF,Programa Bolsa Família (PBF) - número de benefícios em dezembro,MDS,Benefício,23,Social
+VAL_PBF,Programa Bolsa Família (PBF) - valor total dos benefícios em dezembro,MDS,R$ (mil),23,Social
+AREACOLALGHER,Área colhida - algodão - herbáceo (caroço),IBGE,Hectare,28,Regional
+AREACOLAMENDOIM,Área colhida - amendoim,IBGE,Hectare,28,Regional
+AREACOLARROZ,Área colhida - arroz,IBGE,Hectare,28,Regional
+AREACOLBANANA,Área colhida - banana,IBGE,Hectare,28,Regional
+AREACOLBATATA,Área colhida - batata-inglesa,IBGE,Hectare,28,Regional
+AREACOLCACAU,Área colhida - cacau,IBGE,Hectare,28,Regional
+AREACOLCAFE,Área colhida - café,IBGE,Hectare,28,Regional
+AREACOLCANA,Área colhida - cana-de-açúcar,IBGE,Hectare,28,Regional
+AREACOLCEBOLA,Área colhida - cebola,IBGE,Hectare,28,Regional
+AREACOLFEIJAO,Área colhida - feijão,IBGE,Hectare,28,Regional
+AREACOLFUMO,Área colhida - fumo,IBGE,Hectare,28,Regional
+AREACOLLARANJA,Área colhida - laranja,IBGE,Hectare,28,Regional
+AREACOLMANDIOCA,Área colhida - mandioca,IBGE,Hectare,28,Regional
+AREACOLMILHO,Área colhida - milho,IBGE,Hectare,28,Regional
+AREACOLPERM,Área colhida - lavoura permanente,IBGE,Hectare,28,Regional
+AREACOLPIMENTA,Área colhida - pimenta-do-reino,IBGE,Hectare,28,Regional
+AREACOLSOJA,Área colhida - soja,IBGE,Hectare,28,Regional
+AREACOLTEMP,Área colhida - lavoura temporária,IBGE,Hectare,28,Regional
+AREACOLTOMATE,Área colhida - tomate,IBGE,Hectare,28,Regional
+AREACOLTOT,Área colhida - total,IBGE,Hectare,28,Regional
+AREACOLTRIGO,Área colhida - trigo,IBGE,Hectare,28,Regional
+AREACOLUVA,Área colhida - uva,IBGE,Hectare,28,Regional
+AREAPLAPERM,Área destinada à colheita - lavoura permanente,IBGE,Hectare,28,Regional
+AREAPLATEMP,Área plantada - lavoura temporária,IBGE,Hectare,28,Regional
+AREAPLATOT,Área plantada ou destinada à colheita - total,IBGE,Hectare,28,Regional
+QUANTBOVINOS,Efetivo - bovinos - quantidade,IBGE,Cabeça,28,Regional
+QUANTBUBALINOS,Efetivo - bubalinos - quantidade,IBGE,Cabeça,28,Regional
+QUANTCAPRINOS,Efetivo - caprinos - quantidade,IBGE,Cabeça,28,Regional
+QUANTCASULOBS,Produção - casulo de bicho-da-seda - quantidade,IBGE,Kg,28,Regional
+QUANTEQUINOS,Efetivo - equinos - quantidade,IBGE,Cabeça,28,Regional
+QUANTGALINACEOS,Efetivo - galináceos - quantidade,IBGE,Cabeça,28,Regional
+QUANTLA,Produção - lã - quantidade,IBGE,Kg,28,Regional
+QUANTLEITE,Produção - leite - quantidade,IBGE,Litro,28,Regional
+QUANTMEL,Produção - mel de abelha - quantidade,IBGE,Kg,28,Regional
+QUANTOVINOS,Efetivo - ovinos - quantidade,IBGE,Cabeça,28,Regional
+QUANTOVINOSTOSQ,Efetivo - ovinos tosquiados - quantidade,IBGE,Cabeça,28,Regional
+QUANTOVOCODORNA,Produção - ovos de codorna - quantidade,IBGE,Dúzia,28,Regional
+QUANTOVOGALINHA,Produção - ovos de galinha - quantidade,IBGE,Dúzia,28,Regional
+QUANTPRODALGHER,Produção - algodão - herbáceo (caroço),IBGE,Tonelada,28,Regional
+QUANTPRODAMENDOIM,Produção - amendoim,IBGE,Tonelada,28,Regional
+QUANTPRODARROZ,Produção - arroz,IBGE,Tonelada,28,Regional
+QUANTPRODBANANA,Produção - banana,IBGE,Tonelada,28,Regional
+QUANTPRODBATATA,Produção - batata-inglesa,IBGE,Tonelada,28,Regional
+QUANTPRODCACAU,Produção - cacau,IBGE,Tonelada,28,Regional
+QUANTPRODCAFE,Produção - café,IBGE,Tonelada,28,Regional
+QUANTPRODCANA,Produção - cana-de-açúcar,IBGE,Tonelada,28,Regional
+QUANTPRODCEBOLA,Produção - cebola,IBGE,Tonelada,28,Regional
+QUANTPRODFEIJAO,Produção - feijão,IBGE,Tonelada,28,Regional
+QUANTPRODFUMO,Produção - fumo,IBGE,Tonelada,28,Regional
+QUANTPRODLARANJA,Produção - laranja,IBGE,Tonelada,28,Regional
+QUANTPRODMANDIOCA,Produção - mandioca,IBGE,Tonelada,28,Regional
+QUANTPRODMILHO,Produção - milho,IBGE,Tonelada,28,Regional
+QUANTPRODPIMENTA,Produção - pimenta-do-reino,IBGE,Tonelada,28,Regional
+QUANTPRODSOJA,Produção - soja,IBGE,Tonelada,28,Regional
+QUANTPRODTOMATE,Produção - tomate,IBGE,Tonelada,28,Regional
+QUANTPRODTRIGO,Produção - trigo,IBGE,Tonelada,28,Regional
+QUANTPRODUVA,Produção - uva,IBGE,Tonelada,28,Regional
+QUANTSUINOS,Efetivo - suínos - quantidade,IBGE,Cabeça,28,Regional
+QUANTVACASORD,Efetivo - vacas ordenhadas - quantidade,IBGE,Cabeça,28,Regional
+VALORCASULOBS,Produção - casulo de bicho-da-seda,IBGE,"R$, a preços do ano 2010",28,Regional
+VALORLA,Produção - lã,IBGE,"R$, a preços do ano 2010",28,Regional
+VALORLEITE,Produção - leite,IBGE,"R$, a preços do ano 2010",28,Regional
+VALORMEL,Produção - mel de abelha,IBGE,"R$, a preços do ano 2010",28,Regional
+VALOROVOCODORNA,Produção - ovos de codorna,IBGE,"R$, a preços do ano 2010",28,Regional
+VALOROVOGALINHA,Produção - ovos de galinha,IBGE,"R$, a preços do ano 2010",28,Regional
+VALPRODALGHER,Produção - algodão - herbáceo (caroço),IBGE,"R$, a preços do ano 2010",28,Regional
+VALPRODAMENDOIM,Produção - amendoim,IBGE,"R$, a preços do ano 2010",28,Regional
+VALPRODARROZ,Produção - arroz,IBGE,"R$, a preços do ano 2010",28,Regional
+VALPRODBANANA,Produção - banana,IBGE,"R$, a preços do ano 2010",28,Regional
+VALPRODBATATA,Produção - batata-inglesa,IBGE,"R$, a preços do ano 2010",28,Regional
+VALPRODCACAU,Produção - cacau,IBGE,"R$, a preços do ano 2010",28,Regional
+VALPRODCAFE,Produção - café,IBGE,"R$, a preços do ano 2010",28,Regional
+VALPRODCANA,Produção - cana-de-açúcar,IBGE,"R$, a preços do ano 2010",28,Regional
+VALPRODCEBOLA,Produção - cebola,IBGE,"R$, a preços do ano 2010",28,Regional
+VALPRODFEIJAO,Produção - feijão,IBGE,"R$, a preços do ano 2010",28,Regional
+VALPRODFUMO,Produção - fumo,IBGE,"R$, a preços do ano 2010",28,Regional
+VALPRODLARANJA,Produção - laranja,IBGE,"R$, a preços do ano 2010",28,Regional
+VALPRODMANDIOCA,Produção - mandioca,IBGE,"R$, a preços do ano 2010",28,Regional
+VALPRODMILHO,Produção - milho,IBGE,"R$, a preços do ano 2010",28,Regional
+VALPRODPERM,Produção - lavoura permanente,IBGE,"R$, a preços do ano 2010",28,Regional
+VALPRODPIMENTA,Produção - pimenta-do-reino,IBGE,"R$, a preços do ano 2010",28,Regional
+VALPRODSOJA,Produção - soja,IBGE,"R$, a preços do ano 2010",28,Regional
+VALPRODTEMP,Produção - lavoura temporária,IBGE,"R$, a preços do ano 2010",28,Regional
+VALPRODTOMATE,Produção - tomate,IBGE,"R$, a preços do ano 2010",28,Regional
+VALPRODTOT,Valor da produção - total,IBGE,"R$, a preços do ano 2010",28,Regional
+VALPRODTRIGO,Produção - trigo,IBGE,"R$, a preços do ano 2010",28,Regional
+VALPRODUVA,Produção - uva,IBGE,"R$, a preços do ano 2010",28,Regional
+PNADCA_TXPIUF_BRA,Taxa de pobreza internacional - brancos (Brasil),IBGE/PNAD Contínua,(%),30,Social
+PNADCA_TXPIUF_HOM,Taxa de pobreza internacional - homem (Brasil),IBGE/PNAD Contínua,(%),30,Social
+PNADCA_TXPIUF_MUL,Taxa de pobreza internacional - mulher (Brasil),IBGE/PNAD Contínua,(%),30,Social
+PNADCA_TXPIUF_PRT,Taxa de pobreza internacional - pretos/pardos (Brasil),IBGE/PNAD Contínua,(%),30,Social
+PNADCA_TXPIUF_RUR,Taxa de pobreza internacional - rural (Brasil),IBGE/PNAD Contínua,(%),30,Social
+PNADCA_TXPIUF_URB,Taxa de pobreza intenacional - urbano (Brasil),IBGE/PNAD Contínua,(%),30,Social
+PNADCA_TXPNUF_BRA,Taxa de pobreza nacional - brancos (Brasil),IBGE/PNAD Contínua,(%),30,Social
+PNADCA_TXPNUF_HOM,Taxa de pobreza nacional - homem (Brasil),IBGE/PNAD Contínua,(%),30,Social
+PNADCA_TXPNUF_MUL,Taxa de pobreza nacional - mulher (Brasil),IBGE/PNAD Contínua,(%),30,Social
+PNADCA_TXPNUF_PRT,Taxa de pobreza nacional - pretos/pardos (Brasil),IBGE/PNAD Contínua,(%),30,Social
+PNADCA_TXPNUF_RUR,Taxa de pobreza nacional - rural (Brasil),IBGE/PNAD Contínua,(%),30,Social
+PNADCA_TXPNUF_URB,Taxa de pobreza nacional - urbano (Brasil),IBGE/PNAD Contínua,(%),30,Social
+AREA,Área geográfica - censo,IBGE,Km2,32,Regional
+IMPPIB,"PIB Municipal - impostos, líquidos de subsídios, sobre produtos (preços de 2010)",IBGE,"R$ (mil), a preços do ano 2010",81,Regional
+PIB,PIB Municipal - preços de mercado (preços de 2010) - Série Histórica - INATIVA,IBGE,"R$ (mil), a preços do ano 2010",81,Regional
+PIB_IBGE_5938_37,PIB Municipal - preços de mercado (preços de 2010),IBGE,"R$ (mil), a preços do ano 2010",81,Regional
+PIBAG,PIB Municipal (valor adicionado a preços básicos) - agropecuária (preços de 2010),IBGE,"R$ (mil), a preços do ano 2010",81,Regional
+PIBAGE,PIB Estadual (valor adicionado a preços básicos) - agropecuária (preços de 2010),IBGE,"R$ (mil), a preços do ano 2010",81,Regional
+PIBALE,PIB Estadual (valor adicionado a preços básicos) - serviços - atividades imobiliárias (preços de 2010),IBGE,"R$ (mil), a preços do ano 2010",81,Regional
+PIBCME,PIB Estadual (valor adicionado a preços básicos) - serviços - informação e comunicação (preços de 2010),IBGE,"R$ (mil), a preços do ano 2010",81,Regional
+PIBCNE,PIB Estadual (valor adicionado a preços básicos) - indústria - construção civil (preços de 2010),IBGE,"R$ (mil), a preços do ano 2010",81,Regional
+PIBCOE,PIB Estadual (valor adicionado a preços básicos) - serviços - comércio e reparação de veículos automotores e motocicletas (preços de 2010),IBGE,"R$ (mil), a preços do ano 2010",81,Regional
+PIBE,PIB Estadual - preços de mercado (preços de 2010),IBGE,"R$ (mil), a preços do ano 2010",81,Regional
+PIBEGAE,"PIB Estadual (valor adicionado a preços básicos) - indústria - serviços de eletricidade e gás, água, esgoto e limpeza urbana (preços de 2010)",IBGE,"R$ (mil), a preços do ano 2010",81,Regional
+PIBFE,"PIB Estadual (valor adicionado a preços básicos) - serviços - atividades financeiras, de seguros e serviços relacionados (preços de 2010)",IBGE,"R$ (mil), a preços do ano 2010",81,Regional
+PIBG,"PIB Municipal (valor adicionado a preços básicos) - serviços - administração, defesa, educação e saúde públicas e seguridade social (preços de 2010)",IBGE,"R$ (mil), a preços do ano 2010",81,Regional
+PIBGE,"PIB Estadual (valor adicionado a preços básicos) - serviços - administração, defesa, saúde e educação públicas e seguridade social (preços de 2010)",IBGE,"R$ (mil), a preços do ano 2010",81,Regional
+PIBI,PIB Municipal (valor adicionado a preços básicos) - indústria (preços de 2010),IBGE,"R$ (mil), a preços do ano 2010",81,Regional
+PIBIE,PIB Estadual (valor adicionado a preços básicos) - indústria (preços de 2010),IBGE,"R$ (mil), a preços do ano 2010",81,Regional
+PIBIEE,PIB Estadual (valor adicionado a preços básicos) - indústria - extrativa (preços de 2010),IBGE,"R$ (mil), a preços do ano 2010",81,Regional
+PIBITE,PIB Estadual (valor adicionado a preços básicos) - indústria - transformação (preços de 2010),IBGE,"R$ (mil), a preços do ano 2010",81,Regional
+PIBPCE,PIB Estadual per capita - preços de mercado (preços de 2010),IBGE,"R$ (mil), a preços do ano 2010",81,Regional
+PIBPMCE,PIB Estadual - preços de mercado,IBGE,R$ (mil),81,Regional
+PIBSE,"PIB Municipal (valor adicionado a preços básicos) - serviços, exclusive administração, defesa, educação e saúde públicas e seguridade social (preços de 2010)",IBGE,"R$ (mil), a preços do ano 2010",81,Regional
+PIBSEE,PIB Estadual (valor adicionado a preços básicos) - serviços (preços de 2010),IBGE,"R$ (mil), a preços do ano 2010",81,Regional
+PIBTAE,"PIB Estadual (valor adicionado a preços básicos) - serviços - transportes, armazenagem e correio (preços de 2010)",IBGE,"R$ (mil), a preços do ano 2010",81,Regional
+PIBVRAE,PIB Estadual - preços de mercado -  variação anual,IBGE,(%),81,Regional
+FIRJAN_IFDM,IFDM - Índice Firjan de Desenvolvimento Municipal (NOVO),Firjan,-,85,Social
+IDHM,IDHM - Índice de Desenvolvimento Humano Municipal ,IPEA,-,85,Social
+IDHMED,IDHM - Índice de Desenvolvimento Humano Municipal - educação ,IPEA,-,85,Social
+IDHMLO,IDHM - Índice de Desenvolvimento Humano Municipal - longevidade ,IPEA,-,85,Social
+IDHMRE,IDHM - Índice de Desenvolvimento Humano Municipal - renda ,IPEA,-,85,Social
+PNUD_IDH,IDH - Índice de Desenvolvimento Humano (PNUD) - Brasil,PNUD,-,85,Social
+ADH12_ESPVIDA,Esperança de vida ao nascer  (Atlas DH - Pnad Contínua/A) - INATIVA,IPEA/Atlas do Desenvolvimento Humano,Anos,86,Social
+ADH12_POP18M,População de 18 anos ou mais de idade  (IBGE - Pnad Contínua/A),IPEA/Atlas do Desenvolvimento Humano,Mil pessoas,86,Social
+ADH12_POP25M,População de 25 anos ou mais de idade  (IBGE - Pnad Contínua/A),IBGE/PNAD Contínua,Mil pessoas,86,Social
+ADH12_POP65M,População de 65 anos ou mais de idade  (IBGE - Pnad Contínua/A),IBGE/PNAD Contínua,Mil pessoas,86,Social
+ADH12_POPTOT,População total  (IBGE - Pnad Contínua/A),IBGE/PNAD Contínua,Mil pessoas,86,Social
+ADH12_RAZDEP,Razão de dependência  (IBGE - Pnad Contínua/A),IPEA/Atlas do Desenvolvimento Humano,(%),86,Social
+ADH12_T_ENV,Taxa de envelhecimento  (IBGE - Pnad Contínua/A),IPEA/Atlas do Desenvolvimento Humano,(%),86,Social
+ODS_MORT5UF,Taxa de mortalidade até cinco anos de idade (Min. Saúde) - INATIVA,MS,Óbitos por mil,86,Social
+ODS_MORTNUF,Taxa de mortalidade neonatal (Min. Saúde) - INATIVA,MS,Óbitos por mil,86,Social
+DEPIS_POPP_HOM,População residente (homens) - 1º de julho - projeção,IBGE/Pop,Habitante,88,Social
+DEPIS_POPP_MUL,População residente (mulheres) - 1º de julho - projeção,IBGE/Pop,Habitante,88,Social
+ADH12_ANOSEST,Média de anos de estudo - pessoas com 25 anos ou mais (Atlas DH - Pnad Contínua/A) - INATIVA,IPEA/Atlas do Desenvolvimento Humano,Anos,90,Social
+PCT03SVGUF,Crianças de 0 a 3 anos que não frequenta creche ou escola por falta de escola/creche ou vaga (Brasil e Grandes Regiões),IBGE/PNAD Contínua,(%),90,Social
+PCT14CMESBUF,Pessoas de 14 anos ou mais de idade em curso técnico de nível médio que frequentam a modalidade subsequente (Brasil e Grandes Regiões),IBGE/PNAD Contínua,(%),90,Social
+PCT14CMEUF,Estudantes do ensino médio em cursos técnicos de nível médio ou normal (Brasil e Grandes Regiões),IBGE/PNAD Contínua,(%),90,Social
+PCT14CPRFUF,Pessoas de 14 anos ou mais que frequentaram curso de qualificação profissional (Brasil e Grandes Regiões),IBGE/PNAD Contínua,(%),90,Social
+PCT14EMSPNEUF,Pessoas de 14 anos ou mais que concluiram curso técnico de nível médio  com ensino médio completo ou superior incompletam e que não estudam (Brasil e Grandes Regiões),IBGE/PNAD Contínua,(%),90,Social
+PCTEMDMEPBUF,"Estudantes de especialização, mestrado e doutorado que frequentaram o ensino médio somente na rede pública (Brasil e Grandes Regiões)",IBGE/PNAD Contínua,(%),90,Social
+PCTSUPMEPBUF,Estudantes do ensino superior que frequentaram o ensino médio somente na rede pública (Brasil e Grandes Regiões),IBGE/PNAD Contínua,(%),90,Social
+PCTSUPTECUF,Estudantes do ensino superior em cursos de graduação tecnológica (Brasil e Grandes Regiões),IBGE/PNAD Contínua,(%),90,Social
+PNADCA_NMAE25UF,Média de anos de estudo - pessoas com 25 anos ou mais ,IBGE/PNAD Contínua,Anos,90,Social
+PNADCA_PCT1529NOFRUF,Jovens não ocupados e frequentando escola (Brasil e Grandes Regiões),IBGE/PNAD Contínua,(%),90,Social
+PNADCA_PCT1529NONFUF,Jovens não ocupados e não frequentando escola (Brasil e Grandes Regiões),IBGE/PNAD Contínua,(%),90,Social
+PNADCA_PCT1529OCFRUF,"Jovens ocupados e frequentando escola, (Brasil e Grandes Regiões)",IBGE/PNAD Contínua,(%),90,Social
+PNADCA_PCT1529OCNFUF,Jovens ocupados e não frequentando escola (Brasil e Grandes Regiões),IBGE/PNAD Contínua,(%),90,Social
+PNADCA_PCT25FMEUF,Pessoas que não completaram o ensino médio,IBGE/PNAD Contínua,(%),90,Social
+PNADCA_PCT25MSPUF,Pessoas que não completaram o ensino superior,IBGE/PNAD Contínua,(%),90,Social
+PNADCA_PCT25SFUUF,Pessoas que não completaram o ensino fundamental,IBGE/PNAD Contínua,(%),90,Social
+PNADCA_PCT25SUPUF,Pessoas com o ensino superior completo,IBGE/PNAD Contínua,(%),90,Social
+PNADCA_PCTEMDCDISTUF,"Estudantes de especialização, mestrado e doutorado em cursos a distância (Brasil e Grandes Regiões)",IBGE/PNAD Contínua,(%),90,Social
+PNADCA_PCTRPUEUF,Estudantes na rede pública de ensino,IBGE/PNAD Contínua,(%),90,Social
+PNADCA_PCTSPGCDISTUF,Estudantes do ensino superior em cursos a distância (Brasil e Grandes Regiões),IBGE/PNAD Contínua,(%),90,Social
+PNADCA_TXA15MUF,Taxa de analfabetismo - pessoas com 15 anos ou mais,IBGE/PNAD Contínua,(%),90,Social
+PNADCA_TXE00_05UF,Crianças de 0 a 5 anos que frequenta creche ou escola,IBGE/PNAD Contínua,(%),90,Social
+PCT14CMESBUF_BRA,Porcentagem de pessoas de 14 anos ou mais de idade em curso técnico de nível médio que frequentam a modalidade subsequente - Brancos,IBGE/PNAD Contínua,(%),91,Social
+PCT14CMESBUF_NEG,Porcentagem de pessoas de 14 anos ou mais de idade em curso técnico de nível médio que frequentam a modalidade subsequente - Pardos/Pretos,IBGE/PNAD Contínua,(%),91,Social
+PCT14CMEUF_BRA,Estudantes do ensino médio em cursos técnicos de nível médio ou normal - Brancos,IBGE/PNAD Contínua,(%),91,Social
+PCT14CMEUF_NEG,Estudantes do ensino médio em cursos técnicos de nível médio ou normal - Pardos/Pretos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_NMAE25UF_BRA,Número médio de anos de estudo das pessoas com 25 anos ou mais - Brancos,IBGE/PNAD Contínua,Anos,91,Social
+PNADCA_NMAE25UF_NEG,Número médio de anos de estudo das pessoas com 25 anos ou mais - Pardos/Pretos,IBGE/PNAD Contínua,Anos,91,Social
+PNADCA_PCT1529NOFRUF_BRA,Jovens não ocupados e frequentando escola - Brancos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_PCT1529NOFRUF_NEG,Jovens não ocupados e frequentando escola - Pardos/Pretos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_PCT1529NONFUF_BRA,Jovens não ocupados e não frequentando escola - Brancos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_PCT1529NONFUF_NEG,Jovens não ocupados e não frequentando escola - Pardos/Pretos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_PCT1529OCFRUF_BRA,Jovens ocupados e frequentando escola - Brancos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_PCT1529OCFRUF_NEG,Jovens ocupados e frequentando escola - Pardos/Pretos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_PCT1529OCNFUF_BRA,Jovens ocupados e não frequentando escola - Brancos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_PCT1529OCNFUF_NEG,Jovens ocupados e não frequentando escola - Pardos/Pretos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_PCT25FMEUF_BRA,"Porcentagem de pessoas que completaram o ensino fundamental, mas não o médio - Brancos",IBGE/PNAD Contínua,(%),91,Social
+PNADCA_PCT25FMEUF_NEG,"Porcentagem de pessoas que completaram o ensino fundamental, mas não o médio - Pardos/Pretos",IBGE/PNAD Contínua,(%),91,Social
+PNADCA_PCT25MSPUF_BRA,Porcentagem de pessoas que  completaram o ensino médio  mas não o superior - Brancos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_PCT25MSPUF_NEG,Porcentagem de pessoas que  completaram o ensino médio  mas não o superior - Pardos/Pretos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_PCT25SFUUF_BRA,Porcentagem de pessoas que não completaram o ensino fundamental  - Brancos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_PCT25SFUUF_NEG,Porcentagem de pessoas que não completaram o ensino fundamental  - Pardos/Pretos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_PCT25SUPUF_BRA,Porcentagem de pessoas que completaram o ensino superior  - Brancos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_PCT25SUPUF_NEG,Porcentagem de pessoas que completaram o ensino superior  - Pardos/Pretos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_TXA15MUF_BRA,Taxa de analfabetismo - pessoas com 15 anos ou mais - Brancos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_TXA15MUF_NEG,Taxa de analfabetismo - pessoas com 15 anos ou mais - Pardos/Pretos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_TXE00_05UF_BRA,Porcentagem de crianças de 0 a 5 anos que frequenta creche ou escola - Brancos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_TXE00_05UF_NEG,Porcentagem de crianças de 0 a 5 anos que frequenta creche ou escola - Pardos/Pretos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_TXE06_14UF_BRA,Taxa de escolarização: 6-14 anos - Brancos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_TXE06_14UF_NEG,Taxa de escolarização: 6-14 anos - Pardos/Pretos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_TXE15_17UF_BRA,Taxa de escolarização: 15-17 anos - Brancos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_TXE15_17UF_NEG,Taxa de escolarização: 15-17 anos - Pardos/Pretos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_TXE18_24UF_BRA,Taxa de escolarização: 18-24 anos - Brancos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_TXE18_24UF_NEG,Taxa de escolarização: 18-24 anos - Pardos/Pretos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_TXE25_UF_BRA,Taxa de escolarização: 25 anos ou mais - Brancos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_TXE25_UF_NEG,Taxa de escolarização: 25 anos ou mais - Pardos/Pretos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_TXETOTUF_BRA,Taxa de escolarização da população - Brancos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_TXETOTUF_NEG,Taxa de escolarização da população - Pardos/Pretos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_TXFEL06_10FUF_BRA,Taxa ajustada de frequência escolar líquida: 6-14 anos no ensino Fundamental - Brancos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_TXFEL06_10FUF_NEG,Taxa ajustada de frequência escolar líquida: 6-14 anos no ensino Fundamental - Pardos/Pretos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_TXFEL06_14FUF_BRA,Taxa ajustada de frequência escolar líquida: 6 a 10 anos nos anos iniciais do ensino fundamental - Brancos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_TXFEL06_14FUF_NEG,Taxa ajustada de frequência escolar líquida: 6 a 10 anos nos anos iniciais do ensino fundamental - Pardos/Pretos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_TXFEL11_14FUF_BRA,Taxa ajustada de frequência escolar líquida: 11 a 14 anos nos anos finais do ensino fundamental - Brancos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_TXFEL11_14FUF_NEG,Taxa ajustada de frequência escolar líquida: 11 a 14 anos nos anos finais do ensino fundamental - Pardos/Pretos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_TXFEL15_17MUF_BRA,Taxa ajustada de frequência escolar líquida:15 a 17 anos no ensino médio - Brancos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_TXFEL15_17MUF_NEG,Taxa ajustada de frequência escolar líquida:15 a 17 anos no ensino médio - Pardos/Pretos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_TXFEL18_24SUF_BRA,Taxa ajustada de frequência escolar líquida: 18 a 24 no ensino superior - Brancos,IBGE/PNAD Contínua,(%),91,Social
+PNADCA_TXFEL18_24SUF_NEG,Taxa ajustada de frequência escolar líquida: 18 a 24 no ensino superior - Pardos/Pretos,IBGE/PNAD Contínua,(%),91,Social
+PCT14CMESBUF_HOM,Porcentagem de pessoas de 14 anos ou mais de idade em curso técnico de nível médio que frequentam a modalidade subsequente - homem ,IBGE/PNAD Contínua,(%),92,Social
+PCT14CMESBUF_MUL,Porcentagem de pessoas de 14 anos ou mais de idade em curso técnico de nível médio que frequentam a modalidade subsequente - mulher ,IBGE/PNAD Contínua,(%),92,Social
+PCT14CMEUF_HOM,Porcentagem de estudantes do ensino médio em cursos técnicos de nível médio ou normal - homem ,IBGE/PNAD Contínua,(%),92,Social
+PCT14CMEUF_MUL,Porcentagem de estudantes do ensino médio em cursos técnicos de nível médio ou normal - mulher ,IBGE/PNAD Contínua,(%),92,Social
+PCT14EMSPNEUF_HOM,Porcentagem que concluiu curso técnico de nível médio entre pessoas com 14 anos ou mais com ensino médio completo ou superior incompletam e que não estudam - homem ,IBGE/PNAD Contínua,(%),92,Social
+PCT14EMSPNEUF_MUL,Porcentagem que concluiu curso técnico de nível médio entre pessoas com 14 anos ou mais com ensino médio completo ou superior incompletam e que não estudam - mulher ,IBGE/PNAD Contínua,(%),92,Social
+PCTSUPTECUF_HOM,Porcentagem de estudantes do ensino superior em cursos de graduação tecnológica - homem ,IBGE/PNAD Contínua,(%),92,Social
+PCTSUPTECUF_MUL,Porcentagem de estudantes do ensino superior em cursos de graduação tecnológica - mulher ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_NMAE25UF_HOM,Número médio de anos de estudo das pessoas com 25 anos ou mais - homem ,IBGE/PNAD Contínua,Anos,92,Social
+PNADCA_NMAE25UF_MUL,Número médio de anos de estudo das pessoas com 25 anos ou mais - mulher ,IBGE/PNAD Contínua,Anos,92,Social
+PNADCA_PCT1529NOFRUF_HOM,Jovens não ocupados e frequentando escola - homem ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_PCT1529NOFRUF_MUL,Jovens não ocupados e frequentando escola - mulher ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_PCT1529NONFUF_HOM,Jovens não ocupados e não frequentando escola - homem ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_PCT1529NONFUF_MUL,Jovens não ocupados e não frequentando escola - mulher ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_PCT1529OCFRUF_HOM,Jovens ocupados e frequentando escola - homem ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_PCT1529OCFRUF_MUL,Jovens ocupados e frequentando escola - mulher ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_PCT1529OCNFUF_HOM,Jovens ocupados e não frequentando escola - homem ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_PCT1529OCNFUF_MUL,Jovens ocupados e não frequentando escola - mulher ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_PCT25FMEUF_HOM,"Porcentagem de pessoas que completaram o ensino fundamental, mas não o médio - homem ",IBGE/PNAD Contínua,(%),92,Social
+PNADCA_PCT25FMEUF_MUL,"Porcentagem de pessoas que completaram o ensino fundamental, mas não o médio - mulher ",IBGE/PNAD Contínua,(%),92,Social
+PNADCA_PCT25MSPUF_HOM,Porcentagem de pessoas que  completaram o ensino médio  mas não o superior - homem ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_PCT25MSPUF_MUL,Porcentagem de pessoas que  completaram o ensino médio  mas não o superior - mulher ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_PCT25SFUUF_HOM,Porcentagem de pessoas que não completaram o ensino fundamental  - homem ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_PCT25SFUUF_MUL,Porcentagem de pessoas que não completaram o ensino fundamental  - mulher ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_TXA15MUF_HOM,Taxa de analfabetismo - pessoas com 15 anos ou mais - homem ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_TXA15MUF_MUL,Taxa de analfabetismo - pessoas com 15 anos ou mais - mulher ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_TXE00_05UF_HOM,Porcentagem de crianças de 0 a 5 anos que frequenta creche ou escola - homem ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_TXE00_05UF_MUL,Porcentagem de crianças de 0 a 5 anos que frequenta creche ou escola - mulher ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_TXE06_14UF_HOM,Taxa de escolarização: 6-14 anos - homem ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_TXE06_14UF_MUL,Taxa de escolarização: 6-14 anos - mulher ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_TXE15_17UF_HOM,Taxa de escolarização: 15-17 anos - homem ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_TXE15_17UF_MUL,Taxa de escolarização: 15-17 anos - mulher ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_TXE18_24UF_HOM,Taxa de escolarização: 18-24 anos - homem ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_TXE18_24UF_MUL,Taxa de escolarização: 18-24 anos - mulher ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_TXE25_UF_HOM,Taxa de escolarização: 25 anos ou mais - homem ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_TXE25_UF_MUL,Taxa de escolarização: 25 anos ou mais - mulher ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_TXETOTUF_HOM,Taxa de escolarização da população - homem ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_TXETOTUF_MUL,Taxa de escolarização da população - mulher ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_TXFEL06_10FUF_HOM,Taxa ajustada de frequência escolar líquida: 6 a 10 anos nos anos iniciais do ensino fundamental - homem ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_TXFEL06_10FUF_MUL,Taxa ajustada de frequência escolar líquida: 6 a 10 anos nos anos iniciais do ensino fundamental - mulher ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_TXFEL06_14FUF_HOM,Taxa ajustada de frequência escolar líquida: 6-14 anos no ensino Fundamental - homem ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_TXFEL06_14FUF_MUL,Taxa ajustada de frequência escolar líquida: 6-14 anos no ensino Fundamental - mulher ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_TXFEL11_14FUF_HOM,Taxa ajustada de frequência escolar líquida: 11 a 14 anos nos anos finais do ensino fundamental - homem ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_TXFEL11_14FUF_MUL,Taxa ajustada de frequência escolar líquida: 11 a 14 anos nos anos finais do ensino fundamental - mulher ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_TXFEL15_17MUF_HOM,Taxa ajustada de frequência escolar líquida:15 a 17 anos no ensino médio - homem ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_TXFEL15_17MUF_MUL,Taxa ajustada de frequência escolar líquida:15 a 17 anos no ensino médio - mulher ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_TXFEL18_24SUF_HOM,Taxa ajustada de frequência escolar líquida: 18 a 24 no ensino superior - homem ,IBGE/PNAD Contínua,(%),92,Social
+PNADCA_TXFEL18_24SUF_MUL,Taxa ajustada de frequência escolar líquida: 18 a 24 no ensino superior - mulher ,IBGE/PNAD Contínua,(%),92,Social
+Dese_Pnad,Taxa de desemprego (IBGE/Pnad)- INATIVA,IBGE,(%),98,Social
+ADH12_PRENTRAB,Renda proveniente de rendimentos do trabalho  (IBGE - Pnad Contínua/A),IPEA/Atlas do Desenvolvimento Humano,(%),102,Social
+PGINI,Índice de Gini (Pnad/IBGE) - INATIVA,IPEA,-,102,Social
+PNADCA_GINIUF,Índice de Gini (Pnad Contínua/A),IBGE/PNAD Contínua,-,102,Social
+PNADCA_TXPIUF,Taxa de pobreza internacional (SIS/IBGE),IBGE/PNAD Contínua,(%),102,Social
+PNADCA_TXPNUF,Taxa de pobreza nacional (SIS/IBGE),IBGE/PNAD Contínua,(%),102,Social
+PNADCA_TXPPCC300,"Proporção de pessoas abaixo da linha de pobreza de PPC$3,00",IPEA,(%),102,Social
+PNADCA_TXPPCC420,"Proporção de pessoas abaixo da linha de pobreza de PPC$4,20",IPEA,(%),102,Social
+PNADCA_TXPPCC830,"Proporção de pessoas abaixo da linha de pobreza de PPC$8,30",IPEA,(%),102,Social
+SIS_RDPC40,Rendimento domiciliar per capita (Distribuição) - 40% mais pobres (SIS/IBGE),SIS-IBGE,(%),102,Social
+SIS_RDPC90,Rendimento domiciliar per capita (Distribuição) - 10% mais ricos (SIS/IBGE),SIS-IBGE,(%),102,Social
+SIS_RDPCMEDIANO,Rendimento domiciliar per capita mediano (SIS/IBGE),SIS-IBGE,R$ médio do ano,102,Social
+SIS_RDPCMEDIO,Rendimento domiciliar per capita médio (SIS/IBGE),SIS-IBGE,R$ médio do ano,102,Social
+ANS_BNFPLSAUDEUF,Beneficiários de plano de saúde (ANS),ANS,-,106,Social
+SIS_ESTABDTSUSUF,Número de estabelecimentos de diagnose e terapia pelo SUS,DATASUS,-,106,Social
+SIS_ESTABINTSUSUF,Número de estabelecimentos de internação pelo SUS,DATASUS,-,106,Social
+SIS_ESTABSAUDEUF,Número de estabelecimentos de saúde,DATASUS,-,106,Social
+SIS_ESTABURGSUSUF,Número de estabelecimentos de urgência pelo SUS,DATASUS,-,106,Social
+SIS_ESTATAMBUF,Número de estabelecimentos de atendimento ambulatorial pelo SUS,DATASUS,-,106,Social
+SIS_ESTDIAGTERUF,Número de estabelecimentos de diagnose e terapia,DATASUS,-,106,Social
+SIS_ESTTMGCPTSUSUF,Número de estabelecimentos com tomógrafo computadorizado pelo SUS - INATIVA,DATASUS,-,106,Social
+SIS_HOSPDIAUF,Número de hospitais do tipo dia,DATASUS,-,106,Social
+SIS_HOSPESPECUF,Número de hospitais especializados,DATASUS,-,106,Social
+SIS_HOSPGERUF,Número de hospitais do tipo geral,DATASUS,-,106,Social
+SIS_NMENF1000HUF,Enfermeiros por 10.000 habitantes,DATASUS,-,106,Social
+SIS_NMLTCMP1000HUF,Número de leitos complementares (UTI e unidade intermediária) por 10.000 habitantes,DATASUS,-,106,Social
+SIS_NMLTCMPINF1000UF,"Número de leitos complementares infantis (pediátricos + neonatal, UTI e Unidade Intermediária) por 10.000 habitantes",DATASUS,-,106,Social
+SIS_NMLTCMPINFSUS1000UF,"Número de leitos complementares infantis (pediátricos + neonatal, UTI e Unidade Intermediária) pelo SUS por 10.000 habitantes",DATASUS,-,106,Social
+SIS_NMLTCMPSUS1000HUF,Número de leitos complementares pelo SUS (UTI e unidade intermediária) por 10.000 habitantes,DATASUS,-,106,Social
+SIS_NMLTINT1000HUF,Número de leitos para internação por 10.000 habitantes,DATASUS,-,106,Social
+SIS_NMLTINTSUS1000HUF,Número de leitos para internação pelo SUS por 10.000 habitantes,DATASUS,-,106,Social
+SIS_NMLTINTUF,Número de leitos para internação,DATASUS,-,106,Social
+SIS_NMODN1000HUF,Dentistas por 10.000 habitantes,DATASUS,-,106,Social
+SIS_NMTEC1000HUF,Auxiliares e técnicos de saúde por 10.000 habitantes,DATASUS,-,106,Social
+SUS_NMMED10MHUF,Médicos por 10.000 habitantes (proj. pop. 2024),SIS-IBGE,-,106,Social
+PNADCA_NMAE25UF_2539,Número médio de anos de estudo das pessoas com 25 a 39 anos,IBGE/PNAD Contínua,Anos,107,Social
+PNADCA_NMAE25UF_4059,Número médio de anos de estudo das pessoas com 40 a 59 anos,IBGE/PNAD Contínua,Anos,107,Social
+PNADCA_NMAE25UF_60M,Número médio de anos de estudo das pessoas com 60 anos ou mais,IBGE/PNAD Contínua,Anos,107,Social
+PNADCA_PCT1529NOFRUF_1517,Jovens não ocupados e frequentando escola :15 a 17 anos (Brasil e Grandes Regiões),IBGE/PNAD Contínua,(%),107,Social
+PNADCA_PCT1529NOFRUF_1824,Jovens não ocupados e frequentando escola :18 a 24 anos (Brasil e Grandes Regiões),IBGE/PNAD Contínua,(%),107,Social
+PNADCA_PCT1529NOFRUF_2529,Jovens não ocupados e frequentando escola :25 a 29 anos (Brasil e Grandes Regiões),IBGE/PNAD Contínua,(%),107,Social
+PNADCA_PCT1529NONFUF_1517,Jovens não ocupados e não frequentando escola :15 a 17 anos (Brasil e Grandes Regiões),IBGE/PNAD Contínua,(%),107,Social
+PNADCA_PCT1529NONFUF_1824,Jovens não ocupados e não frequentando escola :18 a 24 anos (Brasil e Grandes Regiões),IBGE/PNAD Contínua,(%),107,Social
+PNADCA_PCT1529NONFUF_2529,Jovens não ocupados e não frequentando escola :25 a 29 anos (Brasil e Grandes Regiões),IBGE/PNAD Contínua,(%),107,Social
+PNADCA_PCT1529OCFRUF_1517,Jovens ocupados e frequentando escola :15 a 17 anos (Brasil e Grandes Regiões),IBGE/PNAD Contínua,(%),107,Social
+PNADCA_PCT1529OCFRUF_1824,Jovens ocupados e frequentando escola :18 a 24 anos (Brasil e Grandes Regiões),IBGE/PNAD Contínua,(%),107,Social
+PNADCA_PCT1529OCFRUF_2529,Jovens ocupados e frequentando escola :25 a 29 anos (Brasil e Grandes Regiões),IBGE/PNAD Contínua,(%),107,Social
+PNADCA_PCT1529OCNFUF_1517,Jovens ocupados e não frequentando escola :15 a 17 anos (Brasil e Grandes Regiões),IBGE/PNAD Contínua,(%),107,Social
+PNADCA_PCT1529OCNFUF_1824,Jovens ocupados e não frequentando escola :18 a 24 anos (Brasil e Grandes Regiões),IBGE/PNAD Contínua,(%),107,Social
+PNADCA_PCT1529OCNFUF_2529,Jovens ocupados e não frequentando escola :25 a 29 anos (Brasil e Grandes Regiões),IBGE/PNAD Contínua,(%),107,Social
+PNADCA_TXA15MUF_15M,Taxa de analfabetismo - pessoas com 15 anos ou mais,IBGE/PNAD Contínua,(%),107,Social
+PNADCA_TXA15MUF_18M,Taxa de analfabetismo - pessoas com 18 anos ou mais,IBGE/PNAD Contínua,(%),107,Social
+PNADCA_TXA15MUF_25M,Taxa de analfabetismo - pessoas com 25 anos ou mais,IBGE/PNAD Contínua,(%),107,Social
+PNADCA_TXA15MUF_40M,Taxa de analfabetismo - pessoas com 40 anos ou mais,IBGE/PNAD Contínua,(%),107,Social
+PNADCA_TXA15MUF_60M,Taxa de analfabetismo - pessoas com 60 anos ou mais,IBGE/PNAD Contínua,(%),107,Social
+PNADCA_TXE06_14UF,Taxa de escolarização: 6-14 anos,IBGE/PNAD Contínua,(%),107,Social
+PNADCA_TXE15_17UF,Taxa de escolarização: 15-17 anos,IBGE/PNAD Contínua,(%),107,Social
+PNADCA_TXE18_24UF,Taxa de escolarização: 18-24 anos,IBGE/PNAD Contínua,(%),107,Social
+PNADCA_TXE25_UF,Taxa de escolarização: 25 anos ou mais,IBGE/PNAD Contínua,(%),107,Social
+PNADCA_TXETOTUF,Taxa de escolarização da população,IBGE/PNAD Contínua,(%),107,Social
+PNADCA_TXFEL06_10FUF,Taxa ajustada de frequência escolar líquida: 6 a 10 anos nos anos iniciais do ensino fundamental,IBGE/PNAD Contínua,(%),107,Social
+PNADCA_TXFEL06_14FUF,Taxa ajustada de frequência escolar líquida: 6-14 anos no ensino Fundamental,IBGE/PNAD Contínua,(%),107,Social
+PNADCA_TXFEL11_14FUF,Taxa ajustada de frequência escolar líquida: 11 a 14 anos nos anos finais do ensino fundamental,IBGE/PNAD Contínua,(%),107,Social
+PNADCA_TXFEL15_17MUF,Taxa ajustada de frequência escolar líquida:15 a 17 anos no ensino médio,IBGE/PNAD Contínua,(%),107,Social
+PNADCA_TXFEL18_24SUF,Taxa ajustada de frequência escolar líquida: 18 a 24 no ensino superior,IBGE/PNAD Contínua,(%),107,Social
+AVS_IVS,IVS - Índice de Vulnerabilidade Social,IPEA / Atlas da Vulnerabilidade Social,-,115,Social
+AVS_IVSCH,IVS - subíndice de Capital Humano,IPEA / Atlas da Vulnerabilidade Social,-,115,Social
+AVS_IVSIU,IVS - subíndice de Infraestrutura Urbana,IPEA / Atlas da Vulnerabilidade Social,-,115,Social
+AVS_IVSRT,IVS - subíndice de Renda e Trabalho,IPEA / Atlas da Vulnerabilidade Social,-,115,Social

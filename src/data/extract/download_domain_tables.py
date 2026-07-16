@@ -45,6 +45,7 @@ TABELAS_ESPECIAIS = {
     'S_CID'      : 'cid.csv',            # TD_CID — fonte primária: código, descrição, hierarquia
     'etnia'      : 'etnia.csv',           # TD_ETNIA — CNV com código/descrição
     'br_regsaud' : 'regsaud.csv',         # TD_MUNICIPIO.NO_REGIAO_SAUDE — CNV código município → região saúde
+    'TCNESBR'    : 'tcnes.csv',           # TD_HOSPITAL — colunas: CNES, NOMEFANT 
 }
 
 # ---------------------------------------------------------------------------
@@ -758,6 +759,26 @@ def extrair_cadhosp(registros_dbf: list, caminho: Path) -> bool:
         for r in registros_dbf:
             w.writerow([r.get(c, '') for c in colunas_out])
     logger.info(f"  {caminho.name:<25s} {len(registros_dbf):>6,} registros (-{n_filtrados} sem CGC)")
+    return True
+
+def extrair_tcnes(registros_dbf: list, caminho: Path) -> bool:
+    """TCNESBR.dbf — extrai CNES, NOMEFANT para TD_HOSPITAL (join direto por CNES)."""
+    if not registros_dbf:
+        return False
+    colunas_disponiveis = list(registros_dbf[0].keys())
+    col_cnes = next((c for c in colunas_disponiveis if 'CNES' in c.upper()), None)
+    col_nome = next((c for c in colunas_disponiveis if 'NOMEFANT' in c.upper()), None)
+    colunas_out = [c for c in [col_cnes, col_nome] if c]
+    if not colunas_out:
+        logger.warning("  TCNESBR: nenhuma coluna esperada encontrada")
+        return False
+
+    with open(caminho, 'w', newline='', encoding='utf-8') as f:
+        w = csv.writer(f)
+        w.writerow(colunas_out)
+        for r in registros_dbf:
+            w.writerow([r.get(c, '') for c in colunas_out])
+    logger.info(f"  {caminho.name:<25s} {len(registros_dbf):>6,} registros")
     return True
 
 

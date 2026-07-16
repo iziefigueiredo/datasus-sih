@@ -1,0 +1,86 @@
+85 4
+     85  --- Não especificado ou ignorado                       -zzzz
+     01  Órgão Público do Poder Executivo Federal           1015
+     02  Órgão Público do Poder Exec Estadual ou Distr Fed  1023
+     03  Órgão Público do Poder Executivo Municipal         1031
+     04  Órgão Público do Poder Legislativo Federal         1040
+     05  Órgão Público do Poder Legisl Estadual ou Dist Fed 1058
+     06  Órgão Público do Poder Legislativo Municipal       1066
+     07  Órgão Público do Poder Judiciário Federal          1074
+     08  Órgão Público do Poder Judiciário Estadual         1082
+     09  Autarquia Federal                                  1104
+     10  Autarquia Estadual ou do Distrito Federal          1112
+     11  Autarquia Municipal                                1120
+     12  Fundação Federal                                   1139
+     13  Fundação Estadual ou do Distrito Federal           1147
+     14  Fundação Municipal                                 1155
+     15  Órgão Público Autônomo Federal                     1163
+     16  Órgão Público Autônomo Estadual ou Distr Federal   1171
+     17  Órgão Público Autônomo Municipal                   1180
+     18  Comissão Polinacional                              1198
+     19  Fundo Público                                      1201
+     20  Consórcio Públ de Direito Público (Assoc Pública)  1210
+     21  Consórcio Públ de Direito Privado                  1228
+     22  Estado ou Distrito Federal                         1236
+     23  Município                                          1244
+     24  Fundação Pública de Direito Privado Federal        1252
+     25  Fund Públ de Direito Privado Estadual ou do DF     1260
+     26  Fundação Pública de Direito Privado Municipal      1279
+     27  Empresa Pública                                    2011
+     28  Sociedade de Economia Mista                        2038
+     29  Sociedade Anônima Aberta                           2046
+     30  Sociedade Anônima Fechada                          2054
+     31  Sociedade Empresária Limitada                      2062
+     32  Sociedade Empresária em Nome Coletivo              2070
+     33  Sociedade Empresária em Comandita Simples          2089
+     34  Sociedade Empresária em Comandita por Ações        2097
+     35  Sociedade em Conta de Participação                 2127
+     36  Empresário (Individual)                            2135
+     37  Cooperativa                                        2143
+     38  Consórcio de Sociedades                            2151
+     39  Grupo de Sociedades                                2160
+     40  Estabelecimento no Brasil de Sociedade Estrangeira 2178
+     41  Estab no Brasil Empr Binacional Argentina-Brasil   2194
+     42  Empresa Domiciliada no Exterior                    2216
+     43  Clube/Fundo de Investimento                        2224
+     44  Sociedade Simples Pura                             2232
+     45  Sociedade Simples Limitada                         2240
+     46  Sociedade Simples em Nome Coletivo                 2259
+     47  Sociedade Simples em Comandita Simples             2267
+     48  Empresa Binacional                                 2275
+     49  Consórcio de Empregadores                          2283
+     50  Consórcio Simples                                  2291
+     51  Empr Individ Responsab Limitada (Natur Empresária) 2305
+     52  Empr Individ Responsab Limitada (Natureza Simples) 2313
+     53  Sociedade Unipessoal de Advogados                  2321
+     54  Cooperativas de Consumo                            2330
+     55  Serviço Notarial e Registral (Cartório)            3034
+     56  Fundação Privada                                   3069
+     57  Serviço Social Autônomo                            3077
+     58  Condomínio Edilício                                3085
+     59  Comissão de Conciliação Prévia                     3107
+     60  Entidade de Mediação e Arbitragem                  3115
+     61  Partido Político                                   3123
+     62  Entidade Sindical                                  3131
+     63  Estab no Brasil de Fundação ou Associação Estrang  3204
+     64  Fundação ou Associação Domiciliada no Exterior     3212
+     65  Organização Religiosa                              3220
+     66  Comunidade Indígena                                3239
+     67  Fundo Privado                                      3247
+     68  Órgão de Direção Nacional de Partido Político      3255
+     69  Órgão de Direção Regional de Partido Político      3263
+     70  Órgão de Direção Local de Partido Político         3271
+     71  Comitê Financeiro de Partido Político              3280
+     72  Frente Plebiscitária ou Referendária               3298
+     73  Organização Social (OS)                            3306
+     74  Demais Condomínios                                 3310
+     75  Associação Privada                                 3999
+     76  Empresa Individual Imobiliária                     4014
+     77  Segurado Especial                                  4022
+     78  Contribuinte Individual                            4081
+     79  Candidato a Cargo Político Eletivo                 4090
+     80  Leiloeiro                                          4111
+     81  Produtor Rural (Pessoa Física)                     4124
+     82  Organização Internacional                          5010
+     83  Representação Diplomática Estrangeira              5029
+     84  Outras Instituições Extraterritoriais              5037

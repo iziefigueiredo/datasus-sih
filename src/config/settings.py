@@ -58,7 +58,10 @@ class Settings:
     # =========================================================================
 
     # Escopo padrão de UFs — pode ser sobrescrito via CLI em cada script
-    UF_DEFAULT = ["AC"]
+    UF_DEFAULT = ["AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO",
+                  "MA", "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI",
+                  "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO",
+                ]
     
     # Janela temporal do pipeline
     ANOS_INICIO  = 2008
@@ -89,9 +92,17 @@ class Settings:
     # =========================================================================
 
     # DuckDB — banco analítico local gerado pelo pipeline
-    DB_PATH = BASE_DIR / "sihrd8.duckdb"
+    DB_PATH = BASE_DIR / "sihrd6.duckdb"
 
-  
+    # PostgreSQL — reservado para deploy em ambiente compartilhado
+    DB_CONFIG = {
+        "host":     "localhost",
+        "port":     5432,
+        "database": "sihrd5",
+        "user":     "postgres",
+        "password": "1234",  # substituir por variável de ambiente em produção
+    }
+
     # =========================================================================
     # 5. ARQUIVOS DE APOIO — tabelas de domínio (dimensões estáticas)
     #
@@ -118,6 +129,7 @@ class Settings:
         "complexidade":   "complexidade.csv",   # TAB_SIH / COMPLEX2.cnv — complexidade assistencial
         "regsaud":        "regsaud.csv",        # TAB_SIH / br_regsaud.cnv — regiões de saúde (TD_MUNICIPIO.NO_REGIAO_SAUDE)
         "cadhosp":        "cadhosp.csv",        # TAB_SIH / CADHOSP.DBF — razão social hospitais (TD_HOSPITAL.NO_HOSPITAL)
+        'tcnes' :         'tcnes.csv',          # TD_HOSPITAL — colunas: CNES, NOMEFANT (join direto, sem CGC)
         # socioeconomico: gerado pelo pipeline (parquet) — não é arquivo de apoio estático
     }
 
@@ -171,7 +183,7 @@ class Settings:
     LEITOS_FILENAME         = "leitos.parquet"
     MEDICOS_FILENAME        = "medicos.parquet"
     SOCIOECONOMICO_FILENAME = "socioeconomico.parquet"
-    IPEA_FILENAME           = "ipea_saude.parquet"
+
     # =========================================================================
     # MÉTODOS
     # =========================================================================

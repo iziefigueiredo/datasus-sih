@@ -1,0 +1,91 @@
+N 90 4
+       90  --- Não especificado ou ignorado                                                                         -zzzz
+       01  1. Administração Pública                                                                             1000-1999,
+   01  02  101-5 Órgão Público do Poder Executivo Federal                                                       1015
+   01  03  102-3 Órgão Público do Poder Executivo Estadual ou do Distrito Federal                               1023
+   01  04  103-1 Órgão Público do Poder Executivo Municipal                                                     1031
+   01  05  104-0 Órgão Público do Poder Legislativo Federal                                                     1040
+   01  06  105-8 Órgão Público do Poder Legislativo Estadual ou do Distrito Federal                             1058
+   01  07  106-6 Órgão Público do Poder Legislativo Municipal                                                   1066
+   01  08  107-4 Órgão Público do Poder Judiciário Federal                                                      1074
+   01  09  108-2 Órgão Público do Poder Judiciário Estadual                                                     1082
+   01  10  110-4 Autarquia Federal                                                                              1104
+   01  11  111-2 Autarquia Estadual ou do Distrito Federal                                                      1112
+   01  12  112-0 Autarquia Municipal                                                                            1120
+   01  13  113-9 Fundação Pública de Direito Público Federal                                                    1139
+   01  14  114-7 Fundação Pública de Direito Público Estadual ou do Distrito Federal                            1147
+   01  15  115-5 Fundação Pública de Direito Público Municipal                                                  1155
+   01  16  116-3 Órgão Público Autônomo Federal                                                                 1163
+   01  17  117-1 Órgão Público Autônomo Estadual ou do Distrito Federal                                         1171
+   01  18  118-0 Órgão Público Autônomo Municipal                                                               1180
+   01  19  119-8 Comissão Polinacional                                                                          1198
+   01  20  120-1 Fundo Público                                                                                  1201
+   01  21  121-0 Consórcio Público de Direito Público (Associação Pública)                                      1210
+   01  22  122-8 Consórcio Público de Direito Privado                                                           1228
+   01  23  123-6 Estado ou Distrito Federal                                                                     1236
+   01  24  124-4 Município                                                                                      1244
+   01  25  125-2 Fundação Pública de Direito Privado Federal                                                    1252
+   01  26  126-0 Fundação Pública de Direito Privado Estadual ou do Distrito Federal                            1260
+   01  27  127-9 Fundação Pública de Direito Privado Municipal                                                  1279
+       28  2. Entidades Empresariais                                                                            2000-2999,
+   28  29  201-1 Empresa Pública                                                                                2011
+   28  30  203-8 Sociedade de Economia Mista                                                                    2038
+   28  31  204-6 Sociedade Anônima Aberta                                                                       2046
+   28  32  205-4 Sociedade Anônima Fechada                                                                      2054
+   28  33  206-2 Sociedade Empresária Limitada                                                                  2062
+   28  34  207-0 Sociedade Empresária em Nome Coletivo                                                          2070
+   28  35  208-9 Sociedade Empresária em Comandita Simples                                                      2089
+   28  36  209-7 Sociedade Empresária em Comandita por Ações                                                    2097
+   28  37  212-7 Sociedade em Conta de Participação                                                             2127
+   28  38  213-5 Empresário (Individual)                                                                        2135
+   28  39  214-3 Cooperativa                                                                                    2143
+   28  40  215-1 Consórcio de Sociedades                                                                        2151
+   28  41  216-0 Grupo de Sociedades                                                                            2160
+   28  42  217-8 Estabelecimento, no Brasil, de Sociedade Estrangeira                                           2178
+   28  43  219-4 Estabelecimento, no Brasil, de Empresa Binacional Argentino-Brasileira                         2194
+   28  44  221-6 Empresa Domiciliada no Exterior                                                                2216
+   28  45  222-4 Clube/Fundo de Investimento                                                                    2224
+   28  46  223-2 Sociedade Simples Pura                                                                         2232
+   28  47  224-0 Sociedade Simples Limitada                                                                     2240
+   28  48  225-9 Sociedade Simples em Nome Coletivo                                                             2259
+   28  49  226-7 Sociedade Simples em Comandita Simples                                                         2267
+   28  50  227-5 Empresa Binacional                                                                             2275
+   28  51  228-3 Consórcio de Empregadores                                                                      2283
+   28  52  229-1 Consórcio Simples                                                                              2291
+   28  53  230-5 Empresa Individual de Responsabilidade Limitada (de Natureza Empresária)                       2305
+   28  54  231-3 Empresa Individual de Responsabilidade Limitada (de Natureza Simples)                          2313
+   28  55  232-1 Sociedade Unipessoal de Advogados                                                              2321
+   28  56  233-0 Cooperativas de Consumo                                                                        2330
+       57  3. Entidades sem Fins Lucrativos                                                                     3000-3999,
+   56  58  303-4 Serviço Notarial e Registral (Cartório)                                                        3034
+   56  59  306-9 Fundação Privada                                                                               3069
+   56  60  307-7 Serviço Social Autônomo                                                                        3077
+   56  61  308-5 Condomínio Edilício                                                                            3085
+   56  62  310-7 Comissão de Conciliação Prévia                                                                 3107
+   56  63  311-5 Entidade de Mediação e Arbitragem                                                              3115
+   56  64  312-3 Partido Político                                                                               3123
+   56  65  313-1 Entidade Sindical                                                                              3131
+   56  66  320-4 Estabelecimento, no Brasil, de Fundação ou Associação Estrangeiras                             3204
+   56  67  321-2 Fundação ou Associação Domiciliada no Exterior                                                 3212
+   56  68  322-0 Organização Religiosa                                                                          3220
+   56  69  323-9 Comunidade Indígena                                                                            3239
+   56  70  324-7 Fundo Privado                                                                                  3247
+   56  71  325-5 Órgão de Direção Nacional de Partido Político                                                  3255
+   56  72  326-3 Órgão de Direção Regional de Partido Político                                                  3263
+   56  73  327-1 Órgão de Direção Local de Partido Político                                                     3271
+   56  74  328-0 Comitê Financeiro de Partido Político                                                          3280
+   56  75  329-8 Frente Plebiscitária ou Referendária                                                           3298
+   56  76  330-6 Organização Social (OS)                                                                        3306
+   56  77  331-0 Demais Condomínios                                                                             3310
+   56  78  399-9 Associação Privada                                                                             3999
+       79  4. Pessoas Físicas                                                                                   4000-4999,
+   79  80  401-4 Empresa Individual Imobiliária                                                                 4014
+   79  81  402-2 Segurado Especial                                                                              4022
+   79  82  408-1 Contribuinte individual                                                                        4081
+   79  83  409-0 Candidato a Cargo Político Eletivo                                                             4090
+   79  84  411-1 Leiloeiro                                                                                      4111
+   79  85  412-4 Produtor Rural (Pessoa Física)                                                                 4124
+       86  5. Org Internacionais e Outras Instituições Extraterritoriais                                        5000-5999,
+   86  87  501-0 Organização Internacional                                                                      5010
+   86  88  502-9 Representação Diplomática Estrangeira                                                          5029
+   86  89  503-7 Outras Instituições Extraterritoriais                                                          5037

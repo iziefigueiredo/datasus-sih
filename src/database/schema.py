@@ -57,7 +57,6 @@ _TD_MUNICIPIO: TableSchema = {
         "CO_MUNICIPIO_7D": pl.Int32,
         "NO_MUNICIPIO":    pl.String,
         "SG_UF":           pl.String,
-        "NO_REGIAO_SAUDE": pl.String,   # nullable
         "latitude":        pl.Float32,
         "longitude":       pl.Float32,
     },
@@ -433,13 +432,6 @@ _TD_SOCIOECONOMICO: TableSchema = {
         "VL_LEITOS_SUS_1000": pl.Float64,  # leitos SUS (excl. psiq.) / pop x 1.000
         "QT_MEDICOS":         pl.Int32,
         "VL_MEDICOS_1000":    pl.Float64,  # medicos unicos (CPF) / pop x 1.000
-        "QT_BENEFICIARIOS_PLANO_SAUDE": pl.Int64,    # beneficiários planos privados (ANS)
-        "QT_ESTAB_INTERNACAO_SUS":      pl.Int32,    # estabelecimentos de internação SUS
-        "QT_ESTAB_SAUDE":               pl.Int32,    # estabelecimentos de saúde (total)
-        "QT_ESTAB_URGENCIA_SUS":        pl.Int32,    # estabelecimentos de urgência SUS
-        "VL_ENFERMEIROS_1000":          pl.Float64,  # enfermeiros / pop x 1.000
-        "VL_TECNICOS_SAUDE_1000":       pl.Float64,  # aux./técnicos de saúde / pop x 1.000
-        "VL_LEITOS_UTI_SUS_1000":       pl.Float64,  # leitos UTI SUS / pop x 1.000
     },
     "primary_key": ["CO_MUNICIPIO_6D", "NU_ANO"],
     "foreign_keys": [

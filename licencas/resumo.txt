@@ -1,0 +1,275 @@
+ANÁLISE DE LICENÇAS DE DEPENDÊNCIAS
+BaseSUS Database — Julho 2026
+
+Perguntas avaliadas em cada licença:
+  1. Permite que o novo código seja protegido (proprietário)?
+  2. Exige que o código permaneça open-source?
+  3. Permite utilização para fins comerciais?
+
+================================================================================
+
+BIBLIOTECA: dbt-core
+VERSÃO: 1.11.11
+LICENÇA: Apache License 2.0
+
+  1. Permite proteger o novo código?   SIM
+  2. Exige open-source?                NÃO (só se redistribuir o dbt modificado)
+  3. Permite uso comercial?            SIM
+
+  Fundamentação:
+  - Seção 4: "You may add Your own copyright statement to Your modifications
+    and may provide additional or different license terms and conditions"
+  - Seção 4: as obrigações só se ativam se houver redistribuição da biblioteca
+  - Seção 2: "no-charge, royalty-free, irrevocable copyright license [...]
+    sublicense, and distribute the Work"
+  - Seção 3: "patent license to make, have made, use, offer to sell, sell,
+    import, and otherwise transfer the Work"
+
+  Observação: no uso como ferramenta CLI (dbt run / dbt test), sem
+  redistribuição do dbt-core, nenhuma obrigação se aplica na prática.
+
+================================================================================
+
+
+================================================================================
+
+BIBLIOTECA: dbt-duckdb
+VERSÃO: 1.10.1
+LICENÇA: Apache License 2.0
+
+  1. Permite proteger o novo código?   SIM
+  2. Exige open-source?                NÃO (só se redistribuir o dbt-duckdb modificado)
+  3. Permite uso comercial?            SIM
+
+  Fundamentação:
+  - Seção 4: "You may add Your own copyright statement to Your modifications
+    and may provide additional or different license terms and conditions"
+  - Seção 4: as obrigações só se ativam se houver redistribuição da biblioteca
+  - Seção 2: "no-charge, royalty-free, irrevocable copyright license [...]
+    sublicense, and distribute the Work"
+  - Seção 3: "patent license to make, have made, use, offer to sell, sell,
+    import, and otherwise transfer the Work"
+
+  Observação: usado como plugin CLI do dbt, sem redistribuição.
+  Nenhuma obrigação se aplica na prática.
+
+================================================================================
+
+
+================================================================================
+
+BIBLIOTECA: DuckDB
+VERSÃO: 1.4.4
+LICENÇA: MIT License
+
+  1. Permite proteger o novo código?   SIM
+  2. Exige open-source?                NÃO
+  3. Permite uso comercial?            SIM
+
+  Fundamentação:
+  - "Permission is hereby granted, free of charge, to any person obtaining
+    a copy of this software [...] to deal in the Software without
+    restriction, including without limitation the rights to use, copy,
+    modify, merge, publish, distribute, sublicense, and/or sell copies
+    of the Software"
+  - Única obrigação: "The above copyright notice and this permission notice
+    shall be included in all copies or substantial portions of the Software"
+
+  Observação: a MIT é a licença mais permissiva. A única exigência é manter
+  o aviso de copyright do DuckDB em redistribuições. Não há qualquer
+  restrição sobre o código que usa a biblioteca.
+
+================================================================================
+
+
+================================================================================
+
+BIBLIOTECA: Pandas
+VERSÃO: 2.3.3
+LICENÇA: BSD 3-Clause License
+
+  1. Permite proteger o novo código?   SIM
+  2. Exige open-source?                NÃO
+  3. Permite uso comercial?            SIM
+
+  Fundamentação:
+  - "Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions
+    are met"
+  - As únicas condições são:
+    (a) manter o aviso de copyright em redistribuições de código-fonte
+    (b) reproduzir o aviso de copyright em redistribuições binárias
+    (c) não usar o nome dos autores para promover produtos derivados
+        sem permissão escrita prévia
+
+  Observação: a BSD-3-Clause é equivalente à MIT em permissividade.
+
+================================================================================
+
+
+================================================================================
+
+BIBLIOTECA: Polars
+VERSÃO: 1.31.0
+LICENÇA: MIT License
+
+  1. Permite proteger o novo código?   SIM
+  2. Exige open-source?                NÃO
+  3. Permite uso comercial?            SIM
+
+  Fundamentação:
+  - "Permission is hereby granted, free of charge, to any person obtaining
+    a copy of this software [...] to deal in the Software without
+    restriction, including without limitation the rights to use, copy,
+    modify, merge, publish, distribute, sublicense, and/or sell copies
+    of the Software"
+  - Única obrigação: "The above copyright notice and this permission notice
+    shall be included in all copies or substantial portions of the Software"
+
+  Observação: mesma estrutura da MIT do DuckDB. Nenhuma restrição sobre
+  o código que usa a biblioteca. Única exigência é manter o aviso de
+  copyright em redistribuições.
+
+================================================================================
+
+
+================================================================================
+
+BIBLIOTECA: psutil
+VERSÃO: 5.9.8
+LICENÇA: BSD 3-Clause License
+
+  1. Permite proteger o novo código?   SIM
+  2. Exige open-source?                NÃO
+  3. Permite uso comercial?            SIM
+
+  Fundamentação:
+  - "Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions
+    are met"
+  - As únicas condições são:
+    (a) manter o aviso de copyright em redistribuições de código-fonte
+    (b) reproduzir o aviso de copyright em redistribuições binárias
+    (c) "Neither the name of the psutil authors nor the names of its
+        contributors may be used to endorse or promote products derived
+        from this software without specific prior written permission"
+
+  Observação: mesma estrutura BSD-3 do Pandas. Nenhuma restrição sobre
+  o código que usa a biblioteca.
+
+================================================================================
+
+
+================================================================================
+
+BIBLIOTECA: PyArrow
+VERSÃO: 20.0.0
+LICENÇA: Apache License 2.0
+
+  1. Permite proteger o novo código?   SIM
+  2. Exige open-source?                NÃO (só se redistribuir o PyArrow modificado)
+  3. Permite uso comercial?            SIM
+
+  Fundamentação:
+  - Seção 4: "You may add Your own copyright statement to Your modifications
+    and may provide additional or different license terms and conditions"
+  - Seção 4: as obrigações só se ativam se houver redistribuição da biblioteca
+  - Seção 2: "no-charge, royalty-free, irrevocable copyright license [...]
+    sublicense, and distribute the Work"
+  - Seção 3: "patent license to make, have made, use, offer to sell, sell,
+    import, and otherwise transfer the Work"
+
+  Observação: mesmas cláusulas Apache 2.0 do dbt-core. Nenhuma restrição
+  sobre o código que usa a biblioteca.
+
+================================================================================
+
+
+================================================================================
+
+BIBLIOTECA: PySUS
+VERSÃO: 1.0.1
+LICENÇA: GNU General Public License v3.0 (GPL-3.0)
+
+  1. Permite proteger o novo código?   DEPENDE
+  2. Exige open-source?                DEPENDE (veja observação)
+  3. Permite uso comercial?            SIM (com restrições)
+
+  Fundamentação:
+  - Seção 0 (definição de "propagate"): "executing it on a computer or
+    modifying a private copy" NÃO é considerado distribuição, uso interno
+    é livre.
+  - Seção 2: "You may make, run and propagate covered works that you do
+    not convey, without conditions"
+  - Seção 5c: "You must license the entire work, as a whole, under this
+    License to anyone who comes into possession of a copy" — obrigação
+    ativada SOMENTE ao distribuir.
+  - Último parágrafo: "The GNU General Public License does not permit
+    incorporating your program into proprietary programs."
+
+  PONTO CRÍTICO — efeito copyleft:
+  Se o software for DISTRIBUÍDO (entregue a terceiros, vendido, publicado):
+    - O projeto inteiro deve ser licenciado sob GPL-3.0
+    - O código-fonte completo deve ser disponibilizado
+    - NÃO é possível manter o código proprietário/fechado
+
+  Se o software for usado APENAS INTERNAMENTE (sem distribuição):
+    - Nenhuma obrigação copyleft se aplica
+    - O código pode permanecer fechado
+
+  Observação: A proteção como software proprietário é INCOMPATÍVEL com a GPL-3.0
+  caso o software seja distribuído. 
+================================================================================
+
+
+================================================================================
+
+BIBLIOTECA: tqdm
+VERSÃO: 4.64.0
+LICENÇA: MIT License + Mozilla Public License 2.0 (MPL 2.0)
+
+  1. Permite proteger o novo código?   SIM
+  2. Exige open-source?                NÃO (copyleft limitado ao arquivo)
+  3. Permite uso comercial?            SIM
+
+  Fundamentação — MIT (partes originais):
+  - "Permission is hereby granted, free of charge [...] to deal in the
+    Software without restriction, including [...] sell copies of the Software"
+
+  Fundamentação — MPL 2.0 (arquivos de Casper da Costa-Luis):
+  - Copyleft em nível de ARQUIVO: se você modificar um arquivo do tqdm
+    coberto pela MPL 2.0, esse arquivo específico deve permanecer MPL 2.0.
+  - Seus próprios arquivos que apenas USAM o tqdm podem ter qualquer
+    licença, incluindo proprietária.
+  - Diferença crítica em relação à GPL: a MPL 2.0 NÃO contamina o
+    projeto inteiro — só os arquivos modificados do próprio tqdm.
+
+  Observação: no uso padrão (sem modificar o código-fonte do tqdm),
+  nenhuma obrigação copyleft se aplica. 
+
+================================================================================
+
+
+================================================================================
+
+BIBLIOTECA: Requests
+VERSÃO: 2.34.2
+LICENÇA: Apache License 2.0
+
+  1. Permite proteger o novo código?   SIM
+  2. Exige open-source?                NÃO (só se redistribuir o Requests modificado)
+  3. Permite uso comercial?            SIM
+
+  Fundamentação:
+  - Seção 4: "You may add Your own copyright statement to Your modifications
+    and may provide additional or different license terms and conditions"
+  - Seção 4: as obrigações só se ativam se houver redistribuição da biblioteca
+  - Seção 2: "no-charge, royalty-free, irrevocable copyright license [...]
+    sublicense, and distribute the Work"
+  - Seção 3: "patent license to make, have made, use, offer to sell, sell,
+    import, and otherwise transfer the Work"
+
+  Observação: mesmas cláusulas Apache 2.0 das demais. Nenhuma restrição
+  sobre o código que usa a biblioteca.
+
+================================================================================

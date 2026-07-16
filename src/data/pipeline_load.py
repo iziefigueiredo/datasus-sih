@@ -93,15 +93,6 @@ FORCE_STRING = {
     "cid":           {"RESTRSEXO": pl.String},
 }
 
-COLUMN_RENAME = {
-    "municipios": {
-        "codigo_6d":   "CO_MUNICIPIO_6D",
-        "codigo_ibge": "CO_MUNICIPIO_7D",
-        "nome":        "NO_MUNICIPIO",
-        "estado":      "SG_UF",
-    },
-}
-
 SENTINELAS = {
     # --- Confirmados úteis pelo check_sentinels.py ---
     #"instrucao":      [{"INSTRU": 0, "DESCRICAO": "Não informado"},   # 182M registros
@@ -140,6 +131,14 @@ SENTINELAS = {
     #                 não sequenciais. Código inexistente no domínio, lixo de digitação.
 }
 
+COLUMN_RENAME = {
+    "municipios": {
+        "codigo_6d":   "CO_MUNICIPIO_6D",
+        "codigo_ibge": "CO_MUNICIPIO_7D",
+        "nome":        "NO_MUNICIPIO",
+        "estado":      "SG_UF",
+    },
+}
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -203,6 +202,7 @@ def criar_schema(con: duckdb.DuckDBPyConnection):
 # Etapa: Carregar dimensões (CSVs → DuckDB)
 # ---------------------------------------------------------------------------
 
+
 def carregar_dimensoes(con: duckdb.DuckDBPyConnection):
     """Converte CSVs de apoio para DataFrames e insere nas tabelas de dimensão."""
     logger.info(f"\n  {'DIMENSÃO':<25s} {'REGISTROS':>10s}")
@@ -221,7 +221,7 @@ def carregar_dimensoes(con: duckdb.DuckDBPyConnection):
         overrides = FORCE_STRING.get(nome, {})
         df = pl.read_csv(csv_path, infer_schema_length=10000,
                          encoding="utf8", schema_overrides=overrides)
-        
+
         if nome in COLUMN_RENAME:
             rename_map = {k: v for k, v in COLUMN_RENAME[nome].items() if k in df.columns}
             df = df.rename(rename_map)
@@ -258,11 +258,11 @@ def carregar_dimensoes(con: duckdb.DuckDBPyConnection):
             n_removidas = n_antes - len(df_load)
             if n_removidas > 0:
                 logger.warning(f"  {nome}: {n_removidas} linha(s) com {pk_col} nulo removidas")
+
         con.execute(f'INSERT INTO "{nome}" BY NAME SELECT * FROM df_load')
         logger.info(f"  {nome:<25s} {len(df_load):>10,}")
 
-        
-        del df, df_load
+        del df, df_load    
 
 
 # ---------------------------------------------------------------------------
@@ -500,7 +500,34 @@ def carregar_hospital(con: duckdb.DuckDBPyConnection, hospitais: list):
         .sort("CNES")
     )
 
-    # Enriquecimento com cadhosp
+    # Padroniza CNES do lado do fato (remove espaço, garante 7 dígitos)
+    df_grouped = df_grouped.with_columns(
+        pl.col("CNES").cast(pl.String).str.strip_chars().str.pad_start(7, "0").alias("CNES")
+    )
+
+    # Enriquecimento com tcnes (fonte primária, join direto por CNES)
+    tcnes_path = Settings.get_support_file_path("tcnes")
+    if tcnes_path.exists():
+        tcnes = pl.read_csv(tcnes_path, infer_schema_length=10000,
+                             encoding="utf8", schema_overrides={"CNES": pl.String})
+        col_nome = next((c for c in tcnes.columns if "NOMEFANT" in c.upper()), None)
+
+        if col_nome:
+            tcnes_dedup = (
+                tcnes.with_columns(
+                    pl.col("CNES").str.strip_chars().str.pad_start(7, "0").alias("CNES")
+                )
+                .unique(subset=["CNES"], keep="first")
+                .select(["CNES", col_nome])
+                .rename({col_nome: "NO_HOSPITAL"})
+            )
+            df_grouped = df_grouped.join(tcnes_dedup, on="CNES", how="left")
+        else:
+            df_grouped = df_grouped.with_columns(pl.lit(None).cast(pl.String).alias("NO_HOSPITAL"))
+    else:
+        df_grouped = df_grouped.with_columns(pl.lit(None).cast(pl.String).alias("NO_HOSPITAL"))
+
+    # Fallback com cadhosp para os que ainda ficaram sem nome
     cadhosp_path = Settings.get_support_file_path("cadhosp")
     if cadhosp_path.exists():
         cadhosp = pl.read_csv(cadhosp_path, infer_schema_length=10000,
@@ -508,7 +535,7 @@ def carregar_hospital(con: duckdb.DuckDBPyConnection, hospitais: list):
         col_razao = next((c for c in cadhosp.columns if "RAZAO" in c.upper() or "NOME" in c.upper()), None)
         col_cgc = next((c for c in cadhosp.columns if "CGC" in c.upper()), None)
 
-        if col_razao and col_cgc:
+        if col_razao and col_cgc and "CGC_HOSP" in df_grouped.columns:
             cadhosp = cadhosp.with_columns(
                 pl.col(col_cgc).cast(pl.String).str.strip_chars()
                 .str.replace_all(r"[^0-9]", "").str.pad_start(14, "0")
@@ -518,15 +545,16 @@ def carregar_hospital(con: duckdb.DuckDBPyConnection, hospitais: list):
                 cadhosp.sort(col_cgc, descending=True)
                 .unique(subset=["CGC_HOSP_PAD"], keep="first")
                 .select(["CGC_HOSP_PAD", col_razao])
-                .rename({col_razao: "NO_HOSPITAL", "CGC_HOSP_PAD": "CGC_HOSP"})
+                .rename({col_razao: "NO_HOSPITAL_FALLBACK", "CGC_HOSP_PAD": "CGC_HOSP"})
             )
-            df_grouped = df_grouped.join(cadhosp_dedup, on="CGC_HOSP", how="left")
-            n_match = df_grouped.filter(pl.col("NO_HOSPITAL").is_not_null()).height
-            logger.info(f"    Nomes: {n_match}/{len(df_grouped)} hospitais com razão social")
-        else:
-            df_grouped = df_grouped.with_columns(pl.lit(None).cast(pl.String).alias("NO_HOSPITAL"))
-    else:
-        df_grouped = df_grouped.with_columns(pl.lit(None).cast(pl.String).alias("NO_HOSPITAL"))
+            df_grouped = (
+                df_grouped.join(cadhosp_dedup, on="CGC_HOSP", how="left")
+                .with_columns(pl.coalesce(["NO_HOSPITAL", "NO_HOSPITAL_FALLBACK"]).alias("NO_HOSPITAL"))
+                .drop("NO_HOSPITAL_FALLBACK")
+            )
+
+    n_match = df_grouped.filter(pl.col("NO_HOSPITAL").is_not_null()).height
+    logger.info(f"    Nomes: {n_match}/{len(df_grouped)} hospitais com nome (tcnes + fallback cadhosp)")
 
     # Remove CGC_HOSP (era só ponte para o merge)
     if "CGC_HOSP" in df_grouped.columns:
@@ -537,9 +565,6 @@ def carregar_hospital(con: duckdb.DuckDBPyConnection, hospitais: list):
     df_load = df_grouped.select([c for c in colunas_destino if c in df_grouped.columns])
     con.execute('INSERT INTO "hospital" BY NAME SELECT * FROM df_load')
     logger.info(f"  {'hospital':<25s} {len(df_load):>10,}")
-
-    del df, df_grouped, df_load
-
 
 # ---------------------------------------------------------------------------
 # Etapa: Carregar socioeconômico 

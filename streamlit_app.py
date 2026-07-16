@@ -83,12 +83,27 @@ def get_municipios(uf: str) -> list[tuple[int, str]]:
     ).fetchall()
 
 
+@st.cache_data
+def buscar_procedimentos(termo: str) -> list[tuple[str, str]]:
+    """Busca por código (PROC_REA) ou nome (NOME_PROC), case-insensitive."""
+    if len(termo.strip()) < 2:
+        return []
+    con = get_connection()
+    like = f"%{termo.strip()}%"
+    return con.execute(
+        'SELECT "PROC_REA", "NOME_PROC" FROM "procedimentos" '
+        'WHERE "PROC_REA" ILIKE ? OR "NOME_PROC" ILIKE ? '
+        'ORDER BY "NOME_PROC" LIMIT 50',
+        [like, like],
+    ).fetchall()
+
+
 def build_query(
     ano_ini: int,
     ano_fim: int,
     uf: str,
     municipios_sel: list[int],
-    proc_rea: str,
+    procedimentos_sel: list[str],
     colunas: list[str],
 ) -> tuple[str, str, list]:
     """Monta a projeção de colunas e a cláusula FROM/WHERE separadamente,
@@ -100,12 +115,13 @@ def build_query(
     from_sql = 'FROM "internacoes" i JOIN "municipios" m ON i."MUNIC_RES" = m."CO_MUNICIPIO_6D"'
     params: list = []
 
-    if proc_rea:
+    if procedimentos_sel:
+        placeholders = ", ".join("?" for _ in procedimentos_sel)
         from_sql += (
             ' JOIN "internacao_procedimento" ip'
-            ' ON i."N_AIH" = ip."N_AIH" AND ip."PROC_REA" = ?'
+            f' ON i."N_AIH" = ip."N_AIH" AND ip."PROC_REA" IN ({placeholders})'
         )
-        params.append(proc_rea.strip())
+        params += procedimentos_sel
 
     where = ['i."DT_INTER" BETWEEN ? AND ?', 'm."SG_UF" = ?']
     params += [date(ano_ini, 1, 1), date(ano_fim, 12, 31), uf]
@@ -154,7 +170,19 @@ def render_extracao(con: duckdb.DuckDBPyConnection) -> None:
     )
     municipios_sel = [municipios_por_label[m] for m in municipios_escolhidos]
 
-    proc_rea = st.text_input("Código do procedimento (PROC_REA) — opcional")
+    termo_proc = st.text_input("Buscar procedimento por código ou nome — opcional")
+    procedimentos_sel: list[str] = []
+    if termo_proc:
+        resultados = buscar_procedimentos(termo_proc)
+        if not resultados:
+            st.caption("Nenhum procedimento encontrado.")
+        else:
+            procedimentos_por_label = {f"{nome} ({cod})": cod for cod, nome in resultados}
+            procedimentos_escolhidos = st.multiselect(
+                "Selecione o(s) procedimento(s)",
+                options=list(procedimentos_por_label.keys()),
+            )
+            procedimentos_sel = [procedimentos_por_label[p] for p in procedimentos_escolhidos]
 
     colunas = st.multiselect(
         "Colunas de internacoes a incluir",
@@ -168,10 +196,12 @@ def render_extracao(con: duckdb.DuckDBPyConnection) -> None:
     formato = st.radio("Formato de exportação", ["CSV", "Parquet"], horizontal=True)
 
     select_cols_sql, from_where_sql, params = build_query(
-        ano_ini, ano_fim, uf, municipios_sel, proc_rea, colunas
+        ano_ini, ano_fim, uf, municipios_sel, procedimentos_sel, colunas
     )
-    select_sql = f"SELECT {select_cols_sql} {from_where_sql}"
-    count_sql = f"SELECT COUNT(*) {from_where_sql}"
+    # DISTINCT: selecionar mais de um procedimento pode multiplicar a mesma
+    # internação (uma linha por procedimento batido no JOIN).
+    select_sql = f"SELECT DISTINCT {select_cols_sql} {from_where_sql}"
+    count_sql = f'SELECT COUNT(DISTINCT i."N_AIH") {from_where_sql}'
 
     st.subheader("Preview (100 primeiras linhas)")
     st.dataframe(con.execute(select_sql + " LIMIT 100", params).arrow())

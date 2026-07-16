@@ -64,9 +64,23 @@ def get_connection() -> duckdb.DuckDBPyConnection:
     return duckdb.connect(DB_PATH, read_only=True)
 
 
+def get_cursor() -> duckdb.DuckDBPyConnection:
+    """Um cursor independente por sessão Streamlit.
+
+    A conexão de get_connection() é única e compartilhada por todas as
+    sessões (st.cache_resource). Rodar queries direto nela quebra sob
+    concorrência — duas sessões (ou dois reruns) executando ao mesmo tempo
+    invalidam o stream de resultado uma da outra ("Query Stream is closed").
+    Um cursor por sessão isola cada uma sem abrir um novo arquivo por query.
+    """
+    if "db_cursor" not in st.session_state:
+        st.session_state.db_cursor = get_connection().cursor()
+    return st.session_state.db_cursor
+
+
 @st.cache_data
 def get_ufs() -> list[str]:
-    con = get_connection()
+    con = get_cursor()
     rows = con.execute(
         'SELECT DISTINCT "SG_UF" FROM "municipios" ORDER BY "SG_UF"'
     ).fetchall()
@@ -75,7 +89,7 @@ def get_ufs() -> list[str]:
 
 @st.cache_data
 def get_municipios(uf: str) -> list[tuple[int, str]]:
-    con = get_connection()
+    con = get_cursor()
     return con.execute(
         'SELECT "CO_MUNICIPIO_6D", "NO_MUNICIPIO" FROM "municipios" '
         'WHERE "SG_UF" = ? ORDER BY "NO_MUNICIPIO"',
@@ -88,7 +102,7 @@ def buscar_procedimentos(termo: str) -> list[tuple[str, str]]:
     """Busca por código (PROC_REA) ou nome (NOME_PROC), case-insensitive."""
     if len(termo.strip()) < 2:
         return []
-    con = get_connection()
+    con = get_cursor()
     like = f"%{termo.strip()}%"
     return con.execute(
         'SELECT "PROC_REA", "NOME_PROC" FROM "procedimentos" '
@@ -120,8 +134,10 @@ def build_query(
         from_sql += (
             ' JOIN "internacao_procedimento" ip'
             f' ON i."N_AIH" = ip."N_AIH" AND ip."PROC_REA" IN ({placeholders})'
+            ' JOIN "procedimentos" p ON ip."PROC_REA" = p."PROC_REA"'
         )
         params += procedimentos_sel
+        select_cols += ['ip."PROC_REA"', 'p."NOME_PROC"']
 
     where = ['i."DT_INTER" BETWEEN ? AND ?', 'm."SG_UF" = ?']
     params += [date(ano_ini, 1, 1), date(ano_fim, 12, 31), uf]
@@ -198,13 +214,14 @@ def render_extracao(con: duckdb.DuckDBPyConnection) -> None:
     select_cols_sql, from_where_sql, params = build_query(
         ano_ini, ano_fim, uf, municipios_sel, procedimentos_sel, colunas
     )
-    # DISTINCT: selecionar mais de um procedimento pode multiplicar a mesma
-    # internação (uma linha por procedimento batido no JOIN).
+    # DISTINCT: com filtro de procedimento, PROC_REA/NOME_PROC entram no
+    # SELECT — uma internação com vários procedimentos selecionados gera
+    # uma linha por procedimento batido (fan-out esperado, não duplicata).
     select_sql = f"SELECT DISTINCT {select_cols_sql} {from_where_sql}"
-    count_sql = f'SELECT COUNT(DISTINCT i."N_AIH") {from_where_sql}'
+    count_sql = f"SELECT COUNT(*) FROM ({select_sql}) t"
 
     st.subheader("Preview (100 primeiras linhas)")
-    st.dataframe(con.execute(select_sql + " LIMIT 100", params).arrow())
+    st.dataframe(con.execute(select_sql + " LIMIT 100", params).fetch_arrow_table())
 
     total = con.execute(count_sql, params).fetchone()[0]
     st.metric("Linhas no recorte filtrado", f"{total:,}".replace(",", "."))
@@ -242,7 +259,7 @@ def render_dominio(con: duckdb.DuckDBPyConnection) -> None:
 
     preview_tabela = escolhidas[0]
     st.subheader(f"Preview — {preview_tabela}")
-    st.dataframe(con.execute(f'SELECT * FROM "{preview_tabela}" LIMIT 100').arrow())
+    st.dataframe(con.execute(f'SELECT * FROM "{preview_tabela}" LIMIT 100').fetch_arrow_table())
 
     if st.button("Gerar ZIP para download"):
         ext = "csv" if formato == "CSV" else "parquet"
@@ -268,7 +285,7 @@ def main() -> None:
         st.error(f"Banco não encontrado em '{DB_PATH}'. Ajuste a constante DB_PATH no topo do arquivo.")
         return
 
-    con = get_connection()
+    con = get_cursor()
     aba_internacoes, aba_dominio = st.tabs(["Extrair Internações", "Tabelas de Domínio"])
     with aba_internacoes:
         render_extracao(con)

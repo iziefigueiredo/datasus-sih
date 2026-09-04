@@ -1,10 +1,11 @@
 """Painel Streamlit para extração de dados do SIH/DATASUS."""
 
+import pandas as pd
 import streamlit as st
 
 from src.app.queries import (
-    list_procedimentos, list_ufs, list_options,
-    extrair_internacoes, extrair_socioeconomico, extrair_municipios,
+    list_procedimentos, list_ufs, list_options, list_cid_options,
+    extrair_internacoes, extrair_por_cid, extrair_socioeconomico, extrair_municipios,
 )
 
 st.set_page_config(page_title="SIH/DATASUS - Extração", layout="wide")
@@ -12,7 +13,12 @@ st.title("Extração de dados SIH/DATASUS")
 
 dataset = st.sidebar.selectbox(
     "O que você quer extrair?",
-    ["Internações (SIH)", "Socioeconômico", "Municípios"],
+    [
+        "Internações (SIH)",
+        "Internações por CID-10 (modelo Friedrich et al.)",
+        "Socioeconômico",
+        "Municípios",
+    ],
 )
 st.sidebar.subheader("Filtros")
 
@@ -40,6 +46,33 @@ if dataset == "Internações (SIH)":
             st.session_state["resultado"] = extrair_internacoes(
                 proc_cods, uf_sel, ano_ini, ano_fim, sexo_cods, raca_cods
             )
+
+elif dataset == "Internações por CID-10 (modelo Friedrich et al.)":
+    st.sidebar.caption(
+        "Agrega internações e custo (VAL_TOT) por ano/UF/sexo/faixa etária "
+        "para um grupo de CID-10 -- mesmo desenho da macrocosting analysis "
+        "de Friedrich et al. sobre cefaleias (Rev Saúde Pública, 2026)."
+    )
+    busca_cid = st.sidebar.text_input("Buscar CID (código, descrição, grupo ou capítulo)", "G43")
+    cid_opcoes = list_cid_options(busca_cid) if busca_cid else pd.DataFrame(columns=["codigo", "descricao"])
+    cid_labels = cid_opcoes["codigo"] + " - " + cid_opcoes["descricao"] if not cid_opcoes.empty else pd.Series(dtype=str)
+
+    cid_sel = st.sidebar.multiselect("CID-10", cid_labels.tolist(), default=cid_labels.tolist())
+    uf_sel = st.sidebar.multiselect("UF", list_ufs())
+    ano_ini, ano_fim = st.sidebar.slider("Período", 2008, 2024, (2008, 2023))
+    sexo_df = list_options("SEXO")
+    sexo_sel = st.sidebar.multiselect("Sexo", sexo_df["descricao"])
+
+    cid_cods = cid_opcoes[cid_labels.isin(cid_sel)]["codigo"].tolist() if cid_sel else []
+    sexo_cods = sexo_df[sexo_df["descricao"].isin(sexo_sel)]["codigo"].tolist()
+
+    pode_extrair = bool(cid_cods)
+    if not pode_extrair:
+        st.info("Busque e selecione ao menos um CID-10 para habilitar a extração.")
+
+    if st.sidebar.button("Gerar tabela agregada", disabled=not pode_extrair):
+        with st.spinner("Consultando o banco..."):
+            st.session_state["resultado"] = extrair_por_cid(cid_cods, uf_sel, ano_ini, ano_fim, sexo_cods)
 
 elif dataset == "Socioeconômico":
     uf_sel = st.sidebar.multiselect("UF", list_ufs())

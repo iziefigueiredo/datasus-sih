@@ -41,6 +41,19 @@ def list_ufs() -> list:
         return conn.execute(query).df()["SG_UF"].tolist()
 
 
+def list_cid_options(busca: str) -> pd.DataFrame:
+    """Busca CIDs por trecho do código, descrição, grupo ou capítulo."""
+    query = """
+        SELECT CID AS codigo, DESCRICAO AS descricao
+        FROM cid
+        WHERE CID ILIKE ? OR DESCRICAO ILIKE ? OR DS_GRUPO ILIKE ? OR DS_CAPITULO ILIKE ?
+        ORDER BY CID
+    """
+    termo = f"%{busca}%"
+    with get_conn() as conn:
+        return conn.execute(query, [termo, termo, termo, termo]).df()
+
+
 def extrair_internacoes(procs, ufs, ano_ini, ano_fim, sexos, racas) -> pd.DataFrame:
     """
     Uma linha por internação x procedimento selecionado, já decodificada.
@@ -89,6 +102,53 @@ def extrair_internacoes(procs, ufs, ano_ini, ano_fim, sexos, racas) -> pd.DataFr
         LEFT JOIN cid           cid  ON cid.CID = i.DIAG_PRINC
         LEFT JOIN municipios    mun  ON mun.CO_MUNICIPIO_6D = i.MUNIC_RES
         WHERE {where}
+    """
+    with get_conn() as conn:
+        return conn.execute(query, params).df()
+
+
+def extrair_por_cid(cids, ufs, ano_ini, ano_fim, sexos) -> pd.DataFrame:
+    """
+    Réplica do desenho de Friedrich et al. (macrocosting de internações
+    por CID-10, Rev Saude Publica 2026): agrega internações e custo total
+    (VAL_TOT) por ano, UF, sexo e faixa etária para um grupo de CIDs --
+    não entrega linha a linha, já sai pronta para análise de tendência.
+    Faixas etárias replicam os cortes usados no artigo (0-18 / 19-59 / 60+).
+    """
+    filtros = ["i.DT_INTER BETWEEN ? AND ?"]
+    params = [f"{ano_ini}-01-01", f"{ano_fim}-12-31"]
+
+    filtros.append(f"i.DIAG_PRINC IN ({','.join(['?'] * len(cids))})")
+    params += cids
+    if ufs:
+        filtros.append(f"mun.SG_UF IN ({','.join(['?'] * len(ufs))})")
+        params += ufs
+    if sexos:
+        filtros.append(f"i.SEXO IN ({','.join(['?'] * len(sexos))})")
+        params += sexos
+
+    where = " AND ".join(filtros)
+    query = f"""
+        SELECT
+            YEAR(i.DT_INTER) AS ANO,
+            mun.SG_UF,
+            sexo.DESCRICAO   AS SEXO,
+            CASE
+                WHEN i.IDADE < 19 THEN '0-18'
+                WHEN i.IDADE BETWEEN 19 AND 59 THEN '19-59'
+                ELSE '60+'
+            END              AS FAIXA_ETARIA,
+            cid.DESCRICAO    AS DIAGNOSTICO,
+            COUNT(*)         AS INTERNACOES,
+            SUM(i.VAL_TOT)   AS CUSTO_TOTAL,
+            AVG(i.VAL_TOT)   AS CUSTO_MEDIO
+        FROM internacoes i
+        LEFT JOIN sexo       sexo ON sexo.SEXO = i.SEXO
+        LEFT JOIN municipios mun  ON mun.CO_MUNICIPIO_6D = i.MUNIC_RES
+        LEFT JOIN cid        cid  ON cid.CID = i.DIAG_PRINC
+        WHERE {where}
+        GROUP BY ANO, mun.SG_UF, sexo.DESCRICAO, FAIXA_ETARIA, cid.DESCRICAO
+        ORDER BY ANO, mun.SG_UF
     """
     with get_conn() as conn:
         return conn.execute(query, params).df()

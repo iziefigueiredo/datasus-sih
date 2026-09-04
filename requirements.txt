@@ -12,3 +12,4 @@ python-dotenv==1.0.1
 duckdb==1.4.4
 requests>=2.31.0
 dbt-duckdb
+streamlit
